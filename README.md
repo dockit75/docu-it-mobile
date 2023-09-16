@@ -39,7 +39,3 @@ This docu-it-mobile application is designed to help users scan, upload, and shar
 - **Scanning**: Open the app and navigate to the scan screen. Place the document to be scanned in view and press the scan button.
 - **Uploading**: Navigate to the upload screen and select a document from your device's storage.
 - **Sharing**: After scanning or uploading, select the document and use the share button to share it with your family members.
-
-
-
-
