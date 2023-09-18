@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, Text, Button, TouchableOpacity, StyleSheet, Image, ImageBackground, KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, KeyboardAvoidingView } from 'react-native';
 import { normalize, normalizeVertical, screenHeight, screenWidth } from '../utilities/measurement';
 import {
   CodeField,
@@ -7,20 +7,18 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
-import DeviceInfo from 'react-native-device-info';
 import { COLORS } from '../utilities/colors';
 import { Images } from '../assets/images/images';
 import PhoneInput from 'react-native-phone-number-input';
 import { FONTALIGNMENT } from '../utilities/Fonts';
 import NetworkManager from '../services/NetworkManager';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { retrieveCurrentScreen, retrieveUserSession, storeCurrentScreen } from '../storageManager';
+import { retrieveUserSession} from '../storageManager';
 import { Snackbar } from 'react-native-paper';
 
-const CELL_COUNT = 5;
-const OTPVerification = ({ route, navigation }) => {
+  const CELL_COUNT = 5;
+  const OTPVerification = ({ route, navigation }) => {
   const userData = route?.params?.userData;
-  const [uniqueId, setUniqueId] = useState('');
   const [verificationMethod, setVerificationMethod] = useState('email');
   const [error, setError] = useState(false)
   const [value, setValue] = useState('');
@@ -36,67 +34,11 @@ const OTPVerification = ({ route, navigation }) => {
   useEffect(() => {
     // Get the unique device ID when the component mounts
     const fetchUniqueId = async () => {
-      // const id = await DeviceInfo.getUniqueId();
-      // setUniqueId(id);
       const data = await retrieveUserSession();
               console.log('****regpage***', data);
     };
-
     fetchUniqueId();
   }, []);
-
-
-  // useEffect( async () => {
-  //   // Get the unique device ID when the component mounts
-  //   const fetchUniqueId = async () => {
-  //     const id = await DeviceInfo.getUniqueId();
-  //     setUniqueId(id);
-  //     storeCurrentScreen('OTPVerification');
-  //     const data = await retrieveUserSession();
-  //     const curScreen = await retrieveCurrentScreen();
-  //     console.log(data,'------------otp data');
-  //     console.log(curScreen,'----------otp current scr')
-  //     // await storeUserSession({ currentScreen });
-  //   };
-
-  //   fetchUniqueId();
-  // }, []);
-
-  // const handleSubmit = async () => {
-  //   try {
-  //     if (value.length <= 5) {
-  //       let payload = {};
-  //       if (verificationMethod === 'email') {
-  //         payload = {
-  //           email: userData.emailId,
-  //           code: value
-  //         };
-  //       } else {
-  //         payload = {
-  //           phone: userData?.phoneNo,
-  //           code: value
-  //         };
-  //       }
-  //       const res = await NetworkManager.verifyEmail(payload, verificationMethod);
-
-  //       if (res.status === 200) {
-  //         setValue('');
-  //         navigation.navigate("PinGenerationScreen");
-  //       } else {
-  //         // Handle other HTTP status codes or error responses here
-  //         setSnackbarMessage('Please enter the PIN');
-  //         setSnackbarVisible(true);
-  //       }
-  //     } else {
-  //       setSnackbarMessage('Invalid OTP');
-  //       setSnackbarVisible(true);
-  //     }
-  //   } catch (error) {
-  //     console.error('error', error);
-  //     setSnackbarMessage('Invalid OTP');
-  //     setSnackbarVisible(true); // You can customize the error message here
-  //   }
-  // };
 
   const handleSubmit = async () => {
     try {
@@ -140,7 +82,6 @@ const OTPVerification = ({ route, navigation }) => {
     }
   };
   
-
   const handleResentCode = () => {
     try {
       payload = {
@@ -213,8 +154,7 @@ const OTPVerification = ({ route, navigation }) => {
               <TouchableOpacity onPress={handleResentCode}><Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}> Resend Code</Text></TouchableOpacity>
             </View>
             <View style={{ marginVertical: normalize(20) }}>
-              {error ? <Text style={{ color: 'red', fontSize: 16, fontWeight: '500', letterSpacing: 1.5, }}>{error}</Text> : null}
-
+              {/* {error ? <Text style={{ color: 'red', fontSize: 16, fontWeight: '500', letterSpacing: 1.5, }}>{error}</Text> : null} */}
             </View>
             <View>
               <TouchableOpacity style={styles.button} onPress={handleSubmit}>
@@ -242,7 +182,6 @@ const OTPVerification = ({ route, navigation }) => {
       >
         {snackbarMessage}
       </Snackbar>
-
     </SafeAreaView>
   );
 };
@@ -261,7 +200,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     justifyContent: 'center',
     color: 'white'
-
   },
   signupText: {
     marginVertical: normalize(10),
@@ -348,7 +286,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     borderBottomWidth: 0.5,
     borderBottomColor: 'black',
-
   },
   container: {
     justifyContent: 'center',
@@ -361,7 +298,6 @@ const styles = StyleSheet.create({
     height: normalizeVertical(50),
     borderRadius: normalize(50),
     backgroundColor: '#e3e3e3cc',
-    // marginBottom: normalize(15),
     borderWidth: normalize(1),
     alignItems: FONTALIGNMENT.center,
   },
@@ -371,25 +307,20 @@ const styles = StyleSheet.create({
     height: normalizeVertical(50),
     borderRadius: normalize(50),
     backgroundColor: '#e3e3e3cc',
-    // marginBottom: normalize(15),
     alignItems: FONTALIGNMENT.center,
   },
   phoneInputContainer: {
     backgroundColor: 'transparent',
     width: screenWidth * 0.65,
-    // right: 70,
   },
   phoneInputTextContainer: {
     height: screenHeight * 0.06,
     backgroundColor: 'transparent',
     right: 35,
     paddingTop: normalize(12),
-
   },
   phoneInputTextStyle: {
-    // paddingRight: normalize(8),
     position: 'absolute',
-    // width: screenWidth * 0.58,
     fontSize: 18,
     fontWeight: '500',
     left: 48,
@@ -402,7 +333,7 @@ const styles = StyleSheet.create({
     paddingRight: 0
   },
   Snackbar: {
-    backgroundColor: COLORS.redIcon,
+    backgroundColor: 'rgb(195,0,0)',
     color: 'white',
   }
 });

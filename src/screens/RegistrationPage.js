@@ -1,11 +1,10 @@
-
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView,  Dimensions, ImageBackground, Image, ScrollView,  } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, ScrollView, } from 'react-native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { normalize, normalizeVertical, screenHeight, screenWidth } from '../utilities/measurement';
 import DeviceInfo from 'react-native-device-info';
-import { retrieveCurrentScreen, retrieveUserSession, storeCurrentScreen, storeUserSession } from '../storageManager';
+import { retrieveUserSession, storeUserSession } from '../storageManager';
 import { useDispatch, useSelector } from 'react-redux';
 import { Images } from '../assets/images/images';
 import PhoneInput from "react-native-phone-number-input";
@@ -13,8 +12,7 @@ import { FONTALIGNMENT } from "../utilities/Fonts";
 import { COLORS } from "../utilities/colors";
 import NetworkManager from '../services/NetworkManager';
 import { setUser } from '../slices/UserSlices';
-import { SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-// import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const RegistrationPage = ({ navigation }) => {
     const [phoneNo, setPhoneNo] = useState('');
@@ -36,7 +34,7 @@ const RegistrationPage = ({ navigation }) => {
         setSelectedOption(option);
         setIsOpen(false);
     };
- 
+
     const isAuthenticated = useSelector((state) => state.user);
     // console.log('--respage ---redux--', isAuthenticated );
     const initialValues = {
@@ -47,8 +45,8 @@ const RegistrationPage = ({ navigation }) => {
     };
 
     const cleanTextFields = () => {
-        phoneInput.current.setState({number:''})
-   };
+        phoneInput.current.setState({ number: '' })
+    };
 
     useEffect(() => {
         (async () => {
@@ -73,27 +71,24 @@ const RegistrationPage = ({ navigation }) => {
         gender: yup.string().required('Please choose your gender'),
     });
     const deviceId = DeviceInfo.getUniqueId();
-
-    const handleRegistration = async (values, {resetForm}) => {
+    const handleRegistration = async (values, { resetForm }) => {
         try {
-            
             dispatch(setUser(values));
             const payload = {
-                name: values.userName, 
+                name: values.userName,
                 email: values.emailId,
-                gender:values.gender,
+                gender: values.gender,
                 phone: values.phoneNo,
-                deviceId: uniqueId.toString() + '01231'
+                deviceId: uniqueId.toString() + '012311'
             }
-            await storeUserSession({ ...payload , isAuthenticated: true});
-           
+            await storeUserSession({ ...payload, isAuthenticated: true });
             NetworkManager.signUp(payload).then(res => {
                 if (res.data.code === 200) {
-                    navigation.navigate("OTPVerification", { userData: values })                   
+                    navigation.navigate("OTPVerification", { userData: values })
                     cleanTextFields();
-                    resetForm();                  
+                    resetForm();
                 }
-            }).catch(error =>  {
+            }).catch(error => {
                 console.error('error', error.response);
             })
         } catch (error) {
@@ -112,150 +107,129 @@ const RegistrationPage = ({ navigation }) => {
 
     const handleLogin = (resetForm) => {
         navigation.navigate('LockScreen')
-           resetForm();
-           cleanTextFields();
+        resetForm();
+        cleanTextFields();
     }
+
     return (
-    
-            <ScrollView>
-            <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{width: screenWidth , height: screenHeight + insets.top,}}>                  
-                        <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
-                        <Text style={styles.signup} >Registration</Text>
-                        <Formik innerRef={formikRef} validationSchema={loginValidationSchema} initialValues={initialValues} onSubmit={(values,resetForm) => {handleRegistration(values,resetForm)}}>
-                            {({ values, handleChange, handleBlur, errors, handleSubmit, touched, resetForm, isSubmitting, setFieldValue }) => (
-                                <View style={styles.container}>
-                                    <View>
-                                        <TextInput
-                                            placeholder="Username"
-                                            placeholderTextColor='black'
-                                            onChangeText={handleChange('userName')}
-                                            onBlur={handleBlur('userName')}
-                                            value={values.userName}
-                                            style={[styles.input, errors.userName &&
-                                                touched?.userName && {
-                                                borderColor: '#ff00009c',
-                                                borderWidth: 2
-                                            },]}
-                                        />
-                                    </View>
-                                    <TouchableOpacity style={[styles.mobileInputView,
-                                    errors.phoneNo &&
-                                    touched?.phoneNo && {
+        <ScrollView>
+            <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
+                <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
+                <Text style={styles.signup} >Registration</Text>
+                <Formik innerRef={formikRef} validationSchema={loginValidationSchema} initialValues={initialValues} onSubmit={(values, resetForm) => { handleRegistration(values, resetForm) }}>
+                    {({ values, handleChange, handleBlur, errors, handleSubmit, touched, resetForm, isSubmitting, setFieldValue }) => (
+                        <View style={styles.container}>
+                            <View>
+                                <TextInput
+                                    placeholder="Username"
+                                    placeholderTextColor='black'
+                                    onChangeText={handleChange('userName')}
+                                    onBlur={handleBlur('userName')}
+                                    value={values.userName}
+                                    style={[styles.input, errors.userName &&
+                                        touched?.userName && {
                                         borderColor: '#ff00009c',
                                         borderWidth: 2
-                                    },]}>
-                                        <PhoneInput
-                                            ref={phoneInput}
-                                            defaultValue={values.phoneNo}
-                                            defaultCode="IN"
-                                            onChangeFormattedText={(text) => {
-                                                setPhoneNo(text)
-                                            }}
-                                            disableArrowIcon={true}
-                                            containerStyle={styles.phoneInputContainer
-                                            }
-                                            textContainerStyle={styles.phoneInputTextContainer}
-                                            textInputStyle={styles.phoneInputTextStyle}
-                                            textInputProps={{
-                                                maxLength: 15,
-                                                placeholder: 'Phone Number',
-                                                placeholderTextColor:'black'
-                                            }}
-                                            // codeTextStyle={{fontSize: 17}}
-                                            flagButtonStyle={{right: 0.5, paddingBottom: 2}}
-                                            keyboardType="number-pad"
-                                            onChangeText={handleChange('phoneNo')}
-                                            onBlur={handleBlur('phoneNo')}
-                                            
-                                        />
-                                    </TouchableOpacity>
-
-                                    <View>
-                                        <TextInput
-                                            placeholder="Email"
-                                            placeholderTextColor='black'
-                                            onChangeText={handleChange('emailId')}
-                                            onBlur={handleBlur('emailId')}
-                                            value={values.emailId}
-                                            style={[styles.input, errors.emailId &&
-                                                touched?.emailId && {
-                                                borderColor: '#ff00009c',
-                                                borderWidth: 2,
-                                            },]}
-                                            keyboardType="email-address"
-                                        />
-
+                                    },]}
+                                />
+                            </View>
+                            <TouchableOpacity style={[styles.mobileInputView,
+                            errors.phoneNo &&
+                            touched?.phoneNo && {
+                                borderColor: '#ff00009c',
+                                borderWidth: 2
+                            },]}>
+                                <PhoneInput
+                                    ref={phoneInput}
+                                    defaultValue={values.phoneNo}
+                                    defaultCode="IN"
+                                    onChangeFormattedText={(text) => {
+                                        setPhoneNo(text)
+                                    }}
+                                    disableArrowIcon={true}
+                                    containerStyle={styles.phoneInputContainer
+                                    }
+                                    textContainerStyle={styles.phoneInputTextContainer}
+                                    textInputStyle={styles.phoneInputTextStyle}
+                                    textInputProps={{
+                                        maxLength: 15,
+                                        placeholder: 'Phone Number',
+                                        placeholderTextColor: 'black'
+                                    }}
+                                    // codeTextStyle={{fontSize: 17}}
+                                    flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
+                                    keyboardType="number-pad"
+                                    onChangeText={handleChange('phoneNo')}
+                                    onBlur={handleBlur('phoneNo')}
+                                />
+                            </TouchableOpacity>
+                            <View>
+                                <TextInput
+                                    placeholder="Email"
+                                    placeholderTextColor='black'
+                                    onChangeText={handleChange('emailId')}
+                                    onBlur={handleBlur('emailId')}
+                                    value={values.emailId}
+                                    style={[styles.input, errors.emailId &&
+                                        touched?.emailId && {
+                                        borderColor: '#ff00009c',
+                                        borderWidth: 2,
+                                    },]}
+                                    keyboardType="email-address"
+                                />
+                            </View>
+                            <View>
+                                <TouchableOpacity style={[styles.dropdownContainer,
+                                errors.gender && touched?.gender && {
+                                    borderColor: '#ff00009c',
+                                    borderWidth: 1.5
+                                }]}
+                                    onBlur={handleBlur('gender')}
+                                    onPress={toggleDropdown}>
+                                    <Text style={[styles.selectedOption, values.gender && { color: 'black', fontWeight: '600' }]}>{values.gender || 'Choose Gender'}</Text>
+                                    {isOpen ? (
+                                        <Image source={Images.DROPDOWN_UP} style={styles.icon} />
+                                    ) : (
+                                        <Image source={Images.DROPDOWN} style={styles.icon} />
+                                    )
+                                    }
+                                </TouchableOpacity>
+                                {isOpen && (
+                                    <View style={styles.optionsContainer}>
+                                        {options.map((option) => (
+                                            <TouchableOpacity
+                                                key={option}
+                                                style={styles.optionItem}
+                                                onPress={() => handleGender(setFieldValue, option)}                                                    >
+                                                <Text style={styles.text} >
+                                                    {option}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        ))}
                                     </View>
-
-                                    <View>
-                                        <TouchableOpacity style={[styles.dropdownContainer,
-                                        errors.gender && touched?.gender && {
-                                            borderColor: '#ff00009c',
-                                            borderWidth: 1.5
-                                        }]}
-                                            onBlur={handleBlur('gender')}
-                                            onPress={toggleDropdown}>
-                                            <Text style={[styles.selectedOption, values.gender && { color: 'black' , fontWeight: '600'}]}>{values.gender || 'Choose Gender'}</Text>
-                                            {isOpen ? (
-                                                <Image source={Images.DROPDOWN_UP} style={styles.icon} />
-                                            ) : (
-                                                <Image source={Images.DROPDOWN} style={styles.icon} />
-                                            )
-                                            }
-                                        </TouchableOpacity>
-
-                                        {isOpen && (
-                                            <View style={styles.optionsContainer}>
-                                                {options.map((option) => (
-                                                    <TouchableOpacity
-                                                        key={option}
-                                                        style={styles.optionItem}
-                                                        onPress={() => handleGender(setFieldValue, option)}                                                    >
-                                                        <Text style={styles.text} >
-                                                            {option}
-                                                        </Text>
-                                                    </TouchableOpacity>
-                                                ))}
-                                            </View>
-                                        )}
-                                    </View>
-
-                                    <TouchableOpacity style={styles.button} onPress={() => handleSubmit(values,resetForm)} >
-                                        <Text style={styles.buttonText}>SUBMIT</Text>
-                                    </TouchableOpacity>
-                                    <View style={{flexDirection: 'row', marginBottom: normalize(20)}}>
-                                    <Text style={{color:'black'}}>Already have an accound?</Text>
-                                    <TouchableOpacity  onPress={() => handleLogin(resetForm)}>
-                                        <Text style={{color: 'black', fontWeight: 'bold', borderBottomWidth: 0}}> LOGIN</Text>
-                                    </TouchableOpacity>
-                                    </View>
-                                    {(errors.userName && touched.userName) || (errors.phoneNo && touched.phoneNo) || (errors.emailId && touched.emailId) || (errors.gender && touched.gender) ? (<Text style={styles.errorText}>{errors.userName || errors.phoneNo || errors.emailId || errors.gender}</Text>) : null}
-
-                                </View>
-                            )}
-                        </Formik>
-
-                    
-                
+                                )}
+                            </View>
+                            <TouchableOpacity style={styles.button} onPress={() => handleSubmit(values, resetForm)} >
+                                <Text style={styles.buttonText}>SUBMIT</Text>
+                            </TouchableOpacity>
+                            <View style={{ flexDirection: 'row', marginBottom: normalize(20) }}>
+                                <Text style={{ color: 'black' }}>Already have an accound?</Text>
+                                <TouchableOpacity onPress={() => handleLogin(resetForm)}>
+                                    <Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}> LOGIN</Text>
+                                </TouchableOpacity>
+                            </View>
+                            {(errors.userName && touched.userName) || (errors.phoneNo && touched.phoneNo) || (errors.emailId && touched.emailId) || (errors.gender && touched.gender) ? (<Text style={styles.errorText}>{errors.userName || errors.phoneNo || errors.emailId || errors.gender}</Text>) : null}
+                        </View>
+                    )}
+                </Formik>
             </ImageBackground>
-           
-</ScrollView>
-
-
-        
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
-    },
-    Image: {
-        // width: Dimensions.get('window').width,
-        // height: Dimensions.get('window').height,
-        flex: 1
-        // width: screenWidth - normalize(500),
-        // height:  normalize(810)
     },
     errorText: {
         marginLeft: normalize(15),
@@ -318,14 +292,12 @@ const styles = StyleSheet.create({
     },
     phoneInputContainer: {
         backgroundColor: 'transparent',
-        // width: screenWidth * 0.68,
         right: 30,
     },
     phoneInputTextContainer: {
         backgroundColor: 'transparent',
         right: 35,
         paddingTop: normalize(13),
-       
     },
     phoneInputTextStyle: {
         paddingRight: normalize(8),
@@ -387,7 +359,6 @@ const styles = StyleSheet.create({
         width: 28,
         height: 28,
     }
-
 });
 
 export default RegistrationPage;

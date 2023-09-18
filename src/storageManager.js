@@ -8,14 +8,6 @@ export async function storeUserSession(data) {
   }
 }
 
-// export async function storeSessionData(data) {
-//   try {
-//     await EncryptedStorage.setItem('user_session', JSON.stringify(data));
-//   } catch (error) {
-//     console.log('EncryptedStorage_storeUserSession Error: ', error);
-//   }
-// }
-
 export async function retrieveUserSession() {
   try {
     const session = await EncryptedStorage.getItem('user_session');
@@ -43,14 +35,6 @@ export async function clearStorage() {
     console.log('EncryptedStorage_clearStorage Error: ', error);
   }
 }
-
-// export async function storeCurrentScreen(data) {
-//   try {
-//     await EncryptedStorage.setItem('currentScreen', JSON.stringify(data));
-//   } catch (error) {
-//     console.log('EncryptedStorage_storeUserSession Error: ', error);
-//   }
-// }
 
 export async function retrieveCurrentScreen() {
   try {
