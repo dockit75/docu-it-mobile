@@ -46,7 +46,7 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen
         name="DocumentScannerScreen"
         component={DocumentScannerScreen}
-        options={{ headerShown: true }}
+        options={{ headerShown: true,title:'Upload Document' }}
       />
       <Stack.Screen
         name="LockScreen"

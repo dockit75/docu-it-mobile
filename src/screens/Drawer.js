@@ -68,7 +68,6 @@ const HamburgerMenu = ({ navigation, route }) => {
         <View style={{ justifyContent: 'center', alignItems: 'center', marginVertical: normalize(30) }}>
           <Image source={Images.USER} style={{ width: 100, height: 100 }} resizeMode='center' />
           <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black', letterSpacing: 0.5 }}>{name}</Text>
-          <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black' }}>{email}</Text>
         </View>
         <View style={styles.viewContainer}>
           <Text style={{ fontSize: 22, color: 'white', marginLeft: 20, fontWeight: 'bold', alignSelf: 'center' }} onPress={handleUser}>User</Text>

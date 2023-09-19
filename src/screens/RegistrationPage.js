@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, ScrollView, } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, ScrollView, ActivityIndicator, } from 'react-native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { normalize, normalizeVertical, screenHeight, screenWidth } from '../utilities/measurement';
@@ -25,7 +25,7 @@ const RegistrationPage = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const phoneInput = useRef(null);
     const dispatch = useDispatch();
-
+    const [isLoading, setIsLoading] = useState(false);
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     };
@@ -64,6 +64,10 @@ const RegistrationPage = ({ navigation }) => {
         })();
     }, []);
 
+    useEffect(() => {
+        handleRegistration()
+    }, [])
+
     const loginValidationSchema = yup.object().shape({
         userName: yup.string().required(' Please enter your username'),
         phoneNo: yup.string().required('Please enter your phonenumber').min(10, 'Phone number must be 10 digits'),
@@ -73,17 +77,19 @@ const RegistrationPage = ({ navigation }) => {
     const deviceId = DeviceInfo.getUniqueId();
     const handleRegistration = async (values, { resetForm }) => {
         try {
+            setIsLoading(true); // Show the loader
             dispatch(setUser(values));
             const payload = {
                 name: values.userName,
                 email: values.emailId,
                 gender: values.gender,
                 phone: values.phoneNo,
-                deviceId: uniqueId.toString() + '012311'
+                deviceId: uniqueId.toString() + '5671'
             }
             await storeUserSession({ ...payload, isAuthenticated: true });
             NetworkManager.signUp(payload).then(res => {
                 if (res.data.code === 200) {
+
                     navigation.navigate("OTPVerification", { userData: values })
                     cleanTextFields();
                     resetForm();
@@ -93,6 +99,8 @@ const RegistrationPage = ({ navigation }) => {
             })
         } catch (error) {
             console.error('error', error);
+        } finally {
+            setIsLoading(false); // Hide the loader when done
         }
     };
 
@@ -209,8 +217,12 @@ const RegistrationPage = ({ navigation }) => {
                                     </View>
                                 )}
                             </View>
-                            <TouchableOpacity style={styles.button} onPress={() => handleSubmit(values, resetForm)} >
-                                <Text style={styles.buttonText}>SUBMIT</Text>
+                            <TouchableOpacity style={styles.button} onPress={() => handleSubmit(values, resetForm)} disabled={isLoading}>
+                                {isLoading ? (
+                                    <ActivityIndicator color='white' /> // Show loader while loading
+                                ) : (
+                                    <Text style={styles.buttonText}>SUBMIT</Text>
+                                )}
                             </TouchableOpacity>
                             <View style={{ flexDirection: 'row', marginBottom: normalize(20) }}>
                                 <Text style={{ color: 'black' }}>Already have an accound?</Text>
@@ -253,13 +265,24 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     button: {
+        // backgroundColor: '#0e9b81',
+        // width: screenWidth - normalize(30),
+        // alignSelf: 'center',
+        // height: normalizeVertical(50),
+        // borderRadius: normalize(25),
+        // elevation: 5,
+        // marginTop: normalize(30),
+        // marginBottom: normalize(10)
         backgroundColor: '#0e9b81',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 5,
         width: screenWidth - normalize(30),
         alignSelf: 'center',
         height: normalizeVertical(50),
         borderRadius: normalize(25),
-        elevation: 5,
-        marginTop: normalize(30),
+        elevation: 20,
+        marginTop: 30,
         marginBottom: normalize(10)
     },
     buttonText: {

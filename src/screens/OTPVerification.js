@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import { normalize, normalizeVertical, screenHeight, screenWidth } from '../utilities/measurement';
 import {
   CodeField,
@@ -29,6 +29,7 @@ import { Snackbar } from 'react-native-paper';
     value,
     setValue,
   });
+  const [loading,setLoading] = useState(false)
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -40,6 +41,12 @@ import { Snackbar } from 'react-native-paper';
     fetchUniqueId();
   }, []);
 
+  useEffect(() => {
+    if (value.trim().length === 5) {
+      handleSubmit()
+    }
+  },[value]);
+
   const handleSubmit = async () => {
     try {
       if (value.trim().length === 0) {
@@ -49,11 +56,13 @@ import { Snackbar } from 'react-native-paper';
       } else if (value.length <= 5) {
         let payload = {};
         if (verificationMethod === 'email') {
+          setLoading(true)
           payload = {
             email: userData.emailId,
             code: value
           };
         } else {
+          setLoading(true)
           payload = {
             phone: userData?.phoneNo,
             code: value
@@ -66,12 +75,12 @@ import { Snackbar } from 'react-native-paper';
           navigation.navigate("PinGenerationScreen");
         } else {
           // Handle other HTTP status codes or error responses here
-          setSnackbarMessage('Invalid PIN');
+          setSnackbarMessage('Invalid OTP. Please try again.');
           setSnackbarVisible(true);
         }
       } else {
         // Invalid OTP, show a specific message
-        setSnackbarMessage('Invalid PIN');
+        setSnackbarMessage('Invalid OTP. Please try again.');
         setSnackbarVisible(true);
       }
     } catch (error) {
@@ -79,6 +88,8 @@ import { Snackbar } from 'react-native-paper';
       // You can customize the error message here if needed
       setSnackbarMessage('Invalid PIN');
       setSnackbarVisible(true);
+    }finally {
+      setLoading(false); // Stop loading
     }
   };
   
@@ -150,19 +161,24 @@ import { Snackbar } from 'react-native-paper';
               />
             </View>
             <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'center' }}>
-              <Text style={{ color: 'black', }}>Didn't get the code?</Text>
-              <TouchableOpacity onPress={handleResentCode}><Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}> Resend Code</Text></TouchableOpacity>
+              <Text style={{ color: 'white', }}>Didn't get the code?</Text>
+              <TouchableOpacity onPress={handleResentCode}><Text style={{ color: 'white', fontWeight: 'bold', borderBottomWidth: 0 }}> Resend Code</Text></TouchableOpacity>
             </View>
             <View style={{ marginVertical: normalize(20) }}>
               {/* {error ? <Text style={{ color: 'red', fontSize: 16, fontWeight: '500', letterSpacing: 1.5, }}>{error}</Text> : null} */}
             </View>
-            <View>
-              <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+           
+              <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+               {loading ? (
+                       <ActivityIndicator color='white' />
+               ) : (
                 <Text style={styles.buttonText}>
-                  {`VERIFY ${verificationMethod === '' ? '' : ''}`}
-                </Text>
+                {`VERIFY ${verificationMethod === '' ? '' : ''}`}
+              </Text>
+               )             
+               }
               </TouchableOpacity>
-            </View>
+        
             <View >
               <TouchableOpacity onPress={handleToggleMethod}>
                 <Text style={styles.buttonText1}>

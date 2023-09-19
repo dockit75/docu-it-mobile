@@ -1,15 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+  Image,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
 import { useDispatch } from 'react-redux';
 import { retrieveUserSession } from '../storageManager';
-import { CodeField, Cursor, useBlurOnFulfill, useClearByFocusCell, } from 'react-native-confirmation-code-field';
-import { normalize, normalizeVertical, screenHeight, screenWidth } from '../utilities/measurement';
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
+import {
+  normalize,
+  normalizeVertical,
+  screenHeight,
+  screenWidth,
+} from '../utilities/measurement';
 import { Images } from '../assets/images/images';
 import NetworkManager from '../services/NetworkManager';
 import DeviceInfo from 'react-native-device-info';
 import { Snackbar } from 'react-native-paper';
 import { COLORS } from '../utilities/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const CELL_COUNT = 4;
 const LockScreen = ({ navigation, route }) => {
@@ -23,7 +43,8 @@ const LockScreen = ({ navigation, route }) => {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isForgotPin, setIsForgotPin] = useState('');
-  const [phone, setPhone] = useState('')// Track if in "Forgot PIN" mode
+  const [phone, setPhone] = useState(''); // Track if in "Forgot PIN" mode
+  const [loading, setLoading] = useState(false); // Track loading state
   const insets = useSafeAreaInsets();
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
@@ -44,6 +65,12 @@ const LockScreen = ({ navigation, route }) => {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (value.length === 4) {
+      handlePinEntry()
+    }
+  }, [value]);
 
   const toggleMask = () => setEnableMask(f => !f);
 
@@ -71,6 +98,7 @@ const LockScreen = ({ navigation, route }) => {
       try {
         console.log(isForgotPin)
         if (isForgotPin) {
+          setLoading(true); // Start loading
           const payload = {
             phone: phone,
             verifyPin: value,
@@ -79,13 +107,14 @@ const LockScreen = ({ navigation, route }) => {
           if (verifyPinResponse.data.code === 200) {
             // If verification is successful, navigate to the destination screen
             navigation.navigate('PinGenerationScreen', { fromForget: true });
-            setValue('')
-            setIsForgotPin(false)
+            setValue('');
+            setIsForgotPin(false);
           } else {
             setSnackbarMessage('Invalid PIN. Please try again.');
             setSnackbarVisible(true);
           }
         } else {
+          setLoading(true); // Start loading
           // Call the login API here
           const loginResponse = await NetworkManager.login({
             deviceId: uniqueId,
@@ -94,7 +123,7 @@ const LockScreen = ({ navigation, route }) => {
           if (loginResponse.data.code === 200) {
             // If login is successful, navigate to the dashboard screen
             navigation.navigate('Dashboard', { userData: value });
-            setValue('')
+            setValue('');
           } else {
             setSnackbarMessage('Invalid credentials. Please try again.');
             setSnackbarVisible(true);
@@ -104,6 +133,8 @@ const LockScreen = ({ navigation, route }) => {
         console.error('Error:', error);
         setSnackbarMessage('Invalid PIN. Please try again. ');
         setSnackbarVisible(true);
+      } finally {
+        setLoading(false); // Stop loading
       }
     } else {
       setSnackbarMessage('Please enter a 4-digit PIN.');
@@ -113,7 +144,9 @@ const LockScreen = ({ navigation, route }) => {
 
   const handleForgetPin = async () => {
     try {
-      setIsForgotPin(true)
+      setIsForgotPin(true);
+      setValue('')
+      setLoading(true); // Start loading
       NetworkManager.forgotPin(phone).then(res => {
         console.log(res, 'res......')
         if (res.data.code === 200) {
@@ -122,67 +155,66 @@ const LockScreen = ({ navigation, route }) => {
           setSnackbarVisible(true);
         }
       })
-    } catch {
+    } catch (error) {
       console.log(error, 'error')
+    } finally {
+      setLoading(false); // Stop loading
     }
   }
 
-  const handleSignUp = () => {
-    if (isAuthenticated === false) {
-      navigation.navigate('RegistrationPage')
-    } else {
-      setSnackbarMessage('Cant able to login more then 1 accound');
-      setSnackbarVisible(true);
-    }
-  }
+  // const handleSignUp = () => {
+  //   if (isAuthenticated === false) {
+  //     navigation.navigate('RegistrationPage')
+  //   } else {
+  //     setSnackbarMessage('Cant able to login more than 1 account');
+  //     setSnackbarVisible(true);
+  //   }
+  // }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ justifyContent: 'center', alignItems: 'center'}}>
           <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ justifyContent: 'center', alignSelf: 'center' }} />
+          <View style={{flexDirection: 'row', marginLeft: normalize(20)}}>
           <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', padding: 10 }}>{isForgotPin ? 'Enter OTP' : 'Enter PIN'}</Text>
-          <CodeField
-            ref={ref}
-            {...props}
-            value={value}
-            onChangeText={(text) => {
-              setValue(text)
-              // setError(false)
-            }}
-            cellCount={CELL_COUNT}
-            keyboardType="number-pad"
-            textContentType="oneTimeCode"
-            renderCell={renderCell}
-          />
-          {/* {error ? <Text style={{ color: 'red', fontSize: 16, fontWeight: 'bold', letterSpacing: 1.5, marginTop: 20 }}>{error}</Text> : null} */}
-          <TouchableOpacity onPress={toggleMask}>
-            {enableMask ? (
-              <Image
-                source={Images.EYEOpen} // Replace with the path to your open eye image
-                style={styles.toggle}
-              />
+          <TouchableOpacity onPress={toggleMask} style={{ padding: 10 }}>
+              {enableMask ? (
+                <Icon name='eye' size={24} color="white"/>
+              ) : (
+                <Icon name="eye-slash" size={24} color="white"/>
+              )}
+            </TouchableOpacity>
+            </View>
+          <View style={{ flexDirection: 'row' }}>
+             <CodeField
+             ref={ref}
+             {...props}
+             value={value}
+             onChangeText={(text) => {
+               setValue(text)
+               // setError(false)
+             }}
+             cellCount={CELL_COUNT}
+             keyboardType="number-pad"
+             textContentType="oneTimeCode"
+             renderCell={renderCell}
+           />
+          </View>
+          <TouchableOpacity onPress={handlePinEntry} style={styles.button} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator color='white' />
             ) : (
-              <Image
-                source={Images.EYEClose} // Replace with the path to your closed eye image
-                style={styles.toggle}
-              />
+              <Text style={styles.buttonText}>{isForgotPin ? 'VERIFY' : 'CONTINUE'}</Text>
             )}
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handlePinEntry} style={styles.button}>
-            <Text style={styles.buttonText}>{isForgotPin ? 'VERIFY' : 'UNLOCK'}</Text>
           </TouchableOpacity>
         </View>
         {!isForgotPin && (
           <View style={{ justifyContent: 'center', alignSelf: 'flex-end', marginRight: normalize(30), marginTop: normalize(10), flexDirection: 'row' }}>
-            <Text style={{ color: 'black' }}>Didn't have an accounct?  </Text>
-            <TouchableOpacity onPress={handleSignUp}>
-              <Text style={{ color: 'black', fontWeight: 'bold' }}>Sign UP</Text>
-            </TouchableOpacity>
-            <Text style={{ color: 'black' }}> / </Text>
             <TouchableOpacity onPress={handleForgetPin}>
-              <Text style={{ color: 'black', fontWeight: 'bold', }} >Forget PIN?</Text>
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>Forget PIN</Text>
             </TouchableOpacity>
+            {/* <Text onPress={() => navigation.navigate('RegistrationPage')}> regi</Text> */}
           </View>
         )}
       </ImageBackground>
@@ -224,6 +256,7 @@ const styles = StyleSheet.create({
     height: normalizeVertical(50),
     borderRadius: normalize(25),
     elevation: 20,
+    marginTop: 40
   },
   buttonText: {
     alignSelf: 'center',
@@ -281,5 +314,6 @@ const styles = StyleSheet.create({
     // color: 'white',
   }
 });
+
 
 export default LockScreen;

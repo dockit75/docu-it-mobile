@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, ScrollView } from 'react-native';
+import { SafeAreaView, View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { normalize, normalizeVertical, screenHeight, screenWidth } from '../utilities/measurement';
 import { retrieveUserSession } from '../storageManager';
 import {
@@ -15,6 +15,7 @@ import { Images } from '../assets/images/images';
 import { COLORS } from '../utilities/colors';
 import { Snackbar } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const CELL_COUNT = 4;
 const PinGenerationScreen = ({ navigation, route }) => {
@@ -31,7 +32,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [phone, setPhone] = useState('')
     const [gender, setGender] = useState('')
-    const [email, setEmail] = useState('')
+    const [loading, setLoading] = useState(false)
     const [name, setName] = useState('')
     const insets = useSafeAreaInsets();
     const [props, getCellOnLayoutHandler] = useClearByFocusCell({
@@ -46,11 +47,17 @@ const PinGenerationScreen = ({ navigation, route }) => {
         useEffect(() => {
             (async () => {
                 const data = await retrieveUserSession();
-                console.log(data, '-------------------PinGenerationScreen')
+                console.log(data, '-----PinGenerationScreen')
                 setPhone(data.phone)
                 setName(data.name)
             })();
         }, []);
+
+        useEffect(() => {
+            if (/^\d{4}$/.test(pin) && pin === confirmedPin) {
+                handleGeneratePin()
+            }
+        }, [pin])
 
         if (symbol) {
             textChild = enableMask ? '•' : symbol;
@@ -83,6 +90,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
         try {
             if (/^\d{4}$/.test(pin) && pin === confirmedPin) {
                 if (!fromForget) {
+                    setLoading(true)
                     const payload = {
                         phone: phone,
                         pinNumber: pin,
@@ -98,6 +106,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
                         console.log('Error response:', res);
                     }
                 } else {
+                    setLoading(true)
                     const payload = {
                         phone: phone,
                         pinNumber: pin,
@@ -126,6 +135,8 @@ const PinGenerationScreen = ({ navigation, route }) => {
         } catch (error) {
             console.error('error', error);
             setError('An error occurred while generating the PIN');
+        } finally {
+            setLoading(false); // Stop loading
         }
     };
 
@@ -159,7 +170,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
             <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top }}>
                 <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
                 <View style={styles.container}>
-                    <View style={{ gap: 30 }}>
+                    <View>
                         <View>
                             {/* <Text style={styles.title}>{changePin? 'Enter PIN' : 'Enter New PIN'}</Text> */}
                             <Text style={styles.title}>Enter PIN</Text>
@@ -178,8 +189,16 @@ const PinGenerationScreen = ({ navigation, route }) => {
                                 renderCell={renderCell}
                             />
                         </View>
-                        <View>
-                            <Text style={styles.title}> Re Enter PIN</Text>
+                        <View style={{flexDirection: 'row'}}>
+                            <Text style={styles.conform}> Conform PIN</Text>
+                            <TouchableOpacity onPress={toggleMask} style={styles.title}>
+                                {enableMask ? (
+                                    <Icon name='eye' size={24} color="white"  />
+                                ) : (
+                                    <Icon name="eye-slash" size={24} color="white" />
+                                )}
+                            </TouchableOpacity>
+                            </View>
                             <CodeField
                                 ref={ref}
                                 {...props}
@@ -194,23 +213,15 @@ const PinGenerationScreen = ({ navigation, route }) => {
                                 textContentType="oneTimeCode"
                                 renderCell={renderCellConfirmPin}
                             />
-                            <TouchableOpacity onPress={toggleMask}>
-                                {enableMask ? (
-                                    <Image
-                                        source={Images.EYEOpen} // Replace with the path to your open eye image
-                                        style={styles.toggle}
-                                    />
-                                ) : (
-                                    <Image
-                                        source={Images.EYEClose} // Replace with the path to your closed eye image
-                                        style={styles.toggle}
-                                    />
-                                )}
-                            </TouchableOpacity>
-                        </View>
+                        
                     </View>
-                    <TouchableOpacity style={styles.generateButton} onPress={handleGeneratePin}>
-                        <Text style={styles.generateButtonText}>GENERATE PIN</Text>
+                    <TouchableOpacity style={styles.generateButton} onPress={handleGeneratePin} disabled={loading}>
+                        {loading ? (
+                            <ActivityIndicator color='white' />
+                        ) : (
+                            <Text style={styles.generateButtonText}>GENERATE PIN</Text>
+                        )
+                        }
                     </TouchableOpacity>
                     {error ? <Text style={{ color: 'red', fontSize: 16, fontWeight: '500', letterSpacing: 1.5, marginTop: 20, }}>{error}</Text> : null}
                 </View>
@@ -238,14 +249,20 @@ const styles = StyleSheet.create({
         marginTop: normalize(20),
         color: COLORS.white,
         alignSelf: 'center',
-        paddingVertical: normalize(10)
+        paddingVertical: normalize(10),
+        marginLeft: 20
+    },
+    conform: {
+        fontSize: normalize(18),
+        fontWeight: 'bold',
+        marginTop: normalize(20),
+        color: COLORS.white,
+        alignSelf: 'center',
+        // paddingVertical: normalize(10),
+        marginLeft: normalize(45),
     },
     codeFieldRoot: {
         width: screenWidth - normalize(160),
-    },
-    image: {
-        width: screenWidth - normalize(500),
-        height: normalize(810)
     },
     cell: {
         width: normalize(40),
@@ -257,13 +274,13 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         backgroundColor: '#e3e3e3cc',
     },
-    toggle: {
-        width: normalize(30),
-        height: normalize(30),
-        marginBottom: 20,
-        marginTop: 10,
-        alignSelf: 'center'
-    },
+    // toggle: {
+    //     width: normalize(30),
+    //     height: normalize(30),
+    //     marginBottom: 20,
+    //     marginTop: 10,
+    //     alignSelf: 'center'
+    // },
     focusCell: {
         borderColor: '#000',
     },
@@ -282,7 +299,7 @@ const styles = StyleSheet.create({
         height: normalizeVertical(50),
         borderRadius: normalize(60),
         elevation: 20,
-        marginTop: normalize(20)
+        marginVertical: normalize(30)
     },
     generateButtonText: {
         color: 'white',
