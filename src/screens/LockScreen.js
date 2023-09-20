@@ -30,6 +30,8 @@ import { Snackbar } from 'react-native-paper';
 import { COLORS } from '../utilities/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import PhoneInput from "react-native-phone-number-input";
+
 
 const CELL_COUNT = 4;
 const LockScreen = ({ navigation, route }) => {
@@ -43,6 +45,7 @@ const LockScreen = ({ navigation, route }) => {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isForgotPin, setIsForgotPin] = useState('');
+  const [isSendOtp, setIsSendOtp] = useState(false);
   const [phone, setPhone] = useState(''); // Track if in "Forgot PIN" mode
   const [loading, setLoading] = useState(false); // Track loading state
   const insets = useSafeAreaInsets();
@@ -142,7 +145,7 @@ const LockScreen = ({ navigation, route }) => {
     }
   };
 
-  const handleForgetPin = async () => {
+  const handleSendOtp = async () => {
     try {
       setIsForgotPin(true);
       setValue('')
@@ -161,6 +164,9 @@ const LockScreen = ({ navigation, route }) => {
       setLoading(false); // Stop loading
     }
   }
+  const handleForgetPin = () => {
+    setIsSendOtp(true)
+  }
 
   // const handleSignUp = () => {
   //   if (isAuthenticated === false) {
@@ -174,38 +180,60 @@ const LockScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
-        <View style={{ justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ justifyContent: 'center', alignSelf: 'center' }} />
-          <View style={{flexDirection: 'row', marginLeft: normalize(20)}}>
-          <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', padding: 10 }}>{isForgotPin ? 'Enter OTP' : 'Enter PIN'}</Text>
-          <TouchableOpacity onPress={toggleMask} style={{ padding: 10 }}>
+          <View style={{ flexDirection: 'row', marginLeft: normalize(20) }}>
+            <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', padding: 10 }}>{isForgotPin ? 'Enter OTP' : 'Enter PIN'}</Text>
+            <TouchableOpacity onPress={toggleMask} style={{ padding: 10 }}>
               {enableMask ? (
-                <Icon name='eye' size={24} color="white"/>
+                <Icon name='eye' size={24} color="white" />
               ) : (
-                <Icon name="eye-slash" size={24} color="white"/>
+                <Icon name="eye-slash" size={24} color="white" />
               )}
             </TouchableOpacity>
-            </View>
+          </View>
           <View style={{ flexDirection: 'row' }}>
-             <CodeField
-             ref={ref}
-             {...props}
-             value={value}
-             onChangeText={(text) => {
-               setValue(text)
-               // setError(false)
-             }}
-             cellCount={CELL_COUNT}
-             keyboardType="number-pad"
-             textContentType="oneTimeCode"
-             renderCell={renderCell}
-           />
+            {isSendOtp ? <PhoneInput
+              // ref={phoneInput}
+              // defaultValue={values.phoneNo}
+              defaultCode="IN"
+              onChangeFormattedText={(text) => {
+                // setPhoneNo(text)
+              }}
+              disableArrowIcon={true}
+              containerStyle={styles.phoneInputContainer
+              }
+              textContainerStyle={styles.phoneInputTextContainer}
+              textInputStyle={styles.phoneInputTextStyle}
+              textInputProps={{
+                maxLength: 15,
+                placeholder: 'Phone Number',
+                placeholderTextColor: 'black'
+              }}
+              // codeTextStyle={{fontSize: 17}}
+              flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
+              keyboardType="number-pad"
+              // onChangeText={handleChange('phoneNo')}
+              // onBlur={handleBlur('phoneNo')}
+            /> : <CodeField
+              ref={ref}
+              {...props}
+              value={value}
+              onChangeText={(text) => {
+                setValue(text)
+                // setError(false)
+              }}
+              cellCount={CELL_COUNT}
+              keyboardType="number-pad"
+              textContentType="oneTimeCode"
+              renderCell={renderCell}
+            />}
           </View>
           <TouchableOpacity onPress={handlePinEntry} style={styles.button} disabled={loading}>
             {loading ? (
               <ActivityIndicator color='white' />
             ) : (
-              <Text style={styles.buttonText}>{isForgotPin ? 'VERIFY' : 'CONTINUE'}</Text>
+              <Text style={styles.buttonText}>{isSendOtp && isForgotPin ? 'VERIFY' : isSendOtp ? 'SEND OTP' : 'CONTINUE'}</Text>
             )}
           </TouchableOpacity>
         </View>
