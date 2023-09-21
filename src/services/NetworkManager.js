@@ -2,13 +2,14 @@ import * as Sentry from '@sentry/react-native'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 // import { isJwtExpired } from 'jwt-check-expiration'
-// import jwtDecode from 'jwt-decode'
+import jwtDecode from 'jwt-decode'
 import { clearDBTables } from '../db/deleteDb'
 // import { store } from '../store/store'
 // import { getUserDeviceInfo, getUserSession, removeAll, setEnableVisibleContact, setUserSession } from '../utilities/storageManager'
 // import { ALERT_CANCEL_BUTTON_NAMES, ALERT_HEADER, ALERT_OK_BUTTON_NAMES } from '../utilities/strings'
 // import { IS_IOS, showAlert } from '../utilities/utils'
 import { BASE_API_CORE_URL } from './config'
+import { retrieveUserDetail, retrieveUserSession } from '../storageManager'
 
 // export const IS_IOS = Platform.OS === 'ios';
 
@@ -23,14 +24,7 @@ const axiosHeaders = (isFormData) => {
     return headersInfo;
 };
 
-const axiosRequest = async request => {
-    console.log('Url Request', request.url, request.method)
-      const webToken = await retrieveUserSession();
-    if (webToken?.token) {
-        request.headers.Authorization = `Bearer ${webToken?.token}`;
-    }
-    return request;
-};
+
 const axiosError = error => {
     if (error.response.status !== 409 && error.response.status !== 403 && error.response.status !== 401 && error.response.status !== 400 && error.message !== 'Network Error') {
         Sentry.captureException(error)
@@ -49,8 +43,8 @@ const axiosError = error => {
 /// Core API - No Auth
 const axiosNoAuthCoreInstance = axios.create({ baseURL: BASE_API_CORE_URL })
 axiosNoAuthCoreInstance.interceptors.request.use(config => {
-  console.log('Url Request', config.url, config.method)
-  return config
+    console.log('Url Request', config.url, config.method)
+    return config
 })
 axiosNoAuthCoreInstance.interceptors.response.use(response => response, error => axiosError(error))
 
@@ -60,7 +54,31 @@ axiosRetry(axiosCoreInstance, { retries: 1, retryDelay: axiosRetry.exponentialDe
 axiosCoreInstance.interceptors.request.use(config => axiosRequest(config))
 axiosCoreInstance.interceptors.response.use(response => response, error => axiosError(error))
 
-
+const axiosRequest = async request => {
+    console.log('Url Request', request.url, request.method)
+    let userData = await retrieveUserDetail()
+    if (userData.token) {
+        const decodedToken = jwtDecode((userData.token), { complete: true })
+        const tokenExpiry = (decodedToken.exp * 1000 - 60 * 1000) // ( 1203243423400 )
+        if ((tokenExpiry < new Date().getTime()) || isJwtExpired(webToken.token)) {
+            await refreshTokenPerform(request)
+            userData = await retrieveUserDetail();
+        }
+        if (userData?.token) {
+            request.headers.Authorization = `Bearer ${userData?.token}`
+        }
+    }
+    return request
+}
+const refreshTokenPerform = async () => {
+    const userData = await retrieveUserDetail();
+    const payload = {
+        email: userData.email
+    }
+    const { data } = await Network.generateToken(payload)
+    storeUserDetail({ ...userData, token: data.token })
+    return
+}
 
 const requests = {
     post: (path, params, isFormData) => axiosNoAuthCoreInstance.post(path, params, axiosHeaders(isFormData)),
@@ -71,8 +89,8 @@ const requests = {
     postTokenize: async (path, params, isFormData) => { return await axiosCoreInstance.post(path, params, axiosHeaders(isFormData)) },
     putTokenize: async (path, params, isFormData) => { return await axiosCoreInstance.put(path, params, axiosHeaders(isFormData)) },
     deleteTokenize: async (path, params, isFormData) => { return await axiosCoreInstance.delete(path, { data: params, headers: axiosHeaders(isFormData).headers }) },
-  
-  
+
+
 };
 
 const path = {
@@ -81,10 +99,12 @@ const path = {
     pinGeneration: 'auth/pinGeneration',
     verifyMobileOtp: 'auth/verifyMobileOtp',
     login: 'auth/login',
-    emailResendOtp:'auth/resendCode',
+    emailResendOtp: 'auth/resendCode',
     forgotPin: 'auth/forgotPin',
     verifyPin: 'auth/verifyPin',
-    changePin: 'auth/changePin'
+    changePin: 'auth/changePin',
+    uploadDocument: 'document/uploadDocument',
+    generateToken: '/auth/generateToken',
 }
 
 
@@ -93,7 +113,7 @@ const NetworkManager = {
     signUp: async (params) => {
         return await requests.post(path.signUp, params, false)
     },
-    verifyEmail: async (params,verificationMethod) => {
+    verifyEmail: async (params, verificationMethod) => {
         const verifyOTPPath = verificationMethod === 'email' ? path.verifyEmail : path.verifyMobileOtp
         return await requests.post(verifyOTPPath, params, false)
     },
@@ -101,13 +121,16 @@ const NetworkManager = {
     //      const verifyPhonePin = `${path.pinGeneration}?phone=${phone}&pinNumber=${pinNumber}`
     //     return await requests.post(verifyPhonePin, params, false)
     // },
-       pinGeneration: async (params) => {
+    pinGeneration: async (params) => {
         return await requests.post(path.pinGeneration, params, false)
     },
 
-    login: async ({deviceId,password}) => {
-        const verifyLogin = `${path.login}?deviceId=${deviceId}&password=${password}`
-        return await requests.post(verifyLogin, false)
+    // login: async ({ deviceId, password }) => {
+    //     const verifyLogin = `${path.login}?deviceId=${deviceId}&password=${password}`
+    //     return await requests.post(verifyLogin, false)
+    // },
+    login: async (params) => {
+        return await requests.post(path.login, params, false)
     },
     emailResendOtp: async (email) => {
         const emailResend = `${path.emailResendOtp}?email=${email}`
@@ -117,13 +140,20 @@ const NetworkManager = {
         const forgotPin = `${path.forgotPin}?phoneNumber=${phone}`
         return requests.post(forgotPin, false);
     },
-   verifyPin : async (params) => {
+    verifyPin: async (params) => {
         return await requests.post(path.verifyPin, params, false)
     },
     changePin: async (params) => {
         return await requests.post(path.changePin, params, false)
+    },
+    uploadDocument: async (formData) => {
+        return await requests.postTokenize(path.uploadDocument, formData, true)
+    },
+    generateToken: async (email) => {
+        const tokenGenrate = `${path.generateToken}?email=${email}`
+        return await requests.get(tokenGenrate, false)
     }
-    
+
 };
 
 // const clearSessionAndRestart = async () => {

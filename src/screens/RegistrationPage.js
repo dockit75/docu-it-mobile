@@ -84,7 +84,7 @@ const RegistrationPage = ({ navigation }) => {
                 email: values.emailId,
                 gender: values.gender,
                 phone: values.phoneNo,
-                deviceId: uniqueId.toString() + '5671'
+                deviceId: uniqueId.toString() + 'h5p'
             }
             await storeUserSession({ ...payload, isAuthenticated: true });
             NetworkManager.signUp(payload).then(res => {
@@ -114,7 +114,7 @@ const RegistrationPage = ({ navigation }) => {
     }
 
     const handleLogin = (resetForm) => {
-        navigation.navigate('LockScreen')
+        navigation.navigate('LockScreen',{signInParam: true})
         resetForm();
         cleanTextFields();
     }
@@ -129,7 +129,7 @@ const RegistrationPage = ({ navigation }) => {
                         <View style={styles.container}>
                             <View>
                                 <TextInput
-                                    placeholder="Username"
+                                    placeholder="Name"
                                     placeholderTextColor='black'
                                     onChangeText={handleChange('userName')}
                                     onBlur={handleBlur('userName')}
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     phoneInputTextContainer: {
         backgroundColor: 'transparent',
         right: 35,
-        paddingTop: normalize(13),
+        paddingTop: normalize(12),
     },
     phoneInputTextStyle: {
         paddingRight: normalize(8),

@@ -14,17 +14,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Dashboard from './Dashboard';
 import { useDispatch } from 'react-redux';
 import { retrieveUserSession } from '../storageManager';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { COLORS } from '../utilities/colors';
+import Icon from 'react-native-vector-icons/Ionicons'; // You can use another icon library if you prefer
+import UserAvatar from 'react-native-user-avatar';
 
-const Tab = createBottomTabNavigator();
+// const Tab = createBottomTabNavigator();
 
 const HamburgerMenu = ({ navigation, route }) => {
   const drawer = useRef(null);
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -32,7 +32,6 @@ const HamburgerMenu = ({ navigation, route }) => {
         const data = await retrieveUserSession();
         console.log(data, 'data...,,,?');
         setName(data.name);
-        setEmail(data.email);
       } catch (error) {
         console.error('Error in useEffect:', error);
       }
@@ -47,9 +46,8 @@ const HamburgerMenu = ({ navigation, route }) => {
     }
   };
 
-  const handleUpload = () => {
-    navigation.navigate('DocumentScannerScreen');
-    closeDrawer();
+  const handleSettings = () => {
+  navigation.navigate('Settings')
   };
 
   const handleUser = () => {
@@ -64,23 +62,33 @@ const HamburgerMenu = ({ navigation, route }) => {
 
   const navigationView = () => (
     <>
-      <View style={{ backgroundColor: 'transparent', height: screenHeight }}>
-        <View style={{ justifyContent: 'center', alignItems: 'center', marginVertical: normalize(30) }}>
-          <Image source={Images.USER} style={{ width: 100, height: 100 }} resizeMode='center' />
-          <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black', letterSpacing: 0.5 }}>{name}</Text>
+      <View style={{ backgroundColor: '#0e9b81', flex: 1}}>
+        <View style={{ flexDirection: 'row', marginTop: normalize(60), marginHorizontal: normalize(15)}}>
+        <UserAvatar size={60} name={name.charAt(0)} bgColor="#e0ffff" textColor='black'/>
+          <Text style={{ fontSize: 20, fontWeight: '500', color: 'white', letterSpacing: 0.5 , margin: 15}}>{name}</Text>
+        </View>
+        <View style={styles.editProfile}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleProfile}>
+            <Icon name="person-outline" size={24} color={COLORS.black} />
+            <Text style={styles.menuText}>Edit Profile</Text>
+          </TouchableOpacity>
+           <View style={{borderBottomWidth: 0.5, }}/>
+          <TouchableOpacity style={styles.menuItem} onPress={handleSettings}>
+            <Icon name="cog-outline" size={24} color={COLORS.black} />
+            <Text style={styles.menuText}>Settings</Text>
+          </TouchableOpacity>
+          <View style={{borderBottomWidth: 0.5 }}/>
+          <TouchableOpacity style={styles.menuItem} onPress={handleUser}>
+            <Icon name="share-outline" size={24} color={COLORS.black} />
+            <Text style={styles.menuText}>Invite</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.viewContainer}>
-          <Text style={{ fontSize: 22, color: 'white', marginLeft: 20, fontWeight: 'bold', alignSelf: 'center' }} onPress={handleUser}>User</Text>
+          <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+            <Icon name="log-out-outline" size={24} color={COLORS.red} />
+            <Text style={styles.menuTextLogout}>Log out</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.viewContainer}>
-          <Text style={{ fontSize: 22, color: 'white', marginLeft: 20, fontWeight: 'bold', alignSelf: 'center' }} onPress={handleProfile}>Profile</Text>
-        </View>
-        <View style={styles.viewContainer}>
-          <Text style={{ fontSize: 22, color: 'white', marginLeft: 20, fontWeight: 'bold', alignSelf: 'center' }} onPress={handleUpload}>Upload</Text>
-        </View>
-      </View>
-      <View style={styles.viewContainer1}>
-        <Text style={{ fontSize: 22, color: 'white', fontWeight: 'bold' }} onPress={handleLogout}>Log out</Text>
       </View>
     </>
   );
@@ -107,12 +115,13 @@ const HamburgerMenu = ({ navigation, route }) => {
           <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={styles.Image} />
         </View>
         <Dashboard />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 40, alignItems: 'center', paddingHorizontal: normalize(15), borderTopColor: 'black', borderTopWidth: 0.5 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 40, alignItems: 'center', paddingHorizontal: normalize(15), borderTopColor: 'black', borderTopWidth: 0.9 }}>
           <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
-          <Image source={Images.HOME} style={{ width: 30, height: 30 }} />
+          <Icon name="home-outline" size={24} color={COLORS.black} />
           </TouchableOpacity>
-          <Image source={Images.TIME} style={{ width: 30, height: 30 }} />
-          <Image source={Images.SETTINGS} style={{ width: 30, height: 30 }} />
+          <TouchableOpacity >
+            <Icon name="cog-outline" size={24} color={COLORS.black} />
+          </TouchableOpacity>
         </View>
       </DrawerLayoutAndroid>
     </ImageBackground>
@@ -121,31 +130,47 @@ const HamburgerMenu = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   viewContainer: {
-    width: 290,
-    height: 50,
+    width: normalize(260),
+    height: normalize(52),
+    alignSelf: 'center',
+    backgroundColor: 'rgb(242, 245, 249)',
+    borderRadius: 5
+  },
+  editProfile: {
+    width: normalize(260),
+    height: normalize(158),
     borderColor: 'black',
     alignSelf: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#0e9b81',
-    borderBottomWidth: 1,
-    marginVertical: 1
+    backgroundColor: 'rgb(242, 245, 249)',
+    marginVertical: 1,
+    borderRadius: 10,
+    marginVertical: normalize(20),
+  },
+  menuItem: {
+    flexDirection: 'row',
+    paddingLeft: 20,
+    marginVertical: 16,
+  },
+  menuText: {
+    fontSize: 18,
+    color: 'black',
+    marginLeft: 20,
+    fontWeight: '500',
+  },
+  menuTextLogout: {
+    fontSize: 18,
+    color: 'red',
+    marginLeft: 20,
+    fontWeight: '500',
   },
   hamburgerMenu: {
-    width: 42,
-    height: 42,
+    width: 38,
+    height: 38,
     margin: 10,
   },
-  viewContainer1: {
-    width: 290,
-    height: 50,
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#0e9b81',
-  },
   Image: {
-    width: 30,
-    height: 30,
+    width: 28,
+    height: 28,
     alignSelf: 'center',
     marginRight: normalize(10),
   }

@@ -47,3 +47,24 @@ export async function retrieveCurrentScreen() {
     console.log('EncryptedStorage_retrieveUserSession Error: ', error);
   }
 }
+
+export async function storeUserDetail(data) {
+  try {
+    await EncryptedStorage.setItem('user_detail', JSON.stringify(data));
+  } catch (error) {
+    console.log('EncryptedStorage_storeUserDetail Error: ', error);
+  }
+}
+
+
+export async function retrieveUserDetail() {
+  try {
+    const userDetail = await EncryptedStorage.getItem('user_detail');
+
+    if (userDetail !== undefined) {
+      return JSON.parse(userDetail);
+    }
+  } catch (error) {
+    console.log('EncryptedStorage_retrieveUserDetail Error: ', error);
+  }
+}

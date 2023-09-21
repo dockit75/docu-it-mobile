@@ -17,6 +17,7 @@ import User from '../screens/User';
 import Profile from '../screens/Profile';
 import PinGenerationScreen from '../screens/PinGenerationScreen';
 import DocumentScannerScreen from '../screens/DocumentScannerScreen';
+import Settings from '../screens/Settings';
 
 const Stack = createStackNavigator();
 
@@ -67,6 +68,11 @@ const AppNavigator = ({ initialRouteName }) => {
         name="Profile"
         component={Profile}
         options={{ headerShown: true }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={Settings}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

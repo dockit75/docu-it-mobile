@@ -19,4 +19,6 @@ export const Images = {
     EYEOpen: require('./eyeOpen.png'),
     EYEClose: require('./eyeClose.png'),
     MENU: require('./menu.png'),
+    ARROWRIGHT: require('./arrow_right.png'),
+    ARROW: require('./arrow.png')
 }

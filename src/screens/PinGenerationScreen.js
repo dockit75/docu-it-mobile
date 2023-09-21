@@ -20,14 +20,17 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 const CELL_COUNT = 4;
 const PinGenerationScreen = ({ navigation, route }) => {
     const fromForget = route?.params?.fromForget;
-    console.log(fromForget, 'route,.....')
+    const phoneNo = route?.params?.phone;
+    // console.log(fromForget, 'route,.....')
     const [pin, setPin] = useState('');
     const [confirmedPin, setConfirmedPin] = useState('');
     const [error, setError] = useState(false)
     const [value, setValue] = useState('');
     const [enableMask, setEnableMask] = useState(true);
+    const [enableMaskPin, setEnableMaskPin] = useState(true);
     const [changePin, SetChangePin] = useState(false)
-    const ref = useBlurOnFulfill({ ...value, cellCount: CELL_COUNT });
+    const ref = useBlurOnFulfill({ value: confirmedPin, cellCount: CELL_COUNT });
+    const refPin = useBlurOnFulfill({ value: pin, cellCount: CELL_COUNT });
     const [snackbarVisible, setSnackbarVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [phone, setPhone] = useState('')
@@ -35,30 +38,36 @@ const PinGenerationScreen = ({ navigation, route }) => {
     const [loading, setLoading] = useState(false)
     const [name, setName] = useState('')
     const insets = useSafeAreaInsets();
-    const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-        value,
-        setValue,
+    const [propsPin, getCellOnLayoutHandlerPin] = useClearByFocusCell({
+        value: pin,
+        setValue: setPin,
     });
+    const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+        value: confirmedPin,
+        setValue: setConfirmedPin,
+    });
+    // console.log(fromForget, phoneNo)
+    useEffect(() => {
+        (async () => {
+            const data = await retrieveUserSession();
+            console.log(data, '-----PinGenerationScreen')
+            setPhone(data.phone)
+            setName(data.name)
+        })();
+    }, []);
+
+    useEffect(() => {
+        if (/^\d{4}$/.test(pin) && pin === confirmedPin) {
+            handleGeneratePin()
+        }
+    }, [confirmedPin])
+
+
 
     const toggleMask = () => setEnableMask(f => !f);
+    const toggleMaskPin = () => setEnableMaskPin(f => !f);
     const renderCellConfirmPin = ({ index, symbol, isFocused }) => {
         let textChild = null;
-
-        useEffect(() => {
-            (async () => {
-                const data = await retrieveUserSession();
-                console.log(data, '-----PinGenerationScreen')
-                setPhone(data.phone)
-                setName(data.name)
-            })();
-        }, []);
-
-        useEffect(() => {
-            if (/^\d{4}$/.test(pin) && pin === confirmedPin) {
-                handleGeneratePin()
-            }
-        }, [pin])
-
         if (symbol) {
             textChild = enableMask ? '•' : symbol;
         } else if (isFocused) {
@@ -74,6 +83,33 @@ const PinGenerationScreen = ({ navigation, route }) => {
             </Text>
         );
     };
+
+    const renderCell = ({ index, symbol, isFocused }) => {
+        let textChild = null;
+
+        if (symbol) {
+            textChild = enableMaskPin ? '•' : symbol;
+            // (
+            //     <MaskSymbol
+            //         maskSymbol='•'
+            //         isLastFilledCell={isLastFilledCell({ index, value })}>
+            //         {symbol}
+            //     </MaskSymbol>
+            // );
+        } else if (isFocused) {
+            textChild = <Cursor />;
+        }
+
+        return (
+            <Text
+                key={index}
+                style={[styles.cell, isFocused && styles.focusCell]}
+                onLayout={getCellOnLayoutHandlerPin(index)}>
+                {textChild}
+            </Text>
+        );
+    };
+ 
     const handlePinChange = (value) => {
         if (/^\d*$/.test(value) && value.length <= CELL_COUNT) {
             setPin(value);
@@ -95,8 +131,8 @@ const PinGenerationScreen = ({ navigation, route }) => {
                         phone: phone,
                         pinNumber: pin,
                     };
-                    console.log(payload, 'payload')
-                    console.log('fromOTPSCreen');
+                    // console.log(payload, 'payload')
+                    // console.log('fromOTPSCreen');
                     // Assuming NetworkManager.pinGeneration returns a promise
                     const res = await NetworkManager.pinGeneration(payload);
                     if (res.data.code === 200) {
@@ -108,10 +144,10 @@ const PinGenerationScreen = ({ navigation, route }) => {
                 } else {
                     setLoading(true)
                     const payload = {
-                        phone: phone,
+                        phone: phoneNo,
                         pinNumber: pin,
                     };
-                    console.log('fromforgetSCreen');
+                    // console.log('fromforgetSCreen');
                     // Assuming NetworkManager.changePin returns a promise
                     const res = await NetworkManager.changePin(payload);
                     if (res.data.code === 200) {
@@ -134,49 +170,40 @@ const PinGenerationScreen = ({ navigation, route }) => {
             }
         } catch (error) {
             console.error('error', error);
-            setError('An error occurred while generating the PIN');
+            // setError('An error occurred while generating the PIN');
+            setSnackbarMessage('An error occurred while generating the PIN');
+            setSnackbarVisible(true);
         } finally {
             setLoading(false); // Stop loading
         }
     };
 
-    const renderCell = ({ index, symbol, isFocused }) => {
-        let textChild = null;
 
-        if (symbol) {
-            textChild = (
-                <MaskSymbol
-                    maskSymbol='•'
-                    isLastFilledCell={isLastFilledCell({ index, value })}>
-                    {symbol}
-                </MaskSymbol>
-            );
-        } else if (isFocused) {
-            textChild = <Cursor />;
-        }
-
-        return (
-            <Text
-                key={index}
-                style={[styles.cell, isFocused && styles.focusCell]}
-                onLayout={getCellOnLayoutHandler(index)}>
-                {textChild}
-            </Text>
-        );
-    };
     return (
         <SafeAreaView style={styles.root}>
             {/* <ScrollView> */}
             <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top }}>
                 <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
                 <View style={styles.container}>
-                    <View>
+                    <View style={{gap:normalizeVertical(20)}}>
                         <View>
                             {/* <Text style={styles.title}>{changePin? 'Enter PIN' : 'Enter New PIN'}</Text> */}
-                            <Text style={styles.title}>Enter PIN</Text>
+                            <View style={{ flexDirection: 'row', marginVertical:normalizeVertical(20), justifyContent: 'space-between', }}>
+                                <View/>
+                                <Text style={styles.title}>Enter PIN</Text>
+                                <TouchableOpacity onPress={toggleMaskPin} style={{alignSelf:'center'}}>
+                                    {enableMaskPin ? (
+                                        <Icon name='eye' size={24} color="white" />
+                                    ) : (
+                                        <Icon name="eye-slash" size={24} color="white" />
+                                    )}
+                                </TouchableOpacity>
+                            </View>
 
                             <CodeField
-                                secureTextEntry={true}
+                                // secureTextEntry={true}
+                                ref={refPin}
+                                {...propsPin}
                                 value={pin}
                                 onChangeText={(text) => {
                                     handlePinChange(text)
@@ -189,15 +216,17 @@ const PinGenerationScreen = ({ navigation, route }) => {
                                 renderCell={renderCell}
                             />
                         </View>
-                        <View style={{flexDirection: 'row'}}>
-                            <Text style={styles.conform}> Conform PIN</Text>
-                            <TouchableOpacity onPress={toggleMask} style={styles.title}>
-                                {enableMask ? (
-                                    <Icon name='eye' size={24} color="white"  />
-                                ) : (
-                                    <Icon name="eye-slash" size={24} color="white" />
-                                )}
-                            </TouchableOpacity>
+                        <View>
+                            <View style={{ flexDirection: 'row', marginVertical: normalizeVertical(20), justifyContent: 'space-between', }}>
+                                <View/>
+                                <Text style={styles.title}> Confirm PIN</Text>
+                                <TouchableOpacity onPress={toggleMask} style={{alignSelf:'center'}}>
+                                    {enableMask ? (
+                                        <Icon name='eye' size={24} color="white" />
+                                    ) : (
+                                        <Icon name="eye-slash" size={24} color="white" />
+                                    )}
+                                </TouchableOpacity>
                             </View>
                             <CodeField
                                 ref={ref}
@@ -213,7 +242,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
                                 textContentType="oneTimeCode"
                                 renderCell={renderCellConfirmPin}
                             />
-                        
+                        </View>
                     </View>
                     <TouchableOpacity style={styles.generateButton} onPress={handleGeneratePin} disabled={loading}>
                         {loading ? (
@@ -246,11 +275,11 @@ const styles = StyleSheet.create({
     title: {
         fontSize: normalize(18),
         fontWeight: 'bold',
-        marginTop: normalize(20),
+        // marginTop: normalize(20),
         color: COLORS.white,
-        alignSelf: 'center',
-        paddingVertical: normalize(10),
-        marginLeft: 20
+        // alignSelf: 'center',
+        // paddingVertical: normalize(10),
+        // marginLeft: 20
     },
     conform: {
         fontSize: normalize(18),
@@ -258,8 +287,8 @@ const styles = StyleSheet.create({
         marginTop: normalize(20),
         color: COLORS.white,
         alignSelf: 'center',
-        // paddingVertical: normalize(10),
-        marginLeft: normalize(45),
+        paddingVertical: normalize(10),
+        // marginLeft: normalize(45),
     },
     codeFieldRoot: {
         width: screenWidth - normalize(160),
