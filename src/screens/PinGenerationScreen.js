@@ -109,7 +109,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
             </Text>
         );
     };
- 
+
     const handlePinChange = (value) => {
         if (/^\d*$/.test(value) && value.length <= CELL_COUNT) {
             setPin(value);
@@ -124,7 +124,14 @@ const PinGenerationScreen = ({ navigation, route }) => {
 
     const handleGeneratePin = async () => {
         try {
-            if (/^\d{4}$/.test(pin) && pin === confirmedPin) {
+            if (pin.length === 0) {
+                // Empty value, show snackbar message
+                setSnackbarMessage('Please enter PIN');
+                setSnackbarVisible(true);
+            } else if (pin.length < 4) {
+                setSnackbarMessage('Please enter a 4-digit PIN');
+                setSnackbarVisible(true);
+            } else if (/^\d{4}$/.test(pin) && pin === confirmedPin) {
                 if (!fromForget) {
                     setLoading(true)
                     const payload = {
@@ -159,13 +166,9 @@ const PinGenerationScreen = ({ navigation, route }) => {
                         setError('PIN generation failed');
                     }
                 }
-            } else if (pin.length === 0) {
-                // Empty value, show snackbar message
-                setSnackbarMessage('Please enter a 4-digit PIN');
-                setSnackbarVisible(true);
             } else {
                 // Invalid PINs, show snackbar message
-                setSnackbarMessage('Invalid PIN. Please try again.');
+                setSnackbarMessage("Pin doesn't match.");
                 setSnackbarVisible(true);
             }
         } catch (error) {
@@ -185,13 +188,13 @@ const PinGenerationScreen = ({ navigation, route }) => {
             <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top }}>
                 <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
                 <View style={styles.container}>
-                    <View style={{gap:normalizeVertical(20)}}>
+                    <View style={{ gap: normalizeVertical(20) }}>
                         <View>
                             {/* <Text style={styles.title}>{changePin? 'Enter PIN' : 'Enter New PIN'}</Text> */}
-                            <View style={{ flexDirection: 'row', marginVertical:normalizeVertical(20), justifyContent: 'space-between', }}>
-                                <View/>
+                            <View style={{ flexDirection: 'row', marginVertical: normalizeVertical(20), justifyContent: 'space-between', }}>
+                                <View />
                                 <Text style={styles.title}>Enter PIN</Text>
-                                <TouchableOpacity onPress={toggleMaskPin} style={{alignSelf:'center'}}>
+                                <TouchableOpacity onPress={toggleMaskPin} style={{ alignSelf: 'center' }}>
                                     {enableMaskPin ? (
                                         <Icon name='eye' size={24} color="white" />
                                     ) : (
@@ -218,9 +221,9 @@ const PinGenerationScreen = ({ navigation, route }) => {
                         </View>
                         <View>
                             <View style={{ flexDirection: 'row', marginVertical: normalizeVertical(20), justifyContent: 'space-between', }}>
-                                <View/>
+                                <View />
                                 <Text style={styles.title}> Confirm PIN</Text>
-                                <TouchableOpacity onPress={toggleMask} style={{alignSelf:'center'}}>
+                                <TouchableOpacity onPress={toggleMask} style={{ alignSelf: 'center' }}>
                                     {enableMask ? (
                                         <Icon name='eye' size={24} color="white" />
                                     ) : (

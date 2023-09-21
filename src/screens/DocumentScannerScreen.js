@@ -22,6 +22,7 @@ import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { FAB, Provider as PaperProvider, Portal, } from 'react-native-paper';
 import { Images } from '../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import NetworkManager from '../services/NetworkManager';
 
 const DocumentScannerScreen = () => {
   const [scannedImages, setScannedImages] = useState([]);
@@ -32,6 +33,7 @@ const DocumentScannerScreen = () => {
   const [isFabOpen, setIsFabOpen] = useState(false);
   const rotationValue = new Animated.Value(0);
   const insets = useSafeAreaInsets();
+  const [uploadStatus, setUploadStatus] = useState(null);
 
   const handleScanner = async () => {
     // Check if camera permission is granted
@@ -52,6 +54,9 @@ const DocumentScannerScreen = () => {
           newRotateDegrees[uri] = 0;
         });
         setRotateDegrees({ ...rotateDegrees, ...newRotateDegrees });
+        newScannedImages.forEach((imageUri) => {
+          handleUpload(imageUri);
+        });
       }
     } else if (status === RESULTS.DENIED) {
       // Camera permission is denied, request it from the user
@@ -71,6 +76,9 @@ const DocumentScannerScreen = () => {
             newRotateDegrees[uri] = 0;
           });
           setRotateDegrees({ ...rotateDegrees, ...newRotateDegrees });
+          newScannedImages.forEach((imageUri) => {
+            handleUpload(imageUri);
+          });
         }
       } else {
         // Handle the case where the user denied camera permissions
@@ -139,9 +147,27 @@ const DocumentScannerScreen = () => {
     // handleScanner();
   }, []);
 
-  const handleUpload = () => {
-    // Implement your upload logic here
-    // You can open a file picker or use a library like react-native-document-picker
+  const handleUpload = async (imageUri) => {
+    try {
+      const formData = new FormData();
+      const fileName = `scanned_image.jpg`;
+      formData.append('file', {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: fileName,
+      });
+      formData.append('userId', '9f518520-48de-4aca-b70c-09a21431065c')
+      console.log(formData, 'formdata-----------------------------')
+      const response = await NetworkManager.uploadDocument(formData)
+      console.log(response, 'response');
+      // Handle the API response here
+      const { data } = response;
+
+      setUploadStatus(`Upload Successful. Response: ${data}`);
+    } catch (error) {
+      console.error('Upload error:', error.response);
+      setUploadStatus('Upload Failed');
+    }
   };
 
   return (
@@ -179,49 +205,49 @@ const DocumentScannerScreen = () => {
           </View>
         </View>
       ) : <>
-              <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{width: screenWidth , height: screenHeight + insets.top, flex:1}}>
-        <FlatList
-          data={[...scannedImages]}
-          keyExtractor={(uri, index) => index.toString()}
-          contentContainerStyle={styles.imageContainer}
-          numColumns={2}
-          // showsVerticalScrollIndicator={false}
-          renderItem={({ item: uri }) => (
-            <View style={{ borderWidth: 0, flex: 1, height: normalize(250), maxWidth: screenWidth * 0.45, marginLeft: screenWidth * 0.035, }}>
-              <View style={styles.imageWrapper}>
-                <TouchableOpacity onPress={() => toggleFullScreen(uri)}>
-                  <Image
-                    resizeMode="contain"
-                    style={[
-                      styles.image,
-                      { transform: [{ rotate: `${rotateDegrees[uri] || 0}deg` }] },
-                    ]}
-                    source={{ uri }}
-                  />
-                </TouchableOpacity>
+        <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, flex: 1 }}>
+          <FlatList
+            data={[...scannedImages]}
+            keyExtractor={(uri, index) => index.toString()}
+            contentContainerStyle={styles.imageContainer}
+            numColumns={2}
+            // showsVerticalScrollIndicator={false}
+            renderItem={({ item: uri }) => (
+              <View style={{ borderWidth: 0, flex: 1, height: normalize(250), maxWidth: screenWidth * 0.45, marginLeft: screenWidth * 0.035, }}>
+                <View style={styles.imageWrapper}>
+                  <TouchableOpacity onPress={() => toggleFullScreen(uri)}>
+                    <Image
+                      resizeMode="contain"
+                      style={[
+                        styles.image,
+                        { transform: [{ rotate: `${rotateDegrees[uri] || 0}deg` }] },
+                      ]}
+                      source={{ uri }}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={{ marginRight: normalize(20) }}
+                    onPress={() => toggleFullScreen(uri)}
+                  >
+                    {fullScreenImage === uri ? (
+                      <Icon name="compress" size={24} color="#79aee7" />
+                    ) : (
+                      <Icon name="expand" size={24} color="#79aee7" />
+                    )}
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ marginRight: normalize(10) }}
+                    onPress={() => deleteImage(uri)}
+                  >
+                    <Icon name="trash" size={24} color="#e34077" />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={{ marginRight: normalize(20) }}
-                  onPress={() => toggleFullScreen(uri)}
-                >
-                  {fullScreenImage === uri ? (
-                    <Icon name="compress" size={24} color="#79aee7" />
-                  ) : (
-                    <Icon name="expand" size={24} color="#79aee7" />
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{ marginRight: normalize(10) }}
-                  onPress={() => deleteImage(uri)}
-                >
-                  <Icon name="trash" size={24} color="#e34077" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-        />
-</ImageBackground>
+            )}
+          />
+        </ImageBackground>
         <View style={styles.fabContainer}>
           {isFabOpen && (
             <View style={styles.fabBackground} onTouchStart={() => setIsFabOpen(false)} />
@@ -265,14 +291,14 @@ const styles = StyleSheet.create({
   imageContainer: {
     height: screenHeight,
     width: screenWidth,
-    marginVertical:normalizeVertical(20)
+    marginVertical: normalizeVertical(20)
   },
   imageWrapper: {
     backgroundColor: '#f0f5f0',
     flex: 0.9,
   },
   image: {
-    justifyContent:'center',
+    justifyContent: 'center',
     width: '100%',
     height: '90%',
     marginVertical: normalizeVertical(10),
@@ -351,9 +377,9 @@ const styles = StyleSheet.create({
     bottom: 16,
     right: 16,
     alignItems: 'flex-end',
-    padding:normalize(5),
-    paddingBottom:normalize(0),
-    paddingTop:normalize(0),
+    padding: normalize(5),
+    paddingBottom: normalize(0),
+    paddingTop: normalize(0),
   },
   fabBackground: {
     position: 'absolute',
@@ -361,7 +387,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius:25,
+    borderRadius: 25,
   },
   fabGroup: {
     flexDirection: 'column',

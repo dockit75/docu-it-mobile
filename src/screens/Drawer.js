@@ -40,7 +40,7 @@ const HamburgerMenu = ({ navigation, route }) => {
 
   const handleLogout = () => {
     try {
-      navigation.navigate('LockScreen');
+      navigation.navigate('LockScreen',{signInParam: true});
     } catch (error) {
       console.error('Error in handleNavigation:', error);
     }
