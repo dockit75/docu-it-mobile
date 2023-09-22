@@ -4,6 +4,7 @@ import { normalize, screenHeight, screenWidth } from '../utilities/measurement'
 import { Images } from '../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';// You can use another icon library if you prefer
+import { COLORS } from '../utilities/colors';
 
 
 
@@ -29,7 +30,7 @@ const Settings = ({ navigation }) => {
                             <Text style={styles.Text}>Terms & Conditions</Text>
                             <Image source={Images.ARROWRIGHT} resizeMode='center' style={{ width: 20, height: 20, marginVertical: 20, }} />
                         </TouchableOpacity>
-                        <View style={{borderBottomWidth: 0.5, borderBottomColor: 'black'}}/>
+                        <View style={{borderBottomWidth: 0.5, borderBottomColor:COLORS.lightGray}}/>
                         <TouchableOpacity style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'space-between' }}>
                             <Text style={styles.Text}>Privacy Policy</Text>
                             <Image source={Images.ARROWRIGHT} resizeMode='center' style={{ width: 20, height: 20, marginVertical: 20 }} />

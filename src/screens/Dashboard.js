@@ -16,12 +16,15 @@ const Dashboard = () => {
     return (
         <ScrollView>
             <View style={styles.cardView}>
+            <TouchableOpacity onPress={handleUploadDocument}>
                 <Card style={styles.cardContainer}>
-                    <Image source={Images.ICON_ASSETS} style={styles.Images} resizeMode='center' />
-                    <Card.Content >
-                        <Paragraph style={styles.imageText}>View Document</Paragraph>
-                    </Card.Content>
-                </Card>               
+                    <Image source={Images.ICON_PERSONAL_DOCS} style={styles.Images} resizeMode='center' />
+                    <Card.Content>
+                        <Paragraph style={styles.imageText}>Docu Mgmt</Paragraph>
+                    </Card.Content>                   
+                </Card>
+                </TouchableOpacity>
+                          
                     <Card style={styles.cardContainer} >
                         <Image source={Images.ICON_FAMILY_MGMT} style={styles.Images} resizeMode='center' />
                         <Card.Content >
@@ -31,14 +34,12 @@ const Dashboard = () => {
                 
             </View>
             <View style={styles.cardView}>
-                <TouchableOpacity onPress={handleUploadDocument}>
-                <Card style={styles.cardContainer}>
-                    <Image source={Images.ICON_PERSONAL_DOCS} style={styles.Images} resizeMode='center' />
-                    <Card.Content>
-                        <Paragraph style={styles.imageText}>Upload Document</Paragraph>
-                    </Card.Content>                   
-                </Card>
-                </TouchableOpacity>
+            {/* <Card style={styles.cardContainer}>
+                    <Image source={Images.ICON_ASSETS} style={styles.viewDocumentImage} resizeMode='center' />
+                    <Card.Content >
+                        <Paragraph style={styles.imageText}>View Document</Paragraph>
+                    </Card.Content>
+                </Card>     */}
 
                 {/* <View style={{ marginRight: 15 }} /> */}
                 {/* <Card style={styles.cardContainer}>
@@ -81,10 +82,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#042533',
     },
     Images: {
-        width: normalize(40),
-        height: normalize(40),
+        width: normalize(35),
+        height: normalize(35),
         alignSelf: 'center',
-        marginTop: normalize(20)
+        marginTop: normalize(25)
+    },
+    viewDocumentImage: {
+        width: normalize(46),
+        height: normalize(45),
+        alignSelf: 'center',
+        marginTop: normalize(15)
     },
     imageText: {
         fontWeight: 'bold',

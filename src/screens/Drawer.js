@@ -13,7 +13,7 @@ import { normalize, screenHeight, screenWidth } from '../utilities/measurement';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Dashboard from './Dashboard';
 import { useDispatch } from 'react-redux';
-import { retrieveUserSession } from '../storageManager';
+import { clearStorage, retrieveUserSession } from '../storageManager';
 import { COLORS } from '../utilities/colors';
 import Icon from 'react-native-vector-icons/Ionicons'; // You can use another icon library if you prefer
 import UserAvatar from 'react-native-user-avatar';
@@ -36,30 +36,36 @@ const HamburgerMenu = ({ navigation, route }) => {
         console.error('Error in useEffect:', error);
       }
     })();
-  }, []);
+  }, [retrieveUserSession]);
 
   const handleLogout = () => {
     try {
       navigation.navigate('LockScreen',{signInParam: true});
+      clearStorage();
     } catch (error) {
       console.error('Error in handleNavigation:', error);
     }
   };
-
   const handleSettings = () => {
-  navigation.navigate('Settings')
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Settings' }],
+    });
   };
 
   const handleUser = () => {
-    navigation.navigate('User');
-    closeDrawer();
+    navigation.reset({
+      index: 0,
+      routes:[{ name: 'User' }]
+    })
   };
 
   const handleProfile = () => {
-    navigation.navigate('Profile');
-    closeDrawer();
+    navigation.reset({
+      index: 0,
+      routes:[{ name: 'Profile' }]
+    })
   };
-
   const navigationView = () => (
     <>
       <View style={{ backgroundColor: '#0e9b81', flex: 1}}>
@@ -69,15 +75,15 @@ const HamburgerMenu = ({ navigation, route }) => {
         </View>
         <View style={styles.editProfile}>
           <TouchableOpacity style={styles.menuItem} onPress={handleProfile}>
-            <Icon name="person-outline" size={24} color={COLORS.black} />
+            <Icon name="person" size={24} color={COLORS.black} />
             <Text style={styles.menuText}>Edit Profile</Text>
           </TouchableOpacity>
-           <View style={{borderBottomWidth: 0.5, }}/>
+           <View style={{borderBottomWidth: 0.5, borderBottomColor:COLORS.lightGray}}/>
           <TouchableOpacity style={styles.menuItem} onPress={handleSettings}>
-            <Icon name="cog-outline" size={24} color={COLORS.black} />
+            <Icon name="cog" size={24} color={COLORS.black} />
             <Text style={styles.menuText}>Settings</Text>
           </TouchableOpacity>
-          <View style={{borderBottomWidth: 0.5 }}/>
+          <View style={{borderBottomWidth: 0.5, borderBottomColor:COLORS.lightGray }}/>
           <TouchableOpacity style={styles.menuItem} onPress={handleUser}>
             <Icon name="share-outline" size={24} color={COLORS.black} />
             <Text style={styles.menuText}>Invite</Text>

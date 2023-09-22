@@ -62,12 +62,12 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen
         name="User"
         component={User}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Profile"
         component={Profile}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Settings"
