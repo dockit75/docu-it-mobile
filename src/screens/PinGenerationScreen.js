@@ -143,7 +143,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
                     // Assuming NetworkManager.pinGeneration returns a promise
                     const res = await NetworkManager.pinGeneration(payload);
                     if (res.data.code === 200) {
-                        navigation.navigate('LockScreen', { isForgotPin: false });
+                        navigation.navigate('LockScreen',{ signInParam: true });
                     } else {
                         // Handle other response codes or errors here
                         console.log('Error response:', res);
@@ -159,7 +159,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
                     const res = await NetworkManager.changePin(payload);
                     if (res.data.code === 200) {
                         // PIN generation successful, navigate to the LockScreen
-                        navigation.navigate('LockScreen');
+                        navigation.navigate('LockScreen', { signInParam: true });
                     } else {
                         // Handle other response codes or errors here
                         console.log('Error response:', res);
@@ -314,7 +314,10 @@ const styles = StyleSheet.create({
     //     alignSelf: 'center'
     // },
     focusCell: {
-        borderColor: '#000',
+        borderColor: COLORS.white,
+        textAlign: 'center',
+        justifyContent: 'center',
+        alignSelf: 'center'
     },
     subtitle: {
         fontSize: normalize(18),

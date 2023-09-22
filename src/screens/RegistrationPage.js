@@ -114,7 +114,7 @@ const RegistrationPage = ({ navigation }) => {
     }
 
     const handleLogin = (resetForm) => {
-        navigation.navigate('LockScreen',{signInParam: true})
+        navigation.navigate('LockScreen',{signInParam: false})
         resetForm();
         cleanTextFields();
     }

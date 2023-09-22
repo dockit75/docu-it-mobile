@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { retrieveUserSession, storeUserSession } from '../storageManager';
+import { retrieveUserSession, storeUserDetail, storeUserSession } from '../storageManager';
 import {
   CodeField,
   Cursor,
@@ -62,7 +62,7 @@ const LockScreen = ({ navigation, route }) => {
   const [error, setError] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [isForgotPin, setIsForgotPin] = useState('');
+  // const [isForgotPin, setIsForgotPin] = useState('');
   const [isSendOtp, setIsSendOtp] = useState(false);
   const [phone, setPhone] = useState(''); // Track if in "Forgot PIN" mode
   const [loading, setLoading] = useState(false); // Track loading state
@@ -159,10 +159,10 @@ const LockScreen = ({ navigation, route }) => {
   };
 
   const handlelockpin = async () => {
-     console.log(phone?.length, value?.length,'-------lenght')
+    //  console.log(phone?.length, value?.length,'-------lenght')
     if (phone?.length >= 10) {
       if (value?.length === 4) {
-       
+
         try {
 
           setLoading(true); // Start loading
@@ -175,7 +175,8 @@ const LockScreen = ({ navigation, route }) => {
           const loginResponse = await NetworkManager.login(payload);
           // console.log(loginResponse.data.response.userDetails, '----------')
           const token = loginResponse.data.response.token
-          await storeUserSession({ ...loginResponse.data.response.userDetails, token })
+          await storeUserSession({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
+          await storeUserDetail({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
           if (loginResponse.data.code === 200) {
             // If login is successful, navigate to the dashboard screen
             navigation.navigate('Dashboard', { userData: value });
@@ -203,179 +204,196 @@ const LockScreen = ({ navigation, route }) => {
     }
   }
 
-const handleSendOtp = async () => {
-  if (phone.length >= 10) {
-    try {
-      setValue('')
-      setLoading(true);
-      // setIsSendOtp(false)
-      // console.log(phone, 'phone.............')
-      // NetworkManager.forgotPin(phone).then(res => {
-      const res = await NetworkManager.forgotPin(phone)
-      // console.log(res, 'res......')
-      if (res.data.code === 200) {
-        // setLoading(true);
-        // console.log(res.data.message, 'OTP Send  Success')
-        setSnackbarMessage('A PIN reset link has been sent to your registered mobile/email id');
-        setSnackbarVisible(true);
-        // setIsSendOtp(true)
-        // setIsForgotPin(true);
-        setScreen(SCREENS.verifyOTP);
-      } else {
-        // console.log('else', res)
+  const handleSendOtp = async () => {
+    if (phone.length >= 10) {
+      try {
+        setValue('')
+        setLoading(true);
+        // setIsSendOtp(false)
+        // console.log(phone, 'phone.............')
+        // NetworkManager.forgotPin(phone).then(res => {
+        const res = await NetworkManager.forgotPin(phone)
+        // console.log(res, 'res......')
+        if (res.data.code === 200) {
+          // setLoading(true);
+          // console.log(res.data.message, 'OTP Send  Success')
+          setSnackbarMessage('A PIN reset link has been sent to your registered mobile/email id');
+          setSnackbarVisible(true);
+          // setIsSendOtp(true)
+          // setIsForgotPin(true);
+          setScreen(SCREENS.verifyOTP);
+        } else {
+          // console.log('else', res)
+          setSnackbarMessage('Phone number not found');
+          setSnackbarVisible(true);
+          // setLoading(false);
+        }
+        // })
+      } catch (error) {
+        console.log(error, 'error')
         setSnackbarMessage('Phone number not found');
         setSnackbarVisible(true);
-        // setLoading(false);
+      } finally {
+        setLoading(false); // Stop loading
       }
-      // })
-    } catch (error) {
-      console.log(error, 'error')
-      setSnackbarMessage('Phone number not found');
+    }
+    else {
+      setSnackbarMessage('Enter valid phone number');
       setSnackbarVisible(true);
-    } finally {
-      setLoading(false); // Stop loading
     }
   }
-  else {
-    setSnackbarMessage('Enter valid phone number');
-    setSnackbarVisible(true);
+  const buttonFunction = async () => {
+    if (screen === SCREENS.lockScreen) {
+      // console.log('lockscreen to dash board');
+      handlelockpin();
+    } else if (screen === SCREENS.forgetPin) {
+      // console.log('otp to verfy screen')
+      handleSendOtp();
+    } else if (screen === SCREENS.verifyOTP) {
+      // console.log('verypin screen to pingeneration');
+      handlePinEntry();
+    }
+
   }
-}
-const buttonFunction = async () => {
-  if (screen === SCREENS.lockScreen) {
-    // console.log('lockscreen to dash board');
-    handlelockpin();
-  } else if (screen === SCREENS.forgetPin) {
-    // console.log('otp to verfy screen')
-    handleSendOtp();
-  } else if (screen === SCREENS.verifyOTP) {
-    // console.log('verypin screen to pingeneration');
-    handlePinEntry();
+  const handleForgetPin = () => {
+    setScreen(SCREENS.forgetPin)
   }
+  const handleSighUP = () => {
+    navigation.navigate('RegistrationPage')
+    cleanTextFields();
+  }
+  const handleCancel = () => {
+    setScreen(SCREENS.lockScreen)
+    cleanTextFields();
+  }
+  // console.log(isSendOtp, 'issetotp')
+  // const handleSignUp = () => {
+  //   if (isAuthenticated === false) {
+  //     navigation.navigate('RegistrationPage')
+  //   } else {
+  //     setSnackbarMessage('Cant able to login more than 1 account');
+  //     setSnackbarVisible(true);
+  //   }
+  // }
+  // console.log(BUTTON[screen], screen, signInParam, 'screen button')
 
-}
-const handleForgetPin = () => {
-  setScreen(SCREENS.forgetPin)
-}
-const handleSighUP = () => {
-  navigation.navigate('RegistrationPage')
-}
-// console.log(isSendOtp, 'issetotp')
-// const handleSignUp = () => {
-//   if (isAuthenticated === false) {
-//     navigation.navigate('RegistrationPage')
-//   } else {
-//     setSnackbarMessage('Cant able to login more than 1 account');
-//     setSnackbarVisible(true);
-//   }
-// }
-// console.log(BUTTON[screen], screen, signInParam, 'screen button')
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
+        <View style={{alignSelf:'center'}}>
+          <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ marginTop: normalizeVertical(50), width: normalize(150), height: normalize(150), justifyContent: 'center', alignSelf: 'center' }} />
+          {(!signInParam && screen === SCREENS.lockScreen) || screen === SCREENS.forgetPin ? <View style={{ justifyContent: 'center', flexDirection: 'column', }}>
+            {screen !== SCREENS.forgetPin ? <Text style={[styles.signup, {height: normalizeVertical(50), marginBottom: normalizeVertical(30)}] } >Login</Text> : null}
+            {(screen === SCREENS.forgetPin) ? <Text style={{ fontSize: 15, color: 'white', fontWeight: '400', alignSelf: 'flex-start', marginTop: normalizeVertical(50), height: normalizeVertical(30), }}>Enter Your Registered Phone Number :</Text> : null}
+            <TouchableOpacity style={[styles.mobileInputView,
+              // errors.phoneNo &&
+              // touched?.phoneNo && {
+              //     borderColor: '#ff00009c',
+              //     borderWidth: 2
+              // },
+            ]}>
 
-return (
-  <SafeAreaView style={{ flex: 1 }}>
-    <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ marginTop: normalizeVertical(50), width: normalize(150), height: normalize(150), justifyContent: 'center', alignSelf: 'center' }} />
-        {(signInParam && screen === SCREENS.lockScreen) || screen === SCREENS.forgetPin ? <View style={{ justifyContent: 'center', flexDirection: 'column', }}>
-          {signInParam && screen !== SCREENS.forgetPin ? <Text style={{ ...styles.signup, height: normalizeVertical(50), marginBottom: normalizeVertical(30) }} >Login</Text> : null}
-          {(screen === SCREENS.forgetPin) ? <Text style={{ fontSize: 15, color: 'white', fontWeight: '400', alignSelf: 'flex-start', marginTop: normalizeVertical(50), height: normalizeVertical(30), }}>Enter Your Registered Phone Number :</Text> : null}
-          <TouchableOpacity style={[styles.mobileInputView,
-            // errors.phoneNo &&
-            // touched?.phoneNo && {
-            //     borderColor: '#ff00009c',
-            //     borderWidth: 2
-            // },
-          ]}>
-
-            <PhoneInput
-            key={!phone}
-              ref={phoneInput}
-              defaultValue={phone}
-              defaultCode="IN"
-              onChangeFormattedText={(text) => {
-                const formattedPhoneNumberWithoutCountryCode = text.replace(/^(\+\d{1,2})/, '');
-                setPhone(formattedPhoneNumberWithoutCountryCode)
+              <PhoneInput
+                key={!phone}
+                ref={phoneInput}
+                defaultValue={phone}
+                defaultCode="IN"
+                onChangeFormattedText={(text) => {
+                  const formattedPhoneNumberWithoutCountryCode = text.replace(/^(\+\d{1,2})/, '');
+                  setPhone(formattedPhoneNumberWithoutCountryCode)
+                }}
+                disableArrowIcon={true}
+                containerStyle={styles.phoneInputContainer}
+                textContainerStyle={styles.phoneInputTextContainer}
+                textInputStyle={styles.phoneInputTextStyle}
+                textInputProps={{
+                  maxLength: 15,
+                  placeholder: 'Phone Number',
+                  placeholderTextColor: 'black'
+                }}
+                // codeTextStyle={{fontSize: 17}}
+                flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
+                keyboardType="number-pad"
+              // onChangeText={handleChange('phoneNo')}
+              // onBlur={handleBlur('phoneNo')}
+              />
+            </TouchableOpacity>
+          </View> : null}
+          <View style={{ justifyContent: 'center', alignSelf:'center' }} >
+            {screen !== SCREENS.forgetPin ? <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: normalize(40), }}>
+              <View/>
+              <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', padding: 10, }}>{TITLE[screen]}</Text>
+              <TouchableOpacity onPress={toggleMask} style={{ padding: 10, }}>
+                {enableMask ? (
+                  <Icon name='eye' size={24} color="white" />
+                ) : (
+                  <Icon name="eye-slash" size={24} color="white" />
+                )}
+              </TouchableOpacity>
+            </View>
+              : null}
+            {screen !== SCREENS.forgetPin ? <CodeField
+              ref={ref}
+              {...props}
+              value={value}
+              onChangeText={(text) => {
+                setValue(text)
+                // setError(false)
               }}
-              disableArrowIcon={true}
-              containerStyle={styles.phoneInputContainer}
-              textContainerStyle={styles.phoneInputTextContainer}
-              textInputStyle={styles.phoneInputTextStyle}
-              textInputProps={{
-                maxLength: 15,
-                placeholder: 'Phone Number',
-                placeholderTextColor: 'black'
-              }}
-              // codeTextStyle={{fontSize: 17}}
-              flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
+              cellCount={CELL_COUNT}
               keyboardType="number-pad"
-            // onChangeText={handleChange('phoneNo')}
-            // onBlur={handleBlur('phoneNo')}
-            />
-          </TouchableOpacity>
-        </View> : null}
-
-        {screen !== SCREENS.forgetPin ? <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: normalize(40), }}>
-          <View />
-          <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', padding: 10, }}>{TITLE[screen]}</Text>
-          <TouchableOpacity onPress={toggleMask} style={{ padding: 10, }}>
-            {enableMask ? (
-              <Icon name='eye' size={24} color="white" />
+              textContentType="oneTimeCode"
+              renderCell={renderCell}
+              rootStyle={styles.codeFieldRoot}
+            /> : null}
+          </View>
+          <TouchableOpacity onPress={buttonFunction} style={styles.button} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator color='white' />
             ) : (
-              <Icon name="eye-slash" size={24} color="white" />
+              <Text style={styles.buttonText}>{(signInParam && screen === SCREENS.lockScreen) ? 'LOGIN' : BUTTON[screen]}</Text>
             )}
           </TouchableOpacity>
+          {screen === SCREENS.forgetPin ? <TouchableOpacity onPress={handleCancel} style={{ alignSelf: 'flex-end', marginRight: normalize(10), marginTop: normalize(10) }}><Text style={{ fontWeight: 'bold', color: 'white', }} >CANCEL</Text></TouchableOpacity> : null}
         </View>
-          : null}
-        {screen !== SCREENS.forgetPin ? <CodeField
-          ref={ref}
-          {...props}
-          value={value}
-          onChangeText={(text) => {
-            setValue(text)
-            // setError(false)
-          }}
-          cellCount={CELL_COUNT}
-          keyboardType="number-pad"
-          textContentType="oneTimeCode"
-          renderCell={renderCell}
-        /> : null}
+        {!signInParam && screen === SCREENS.lockScreen ? (
+          <View>
+            <View>
 
-        <TouchableOpacity onPress={buttonFunction} style={styles.button} disabled={loading}>
-          {loading ? (
-            <ActivityIndicator color='white' />
-          ) : (
-            <Text style={styles.buttonText}>{(signInParam && screen === SCREENS.lockScreen) ? 'LOGIN' : BUTTON[screen]}</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-      {screen === SCREENS.lockScreen ? (
-        <View style={{ justifyContent: 'center', alignSelf: 'flex-end', marginRight: normalize(20), marginTop: normalize(10), flexDirection: 'row' }}>
-          {signInParam ? <>
-            <Text style={{ color: 'black' }}> Don't have account?    </Text>
-            <TouchableOpacity onPress={handleSighUP}>
-              <Text style={{ color: 'white', fontWeight: 'bold', marginRight: normalize(8) }}>SIGN UP</Text>
-            </TouchableOpacity>
-            <Text style={{ color: 'white' }}>/</Text>
-          </> : null}
-          <TouchableOpacity onPress={handleForgetPin}>
-            <Text style={{ color: 'white', fontWeight: 'bold', marginLeft: normalize(8) }}>FORGET PIN</Text>
-          </TouchableOpacity>
-          {/* <Text onPress={() => navigation.navigate('RegistrationPage')}>i</Text> */}
-        </View>
-      ) : null}
+              <View style={{ alignSelf: 'flex-end', marginRight: normalize(20), marginTop: normalize(10) }}>
+                {/* {signInParam ? <> */}
 
-    </ImageBackground>
-    <Snackbar
-      visible={snackbarVisible}
-      onDismiss={() => setSnackbarVisible(false)}
-      duration={3000}
-      style={styles.Snackbar}
-    >
-      {snackbarMessage}
-    </Snackbar>
+                {/* <Text style={{ color: 'white' }}>/</Text> */}
+                {/* </> : null} */}
+                <TouchableOpacity onPress={handleForgetPin}>
+                  <Text style={{ color: 'white', fontWeight: 'bold', marginLeft: normalize(8) }}>FORGET PIN</Text>
+                </TouchableOpacity>
+                {/* <Text onPress={() => navigation.navigate('RegistrationPage')}>i</Text> */}
+              </View>
 
-  </SafeAreaView>
-);
+            </View>
+            <View style={{ justifyContent: 'center', alignSelf: 'center', flexDirection: 'row', paddingTop: normalizeVertical(37), }}>
+              <Text style={{ color: 'black' }}> Don't have an account? </Text>
+              <TouchableOpacity onPress={handleSighUP}>
+                <Text style={{ color: 'black', fontWeight: 'bold', }}>SIGN UP</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : null}
+
+      </ImageBackground>
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => setSnackbarVisible(false)}
+        duration={3000}
+        // style={styles.Snackbar}
+        style={[styles.Snackbar, snackbarMessage === 'A PIN reset link has been sent to your registered mobile/email id' && { backgroundColor: '#0e9b81' }]}
+      >
+        {snackbarMessage}
+      </Snackbar>
+
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -435,28 +453,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 8,
   },
-  cell: {
+  codeFieldRoot: {
+    width: screenWidth - normalize(160),
+},
+cell: {
     width: normalize(40),
     height: normalize(40),
-    fontSize: 30,
-    fontWeight: '500',
+    fontSize: normalize(30),
     textAlign: 'center',
-    marginLeft: 8,
-    borderRadius: 6,
-    borderWidth: 1,
+    borderRadius: normalize(6),
+    borderWidth: normalize(1),
     borderColor: 'black',
     backgroundColor: '#e3e3e3cc',
-    paddingVertical: 2
-  },
-  toggle: {
-    width: normalize(30),
-    height: normalize(30),
-    marginBottom: 20,
-    marginTop: 10,
-  },
-  focusCell: {
-    borderColor: '#000',
-  },
+},
+focusCell: {
+    borderColor: COLORS.white,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center'
+},
+  // cell: {
+  //   width: normalize(40),
+  //   height: normalize(40),
+  //   fontSize: 30,
+  //   fontWeight: '500',
+  //   textAlign: 'center',
+  //   marginLeft: 8,
+  //   borderRadius: 6,
+  //   borderWidth: 1,
+  //   borderColor: 'black',
+  //   backgroundColor: '#e3e3e3cc',
+  //   paddingVertical: 2
+  // },
+
+  // codeFieldRoot: {
+  //   alignSelf: 'center',
+  //   width: screenWidth - normalize(160),
+  // },
+  
+  // focusCell: {
+  //   borderColor: '#000',
+  // },
   Snackbar: {
     backgroundColor: 'rgb(195,0,0)',
     // color: 'white',
@@ -495,7 +532,9 @@ const styles = StyleSheet.create({
     borderColor: COLORS.gray,
     // alignItems: FONTALIGNMENT.center,
     // marginTop: normalize(30),
-    marginBottom: normalize(0)
+    marginBottom: normalize(0),
+    // alignSelf: 'center',
+    // justifyContent: 'center'
   },
   signup: {
     fontSize: 30,
