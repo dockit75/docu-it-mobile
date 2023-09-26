@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react-native'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-// import { isJwtExpired } from 'jwt-check-expiration'
+import { isJwtExpired } from 'jwt-check-expiration'
 import jwtDecode from 'jwt-decode'
 import { clearDBTables } from '../db/deleteDb'
 // import { store } from '../store/store'
@@ -26,8 +26,8 @@ const axiosHeaders = (isFormData) => {
 
 
 const axiosError = error => {
-    if (error.response.status !== 409 && error.response.status !== 403 && error.response.status !== 401 && error.response.status !== 400 && error.message !== 'Network Error') {
-        Sentry.captureException(error)
+    // if (error.response.status !== 409 && error.response.status !== 403 && error.response.status !== 401 && error.response.status !== 400 && error.message !== 'Network Error') {
+        // Sentry.captureException(error)
         // showAlert({
         //     cancelButtonName: ALERT_CANCEL_BUTTON_NAMES.cancel,
         //     header: ALERT_HEADER,
@@ -35,8 +35,9 @@ const axiosError = error => {
         //     okButtonName: ALERT_OK_BUTTON_NAMES.ok,
         //     cancelable: false
         // })
-    }
-    console.warn(`AXIOS ERROR [${error.response.status}] ${error?.config?.method} ${error?.config?.url}`)
+    // }
+
+    console.warn(`AXIOS ERROR [${JSON.stringify(error)}]`)
     return Promise.reject(error)
 }
 
@@ -49,6 +50,7 @@ axiosNoAuthCoreInstance.interceptors.request.use(config => {
 axiosNoAuthCoreInstance.interceptors.response.use(response => response, error => axiosError(error))
 
 // Core API
+// const axiosCoreInstance = axios.create({ baseURL: BASE_API_CORE_URL, headers: {  Authorization: `Bearer ${token}`} })
 const axiosCoreInstance = axios.create({ baseURL: BASE_API_CORE_URL })
 axiosRetry(axiosCoreInstance, { retries: 1, retryDelay: axiosRetry.exponentialDelay })
 axiosCoreInstance.interceptors.request.use(config => axiosRequest(config))
@@ -60,7 +62,7 @@ const axiosRequest = async request => {
     if (userData.token) {
         const decodedToken = jwtDecode((userData.token), { complete: true })
         const tokenExpiry = (decodedToken.exp * 1000 - 60 * 1000) // ( 1203243423400 )
-        if ((tokenExpiry < new Date().getTime()) || isJwtExpired(webToken.token)) {
+        if ((tokenExpiry < new Date().getTime()) || isJwtExpired(userData.token)) {
             await refreshTokenPerform(request)
             userData = await retrieveUserDetail();
         }
@@ -68,14 +70,16 @@ const axiosRequest = async request => {
             request.headers.Authorization = `Bearer ${userData?.token}`
         }
     }
+    console.log(request.headers,'request')
     return request
 }
 const refreshTokenPerform = async () => {
+    console.log('token expire check');
     const userData = await retrieveUserDetail();
     const payload = {
         email: userData.email
     }
-    const { data } = await Network.generateToken(payload)
+    const { data } = await NetworkManager.generateToken(payload)
     storeUserDetail({ ...userData, token: data.token })
     return
 }
@@ -104,7 +108,8 @@ const path = {
     verifyPin: 'auth/verifyPin',
     changePin: 'auth/changePin',
     uploadDocument: 'document/uploadDocument',
-    generateToken: '/auth/generateToken',
+    generateToken: 'auth/generateToken',
+    listCategories: 'category/listCategories,'
 }
 
 
@@ -152,6 +157,9 @@ const NetworkManager = {
     generateToken: async (email) => {
         const tokenGenrate = `${path.generateToken}?email=${email}`
         return await requests.get(tokenGenrate, false)
+    },
+    listCategories: async () => {
+        return await requests.getTokenize(path.listCategories, false)
     }
 
 };

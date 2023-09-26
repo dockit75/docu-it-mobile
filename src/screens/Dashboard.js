@@ -11,8 +11,11 @@ const Dashboard = () => {
     const navigation = useNavigation();
 
     const handleUploadDocument = async () => {
-        navigation.navigate('DocumentScannerScreen')
+        navigation.navigate('CategoryScreen')
     };
+    const handleFamilyDocument = () => {
+        navigation.navigate('FamilyDoct')
+    }
     return (
         <ScrollView>
             <View style={styles.cardView}>
@@ -24,14 +27,14 @@ const Dashboard = () => {
                     </Card.Content>                   
                 </Card>
                 </TouchableOpacity>
-                          
+                <TouchableOpacity onPress={handleFamilyDocument}>
                     <Card style={styles.cardContainer} >
                         <Image source={Images.ICON_FAMILY_MGMT} style={styles.Images} resizeMode='center' />
                         <Card.Content >
                             <Paragraph style={styles.imageText}>Family Mgmt</Paragraph>
                         </Card.Content>
                     </Card>
-                
+                </TouchableOpacity>
             </View>
             <View style={styles.cardView}>
             {/* <Card style={styles.cardContainer}>

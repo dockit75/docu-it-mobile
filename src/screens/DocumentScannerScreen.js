@@ -8,6 +8,7 @@ import {
   Animated,
   FlatList,
   ImageBackground,
+  Text,
 } from 'react-native';
 import DocumentScanner from 'react-native-document-scanner-plugin';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -23,17 +24,19 @@ import { FAB, Provider as PaperProvider, Portal, } from 'react-native-paper';
 import { Images } from '../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import NetworkManager from '../services/NetworkManager';
+import DocumentPicker from 'react-native-document-picker';
 
-const DocumentScannerScreen = () => {
+const DocumentScannerScreen = ({ navigation }) => {
   const [scannedImages, setScannedImages] = useState([]);
   const [cameraPermissionStatus, setCameraPermissionStatus] = useState(null);
   const [fullScreenImage, setFullScreenImage] = useState(null);
   const [rotateDegrees, setRotateDegrees] = useState({});
-  const [isFABOpen, setIsFABOpen] = useState(false);
-  const [isFabOpen, setIsFabOpen] = useState(false);
+  // const [isFABOpen, setIsFABOpen] = useState(false);
+  const [isFabOpen, setIsFabOpen] = useState(true);
   const rotationValue = new Animated.Value(0);
   const insets = useSafeAreaInsets();
   const [uploadStatus, setUploadStatus] = useState(null);
+  const [pickedDocuments, setPickedDocuments] = useState([]);
 
   const handleScanner = async () => {
     // Check if camera permission is granted
@@ -54,9 +57,10 @@ const DocumentScannerScreen = () => {
           newRotateDegrees[uri] = 0;
         });
         setRotateDegrees({ ...rotateDegrees, ...newRotateDegrees });
-        newScannedImages.forEach((imageUri) => {
-          handleUpload(imageUri);
-        });
+        //upload document for each scan
+        // newScannedImages.forEach((imageUri) => {
+        // handleUpload(imageUri);
+        // });
       }
     } else if (status === RESULTS.DENIED) {
       // Camera permission is denied, request it from the user
@@ -76,13 +80,18 @@ const DocumentScannerScreen = () => {
             newRotateDegrees[uri] = 0;
           });
           setRotateDegrees({ ...rotateDegrees, ...newRotateDegrees });
-          newScannedImages.forEach((imageUri) => {
-            handleUpload(imageUri);
-          });
+          //upload document for each scan
+          // newScannedImages.forEach((imageUri) => {
+          //   handleUpload(imageUri);
+          // });
         }
       } else {
         // Handle the case where the user denied camera permissions
-        // You can show a message to the user explaining why the camera is required
+        // You can show a message to the user explaining why the camera is require
+        alert('Permission to access camera was denied.');
+        setSnackbarMessage('Camera permission required to scan Documents');
+        setSnackbarVisible(true);
+
       }
     } else {
       // Handle other permission statuses if needed
@@ -93,7 +102,8 @@ const DocumentScannerScreen = () => {
     if (fullScreenImage === imageUri) { // Corrected comparison here
       // If the same image is already in full-screen mode, close it
       setFullScreenImage(null);
-    } else {
+    }
+    else {
       // Otherwise, set it to full-screen mode
       setFullScreenImage(imageUri);
     }
@@ -147,28 +157,59 @@ const DocumentScannerScreen = () => {
     // handleScanner();
   }, []);
 
-  const handleUpload = async (imageUri) => {
-    try {
-      const formData = new FormData();
-      const fileName = `scanned_image.jpg`;
-      formData.append('file', {
-        uri: imageUri,
-        type: 'image/jpeg',
-        name: fileName,
-      });
-      formData.append('userId', '9f518520-48de-4aca-b70c-09a21431065c')
-      console.log(formData, 'formdata-----------------------------')
-      const response = await NetworkManager.uploadDocument(formData)
-      console.log(response, 'response');
-      // Handle the API response here
-      const { data } = response;
+  // const handleUpload = async (imageUri) => {
+  // try {
+  //   const formData = new FormData();
+  //   const fileName = `scanned_image.jpg`;
+  //   formData.append('file', {
+  //     uri: imageUri,
+  //     type: 'image/jpeg',
+  //     name: fileName,
+  //   });
+  //   formData.append('userId', '9f518520-48de-4aca-b70c-09a21431065c')
+  //   console.log(formData, 'formdata-----------------------------')
+  //   const response = await NetworkManager.uploadDocument(formData)
+  //   console.log(response, 'response');
+  //   // Handle the API response here
+  //   const { data } = response;
 
-      setUploadStatus(`Upload Successful. Response: ${data}`);
-    } catch (error) {
-      console.error('Upload error:', error.response);
-      setUploadStatus('Upload Failed');
+  //   setUploadStatus(`Upload Successful. Response: ${data}`);
+  // } catch (error) {
+  //   console.error('Upload error:', error.response);
+  //   setUploadStatus('Upload Failed');
+  // }
+  // };
+
+  const handleUpload = async () => {
+    console.log('before try');
+    try {
+      console.log('inside try');
+      const docs = await DocumentPicker.pick({
+        type: [DocumentPicker.types.allFiles],
+        allowMultiSelection: true
+      });
+  
+      // Iterate over selected documents and add them to the pickedDocuments array
+      for (const doc of docs) {
+        console.log('inside for')
+        setPickedDocuments((prevDocuments) => [...prevDocuments, doc]);
+      }
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        console.log('User canceled the upload', err);
+      } else {
+        console.error('An error occurred during document picking:', err);
+      }
     }
+  }
+  const blurredNextButton = {
+    opacity: scannedImages.length === 0 ? 0.5 : 1,
+
+    // color: scannedImages.length === 0 ? 'gray' : 'white',
   };
+  const handleNext = () => {
+    navigation.navigate('SaveDocumentScreen');
+  }
 
   return (
     <SafeAreaView style={{ height: screenHeight * 0.93, backgroundColor: 'rgba(4, 104, 77, 0.6)' }}>
@@ -247,31 +288,40 @@ const DocumentScannerScreen = () => {
               </View>
             )}
           />
+          {pickedDocuments.map((document, index) => (
+            <View key={`document-${index}`}>
+              {/* Display document details or a link to the document */}
+              {document}
+              <Text>Picked Document #{index + 1}</Text>
+            </View>
+          ))}
         </ImageBackground>
-        <View style={styles.fabContainer}>
-          {isFabOpen && (
-            <View style={styles.fabBackground} onTouchStart={() => setIsFabOpen(false)} />
-          )}
-          {isFabOpen && (
-            <Animated.View style={[styles.fabButton, { transform: [{ rotate: rotation }] }]}>
-              <TouchableOpacity onPress={handleScanner}>
-                <Icon name="camera" size={24} color="white" />
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-          {isFabOpen && (
-            <Animated.View style={[styles.fabButton, { transform: [{ rotate: rotation }] }]}>
-              <TouchableOpacity onPress={handleUpload}>
-                <Icon name="upload" size={24} color="white" />
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-          <TouchableOpacity
-            style={[styles.fabToggle, { transform: [{ rotate: rotation }] }]}
-            onPress={toggleFab}
-          >
-            <MaterialIcon name={isFabOpen ? 'close' : 'add'} size={24} color="black" />
+        <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', gap: normalize(10), padding: normalize(5), }}>
+          <TouchableOpacity style={[styles.nextButton, blurredNextButton, { right: 95, bottom: 6 }]} onPress={handleNext} disabled={scannedImages.length === 0}>
+            <Text style={[styles.nextButtonText,]}>NEXT</Text>
           </TouchableOpacity>
+          <View style={styles.fabContainer}>
+            {isFabOpen && (
+              <View style={styles.fabBackground} onTouchStart={() => setIsFabOpen(false)} />
+            )}
+            {isFabOpen && (
+              // <Animated.View style={[styles.fabButton, { transform: [{ rotate: rotation }] }]}>
+                <TouchableOpacity style={styles.fabButton} onPress={handleScanner}>
+                  <Icon name="camera" size={24} color="white" />
+                </TouchableOpacity>
+              // </Animated.View>
+            )}
+            {isFabOpen && (
+              // <Animated.View style={[styles.fabButton, { transform: [{ rotate: rotation }] }]}>
+                <TouchableOpacity style={styles.fabButton} onPress={handleUpload}>
+                  <Icon name="upload" size={24} color="white" />
+                </TouchableOpacity>
+              // </Animated.View>
+            )}
+            <TouchableOpacity style={[styles.fabToggle, { transform: [{ rotate: rotation }] }]} onPress={toggleFab} >
+              <MaterialIcon name={isFabOpen ? 'close' : 'add'} size={24} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
       </>
       }
@@ -335,11 +385,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  button: {
-    borderWidth: 1,
-    borderRadius: 15,
-    padding: normalize(15),
-    backgroundColor: 'white'
+  nextButton: {
+    backgroundColor: '#0e9b81',
+    alignSelf: 'center',
+    height: normalizeVertical(50),
+    borderRadius: normalize(25),
+    marginTop: 30,
+    marginBottom: normalize(10)
+  },
+
+  nextButtonText: {
+    alignSelf: 'center',
+    marginTop: 'auto',
+    marginBottom: 'auto',
+    color: 'white',
+    letterSpacing: 1.8,
+    fontSize: 18,
+    fontWeight: '800',
+    paddingHorizontal: normalize(15)
   },
   scanButtonContainer: {
     flexDirection: 'row',
@@ -347,12 +410,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: normalize(60),
 
-  },
-  buttonText: {
-    color: 'black',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 15,
   },
   buttonContainerFullScreen: {
     flex: 1,

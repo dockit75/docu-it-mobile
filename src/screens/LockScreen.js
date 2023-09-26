@@ -65,6 +65,7 @@ const LockScreen = ({ navigation, route }) => {
   // const [isForgotPin, setIsForgotPin] = useState('');
   const [isSendOtp, setIsSendOtp] = useState(false);
   const [phone, setPhone] = useState(''); // Track if in "Forgot PIN" mode
+  const [isPhoneExist, setIsPhoneExist] = useState(false);
   const [loading, setLoading] = useState(false); // Track loading state
   const insets = useSafeAreaInsets();
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
@@ -73,7 +74,7 @@ const LockScreen = ({ navigation, route }) => {
   });
   const phoneInput = useRef(null);
   const [screen, setScreen] = useState(SCREENS.lockScreen);
-  console.log(signInParam,phone,'signinparam')
+  console.log(signInParam, phone, 'signinparam')
 
   useEffect(() => {
     (async () => {
@@ -81,7 +82,8 @@ const LockScreen = ({ navigation, route }) => {
         const data = await retrieveUserSession();
         // console.log(data, 'data...')
         // setUniqueId(data.deviceId);
-        setPhone(data?.phone)
+        setPhone(data?.phone);
+        setIsPhoneExist(true);
         // setIsAuthenticated(data.isAuthenticated === true);
         // handlePinEntry(data);
       } catch (error) {
@@ -280,10 +282,10 @@ const LockScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
-        <View style={{alignSelf:'center'}}>
+        <View style={{ alignSelf: 'center' }}>
           <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ marginTop: normalizeVertical(50), width: normalize(150), height: normalize(150), justifyContent: 'center', alignSelf: 'center' }} />
           {(!signInParam && screen === SCREENS.lockScreen) || screen === SCREENS.forgetPin ? <View style={{ justifyContent: 'center', flexDirection: 'column', }}>
-            {screen !== SCREENS.forgetPin ? <Text style={[styles.signup, {height: normalizeVertical(50), marginBottom: normalizeVertical(30)}] } >Login</Text> : null}
+            {screen !== SCREENS.forgetPin ? <Text style={[styles.signup, { height: normalizeVertical(50), marginBottom: normalizeVertical(30) }]} >Login</Text> : null}
             {(screen === SCREENS.forgetPin) ? <Text style={{ fontSize: 15, color: 'white', fontWeight: '400', alignSelf: 'flex-start', marginTop: normalizeVertical(50), height: normalizeVertical(30), }}>Enter Your Registered Phone Number :</Text> : null}
             <TouchableOpacity style={[styles.mobileInputView,
               // errors.phoneNo &&
@@ -294,13 +296,16 @@ const LockScreen = ({ navigation, route }) => {
             ]}>
 
               <PhoneInput
-                key={!phone}
+                key={isPhoneExist}
                 ref={phoneInput}
                 defaultValue={phone}
                 defaultCode="IN"
-                onChangeFormattedText={(text) => {
-                  const formattedPhoneNumberWithoutCountryCode = text.replace(/^(\+\d{1,2})/, '');
-                  setPhone(formattedPhoneNumberWithoutCountryCode)
+                // onChangeFormattedText={(text) => {
+                //   const formattedPhoneNumberWithoutCountryCode = text.replace(/^(\+\d{1,2})/, '');
+                //   setPhone(formattedPhoneNumberWithoutCountryCode)
+                // }}
+                onChangeText={(text) => {
+                  setPhone(text);
                 }}
                 disableArrowIcon={true}
                 containerStyle={styles.phoneInputContainer}
@@ -319,9 +324,9 @@ const LockScreen = ({ navigation, route }) => {
               />
             </TouchableOpacity>
           </View> : null}
-          <View style={{ justifyContent: 'center', alignSelf:'center' }} >
-            {screen !== SCREENS.forgetPin ? <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: normalize(40), }}>
-              <View/>
+          <View style={{ justifyContent: 'center', alignSelf: 'center' }} >
+            {screen !== SCREENS.forgetPin ? <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: normalize(40), }}>
+              <View />
               <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', padding: 10, }}>{TITLE[screen]}</Text>
               <TouchableOpacity onPress={toggleMask} style={{ padding: 10, }}>
                 {enableMask ? (
@@ -361,18 +366,13 @@ const LockScreen = ({ navigation, route }) => {
             <View>
 
               <View style={{ alignSelf: 'flex-end', marginRight: normalize(20), marginTop: normalize(10) }}>
-                {/* {signInParam ? <> */}
-
-                {/* <Text style={{ color: 'white' }}>/</Text> */}
-                {/* </> : null} */}
                 <TouchableOpacity onPress={handleForgetPin}>
                   <Text style={{ color: 'white', fontWeight: 'bold', marginLeft: normalize(8) }}>FORGET PIN</Text>
                 </TouchableOpacity>
-                {/* <Text onPress={() => navigation.navigate('RegistrationPage')}>i</Text> */}
               </View>
 
             </View>
-            <View style={{ justifyContent: 'center', alignSelf: 'center', flexDirection: 'row', paddingTop: normalizeVertical(37), }}>
+            <View style={{ justifyContent: 'center', alignSelf: 'center', flexDirection: 'row', paddingTop: normalizeVertical(50), }}>
               <Text style={{ color: 'black' }}> Don't have an account? </Text>
               <TouchableOpacity onPress={handleSighUP}>
                 <Text style={{ color: 'black', fontWeight: 'bold', }}>SIGN UP</Text>
@@ -455,8 +455,8 @@ const styles = StyleSheet.create({
   },
   codeFieldRoot: {
     width: screenWidth - normalize(160),
-},
-cell: {
+  },
+  cell: {
     width: normalize(40),
     height: normalize(40),
     fontSize: normalize(30),
@@ -465,13 +465,13 @@ cell: {
     borderWidth: normalize(1),
     borderColor: 'black',
     backgroundColor: '#e3e3e3cc',
-},
-focusCell: {
+  },
+  focusCell: {
     borderColor: COLORS.white,
     textAlign: 'center',
     justifyContent: 'center',
     alignSelf: 'center'
-},
+  },
   // cell: {
   //   width: normalize(40),
   //   height: normalize(40),
@@ -490,7 +490,7 @@ focusCell: {
   //   alignSelf: 'center',
   //   width: screenWidth - normalize(160),
   // },
-  
+
   // focusCell: {
   //   borderColor: '#000',
   // },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import WelcomePage from '../screens/WelcomePage';
 import OTPVerification from '../screens/OTPVerification';
 import ScannerScreen from '../screens/Scanner';
@@ -10,7 +10,7 @@ import { retrieveUserSession } from '../storageManager';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store } from '../store';
 import RegistrationPage from '../screens/RegistrationPage';
-import { StatusBar } from 'react-native'
+import { StatusBar, TouchableOpacity } from 'react-native'
 import { COLORS } from '../utilities/colors';
 import HamburgerMenu from '../screens/Drawer';
 import User from '../screens/User';
@@ -18,10 +18,37 @@ import Profile from '../screens/Profile';
 import PinGenerationScreen from '../screens/PinGenerationScreen';
 import DocumentScannerScreen from '../screens/DocumentScannerScreen';
 import Settings from '../screens/Settings';
+import SaveDocumentScreen from '../screens/SaveDocumentScreen';
+import CategoryScreen from '../screens/CategoryScreen';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { normalize } from '../utilities/measurement';
+import FamilyDoct from '../screens/FamilyDoct';
 
 const Stack = createStackNavigator();
 
 const AppNavigator = ({ initialRouteName }) => {
+  const navigation = useNavigation();
+
+  const customHeaderOption = {
+    gestureEnabled: true,
+    headerShown: true,
+    headerLeft: () => (
+      <TouchableOpacity
+        style={{ marginLeft: normalize(20) }}
+        onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" color="white" size={normalize(20)} />
+      </TouchableOpacity>
+    ),
+    headerStyle: {
+      backgroundColor: '#0e9b81',
+    },
+    headerTintColor: 'white',
+    headerTitleAlign: 'center',
+    headerTitleStyle: {
+      fontSize: 17,
+    },
+    headerTitleAllowFontScaling: true,
+  };
   return (
     <Stack.Navigator initialRouteName={initialRouteName}>
       <Stack.Screen
@@ -33,6 +60,17 @@ const AppNavigator = ({ initialRouteName }) => {
         name="RegistrationPage"
         component={RegistrationPage}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CategoryScreen"
+        component={CategoryScreen}
+        options={{ headerShown: true, title:'Category' }}
+        
+      />
+      <Stack.Screen
+        name="SaveDocumentScreen"
+        component={SaveDocumentScreen}
+        options={{ headerShown: true ,title:'Save Document'}}
       />
       <Stack.Screen
         name="OTPVerification"
@@ -47,7 +85,18 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen
         name="DocumentScannerScreen"
         component={DocumentScannerScreen}
-        options={{ headerShown: true,title:'Upload Document' }}
+        //options={{ headerShown: true,title:'Upload Document' }}
+        options={({ route }) => ({
+          ...customHeaderOption,
+          title: route.params.title,
+          cardStyleInterpolator:
+            CardStyleInterpolators.forFadeFromBottomAndroid,
+        })}
+      />
+      <Stack.Screen
+        name="FamilyDoct"
+        component={FamilyDoct}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="LockScreen"
