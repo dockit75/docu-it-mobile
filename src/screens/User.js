@@ -17,7 +17,7 @@ const User = ({ navigation }) => {
                                 <Image source={Images.ARROW} style={{ width: 26, height: 26 }} />
                             </TouchableOpacity>
                             <Text style={styles.TextProfile}>Invite</Text>
-                            <View/>
+                            <View />
                         </View>
                     </View>
                 </ImageBackground>

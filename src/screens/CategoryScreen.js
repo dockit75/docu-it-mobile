@@ -1,23 +1,29 @@
 import React from 'react'
 import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground } from 'react-native'
-import { Card, Title, Paragraph, Button } from 'react-native-paper'
+import { Card, Paragraph } from 'react-native-paper'
 import { normalize, screenHeight, screenWidth } from '../utilities/measurement'
 import { COLORS } from '../utilities/colors'
 import { Images } from '../assets/images/images'
-import { Dashboard_CARD_TEXT } from '../utilities/strings'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-// import { useNavigation } from '@react-navigation/native'
 
 const CategoryScreen = ({ navigation }) => {
-    // const navigation = useNavigation();
     const insets = useSafeAreaInsets();
 
     const handleUploadDocument = async (head) => {
-        navigation.navigate('DocumentScannerScreen',{title:head})
+        navigation.navigate('DocumentScannerScreen', { title: head })
     };
     return (
         <ScrollView>
             <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, flex: 1 }}>
+                <View style={{ marginTop: 60, }}>
+                    <View style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'space-between' }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Dashboard')} style={{ alignSelf: 'center' }}>
+                            <Image source={Images.ARROW} style={{ width: 22, height: 22 }} />
+                        </TouchableOpacity>
+                        <Text style={styles.TextSettings}>Category</Text>
+                        <View />
+                    </View>
+                </View>
                 <View style={styles.cardView}>
                     <TouchableOpacity onPress={() => handleUploadDocument('Life Insurance')}>
                         <Card style={styles.cardContainer}>
@@ -45,7 +51,6 @@ const CategoryScreen = ({ navigation }) => {
                             </Card.Content>
                         </Card>
                     </TouchableOpacity>
-                    {/* <View style={{ marginRight: 15 }} /> */}
                     <TouchableOpacity onPress={() => handleUploadDocument('Car Insurance')}>
                         <Card style={styles.cardContainer}>
                             <Image source={Images.ICON_AUTO_DOC} style={styles.Images} resizeMode='center' />
@@ -55,7 +60,6 @@ const CategoryScreen = ({ navigation }) => {
                         </Card>
                     </TouchableOpacity>
                 </View>
-
                 <View style={styles.cardView}>
                     <TouchableOpacity onPress={() => handleUploadDocument('Life Insurance')}>
                         <Card style={styles.cardContainer}>
@@ -65,7 +69,6 @@ const CategoryScreen = ({ navigation }) => {
                             </Card.Content>
                         </Card>
                     </TouchableOpacity>
-                    {/* <View style={{ marginRight: 15 }} /> */}
                     <TouchableOpacity onPress={() => handleUploadDocument('Health Insurance')}>
                         <Card style={styles.cardContainer}>
                             <Image source={Images.ICON_HEALTH_INSURANCE} style={styles.Images} resizeMode='center' />
@@ -110,7 +113,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         letterSpacing: 0.6,
         marginTop: normalize(15),
-    }
+    },
+    TextSettings: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginVertical: 15,
+        color: 'white',
+        marginRight: normalize(15)
+    },
 })
 
 export default CategoryScreen

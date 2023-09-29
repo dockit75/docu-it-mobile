@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
-import WelcomePage from '../screens/WelcomePage';
 import OTPVerification from '../screens/OTPVerification';
-import ScannerScreen from '../screens/Scanner';
 import LockScreen from '../screens/LockScreen';
 import { retrieveUserSession } from '../storageManager';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -18,7 +16,6 @@ import Profile from '../screens/Profile';
 import PinGenerationScreen from '../screens/PinGenerationScreen';
 import DocumentScannerScreen from '../screens/DocumentScannerScreen';
 import Settings from '../screens/Settings';
-import SaveDocumentScreen from '../screens/SaveDocumentScreen';
 import CategoryScreen from '../screens/CategoryScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { normalize } from '../utilities/measurement';
@@ -27,35 +24,11 @@ import FamilyDoct from '../screens/FamilyDoct';
 const Stack = createStackNavigator();
 
 const AppNavigator = ({ initialRouteName }) => {
-  const navigation = useNavigation();
 
-  const customHeaderOption = {
-    gestureEnabled: true,
-    headerShown: true,
-    headerLeft: () => (
-      <TouchableOpacity
-        style={{ marginLeft: normalize(20) }}
-        onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" color="white" size={normalize(20)} />
-      </TouchableOpacity>
-    ),
-    headerStyle: {
-      backgroundColor: '#0e9b81',
-    },
-    headerTintColor: 'white',
-    headerTitleAlign: 'center',
-    headerTitleStyle: {
-      fontSize: 17,
-    },
-    headerTitleAllowFontScaling: true,
-  };
+
   return (
     <Stack.Navigator initialRouteName={initialRouteName}>
-      <Stack.Screen
-        name="WelcomePage"
-        component={WelcomePage}
-        options={{ headerShown: false }}
-      />
+ 
       <Stack.Screen
         name="RegistrationPage"
         component={RegistrationPage}
@@ -64,13 +37,7 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen
         name="CategoryScreen"
         component={CategoryScreen}
-        options={{ headerShown: true, title:'Category' }}
-        
-      />
-      <Stack.Screen
-        name="SaveDocumentScreen"
-        component={SaveDocumentScreen}
-        options={{ headerShown: true ,title:'Save Document'}}
+        options={{ headerShown: false, title: 'Category' }}
       />
       <Stack.Screen
         name="OTPVerification"
@@ -85,13 +52,7 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen
         name="DocumentScannerScreen"
         component={DocumentScannerScreen}
-        //options={{ headerShown: true,title:'Upload Document' }}
-        options={({ route }) => ({
-          ...customHeaderOption,
-          title: route.params.title,
-          cardStyleInterpolator:
-            CardStyleInterpolators.forFadeFromBottomAndroid,
-        })}
+        options={{ headerShown: true, title: 'Upload Document' }}
       />
       <Stack.Screen
         name="FamilyDoct"
@@ -133,7 +94,6 @@ const App = () => {
   useEffect(() => {
     const fetchCurrentScreen = async () => {
       const data = await retrieveUserSession();
-      console.log(data, 'data>>>>>>');
       if (data.isAuthenticated) {
         setInitialRouteName('LockScreen');
       }

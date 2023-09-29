@@ -20,5 +20,6 @@ export const Images = {
     EYEClose: require('./eyeClose.png'),
     MENU: require('./menu.png'),
     ARROWRIGHT: require('./arrow_right.png'),
-    ARROW: require('./arrow.png')
+    ARROW: require('./arrow.png'),
+    LOG_OUT: require('./logout.png')
 }

@@ -15,10 +15,9 @@ import Dashboard from './Dashboard';
 import { useDispatch } from 'react-redux';
 import { clearStorage, retrieveUserSession } from '../storageManager';
 import { COLORS } from '../utilities/colors';
-import Icon from 'react-native-vector-icons/Ionicons'; // You can use another icon library if you prefer
+import Icon from 'react-native-vector-icons/Ionicons';
 import UserAvatar from 'react-native-user-avatar';
 
-// const Tab = createBottomTabNavigator();
 
 const HamburgerMenu = ({ navigation, route }) => {
   const drawer = useRef(null);
@@ -30,7 +29,6 @@ const HamburgerMenu = ({ navigation, route }) => {
     (async () => {
       try {
         const data = await retrieveUserSession();
-        console.log(data, 'data...,,,?');
         setName(data.name);
       } catch (error) {
         console.error('Error in useEffect:', error);
@@ -40,8 +38,8 @@ const HamburgerMenu = ({ navigation, route }) => {
 
   const handleLogout = () => {
     try {
-      navigation.navigate('LockScreen',{signInParam: false});
-      clearStorage();
+      navigation.navigate('LockScreen', { signInParam: false });
+      // clearStorage();
     } catch (error) {
       console.error('Error in handleNavigation:', error);
     }
@@ -56,34 +54,34 @@ const HamburgerMenu = ({ navigation, route }) => {
   const handleUser = () => {
     navigation.reset({
       index: 0,
-      routes:[{ name: 'User' }]
+      routes: [{ name: 'User' }]
     })
   };
 
   const handleProfile = () => {
     navigation.reset({
       index: 0,
-      routes:[{ name: 'Profile' }]
+      routes: [{ name: 'Profile' }]
     })
   };
   const navigationView = () => (
     <>
-      <View style={{ backgroundColor: '#0e9b81', flex: 1}}>
-        <View style={{ flexDirection: 'row', marginTop: normalize(60), marginHorizontal: normalize(15)}}>
-        <UserAvatar size={60} name={name.charAt(0)} bgColor="#e0ffff" textColor='black'/>
-          <Text style={{ fontSize: 20, fontWeight: '500', color: 'white', letterSpacing: 0.5 , margin: 15}}>{name}</Text>
+      <View style={{ backgroundColor: '#0e9b81', flex: 1 }}>
+        <View style={{ flexDirection: 'row', marginTop: normalize(60), marginHorizontal: normalize(15) }}>
+          <UserAvatar size={60} name={name.charAt(0)} bgColor="#e0ffff" textColor='black' />
+          <Text style={{ fontSize: 20, fontWeight: '500', color: 'white', letterSpacing: 0.5, margin: 15 }}>{name}</Text>
         </View>
         <View style={styles.editProfile}>
           <TouchableOpacity style={styles.menuItem} onPress={handleProfile}>
             <Icon name="person" size={24} color={COLORS.black} />
             <Text style={styles.menuText}>Edit Profile</Text>
           </TouchableOpacity>
-           <View style={{borderBottomWidth: 0.5, borderBottomColor:COLORS.lightGray}}/>
+          <View style={{ borderBottomWidth: 0.5, borderBottomColor: COLORS.lightGray }} />
           <TouchableOpacity style={styles.menuItem} onPress={handleSettings}>
             <Icon name="cog" size={24} color={COLORS.black} />
             <Text style={styles.menuText}>Settings</Text>
           </TouchableOpacity>
-          <View style={{borderBottomWidth: 0.5, borderBottomColor:COLORS.lightGray }}/>
+          <View style={{ borderBottomWidth: 0.5, borderBottomColor: COLORS.lightGray }} />
           <TouchableOpacity style={styles.menuItem} onPress={handleUser}>
             <Icon name="share-outline" size={24} color={COLORS.black} />
             <Text style={styles.menuText}>Invite</Text>
@@ -91,7 +89,7 @@ const HamburgerMenu = ({ navigation, route }) => {
         </View>
         <View style={styles.viewContainer}>
           <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-            <Icon name="log-out-outline" size={24} color={COLORS.red} />
+            <Image source={Images.LOG_OUT} style={{ width: 22, height: 22, marginTop: normalize(3) }} />
             <Text style={styles.menuTextLogout}>Log out</Text>
           </TouchableOpacity>
         </View>
@@ -123,7 +121,7 @@ const HamburgerMenu = ({ navigation, route }) => {
         <Dashboard />
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 40, alignItems: 'center', paddingHorizontal: normalize(15), borderTopColor: 'black', borderTopWidth: 0.9 }}>
           <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
-          <Icon name="home-outline" size={24} color={COLORS.black} />
+            <Icon name="home-outline" size={24} color={COLORS.black} />
           </TouchableOpacity>
           <TouchableOpacity >
             <Icon name="cog-outline" size={24} color={COLORS.black} />

@@ -20,10 +20,8 @@ import {
   screenWidth,
 } from '../utilities/measurement';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { FAB, Provider as PaperProvider, Portal, } from 'react-native-paper';
 import { Images } from '../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import NetworkManager from '../services/NetworkManager';
 import DocumentPicker from 'react-native-document-picker';
 
 const DocumentScannerScreen = ({ navigation }) => {
@@ -31,14 +29,20 @@ const DocumentScannerScreen = ({ navigation }) => {
   const [cameraPermissionStatus, setCameraPermissionStatus] = useState(null);
   const [fullScreenImage, setFullScreenImage] = useState(null);
   const [rotateDegrees, setRotateDegrees] = useState({});
-  // const [isFABOpen, setIsFABOpen] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(true);
   const rotationValue = new Animated.Value(0);
   const insets = useSafeAreaInsets();
-  const [uploadStatus, setUploadStatus] = useState(null);
-  const [pickedDocuments, setPickedDocuments] = useState([]);
+  const [combinedDocuments, setCombinedDocuments] = useState([]);
+
+  const formatScannedImages = (images) => {
+    return images.map((uri) => ({
+      uri,
+      type: 'image/jpg', // You can change the type as needed
+    }));
+  };
 
   const handleScanner = async () => {
+
     // Check if camera permission is granted
     const status = await check(PERMISSIONS.ANDROID.CAMERA);
     setCameraPermissionStatus(status);
@@ -47,20 +51,19 @@ const DocumentScannerScreen = ({ navigation }) => {
       // Camera permission is already granted, start the document scanner
       const { scannedImages: newScannedImages } = await DocumentScanner.scanDocument();
 
-      if (newScannedImages.length > 0) {
-        // Append new scanned images to the existing array
-        setScannedImages([...scannedImages, ...newScannedImages]);
 
+      if (newScannedImages.length > 0) {
+
+        const formattedScannedImages = formatScannedImages(newScannedImages);
+        // Append new scanned images to the existing array
+        // setScannedImages([...scannedImages, ...formattedScannedImages]);
+        setCombinedDocuments((prevDocuments) => [...prevDocuments, ...formattedScannedImages]);
         // Initialize the rotation degrees for new images
         const newRotateDegrees = {};
         newScannedImages.forEach((uri) => {
           newRotateDegrees[uri] = 0;
         });
         setRotateDegrees({ ...rotateDegrees, ...newRotateDegrees });
-        //upload document for each scan
-        // newScannedImages.forEach((imageUri) => {
-        // handleUpload(imageUri);
-        // });
       }
     } else if (status === RESULTS.DENIED) {
       // Camera permission is denied, request it from the user
@@ -71,8 +74,12 @@ const DocumentScannerScreen = ({ navigation }) => {
         const { scannedImages: newScannedImages } = await DocumentScanner.scanDocument();
 
         if (newScannedImages.length > 0) {
+
+          const formattedScannedImages = formatScannedImages(newScannedImages);
+
           // Append new scanned images to the existing array
-          setScannedImages([...scannedImages, ...newScannedImages]);
+          // setScannedImages([...scannedImages, ...formattedScannedImages]);
+          setCombinedDocuments((prevDocuments) => [...prevDocuments, ...formattedScannedImages]);
 
           // Initialize the rotation degrees for new images
           const newRotateDegrees = {};
@@ -80,10 +87,6 @@ const DocumentScannerScreen = ({ navigation }) => {
             newRotateDegrees[uri] = 0;
           });
           setRotateDegrees({ ...rotateDegrees, ...newRotateDegrees });
-          //upload document for each scan
-          // newScannedImages.forEach((imageUri) => {
-          //   handleUpload(imageUri);
-          // });
         }
       } else {
         // Handle the case where the user denied camera permissions
@@ -94,12 +97,15 @@ const DocumentScannerScreen = ({ navigation }) => {
 
       }
     } else {
-      // Handle other permission statuses if needed
+      // Handle other permission statuses 
+      alert('Permission to access camera was denied.');
+      setSnackbarMessage('Camera permission required to scan Documents');
+      setSnackbarVisible(true);
     }
   };
 
   const toggleFullScreen = (imageUri) => {
-    if (fullScreenImage === imageUri) { // Corrected comparison here
+    if (fullScreenImage === imageUri) { 
       // If the same image is already in full-screen mode, close it
       setFullScreenImage(null);
     }
@@ -110,23 +116,15 @@ const DocumentScannerScreen = ({ navigation }) => {
   };
   const closeFullScreen = () => {
     setFullScreenImage(null);
-    // Reset the rotation degree for the closed image
-    // if (fullScreenImage) {
-    //   const updatedDegrees = { ...rotateDegrees };
-    //   delete updatedDegrees[fullScreenImage];
-    //   setRotateDegrees(updatedDegrees);
-    // }
   };
 
-  const deleteImage = (imageUri) => {
-    // Remove the selected image from the scannedImages array
-    const updatedImages = scannedImages.filter((uri) => uri !== imageUri);
-    setScannedImages(updatedImages);
-    // Close the full-screen view if the deleted image was open
-    if (fullScreenImage === imageUri) {
-      closeFullScreen();
+  const deleteItem = (item) => {
+    const updatedDocuments = combinedDocuments.filter((doc) => doc.uri !== item.uri);
+    setCombinedDocuments(updatedDocuments);
+    if (fullScreenImage && fullScreenImage.uri === item.uri) {
+      setFullScreenImage(null);
     }
-  };
+  }
 
   const rotateLeft = (imageUri) => {
     const currentDegree = rotateDegrees[imageUri] || 0;
@@ -152,48 +150,18 @@ const DocumentScannerScreen = ({ navigation }) => {
     inputRange: [0, 1],
     outputRange: ['0deg', '45deg'], // Rotate 45 degrees when open
   });
-  useEffect(() => {
-    // Call handleScanner on component load
-    // handleScanner();
-  }, []);
 
-  // const handleUpload = async (imageUri) => {
-  // try {
-  //   const formData = new FormData();
-  //   const fileName = `scanned_image.jpg`;
-  //   formData.append('file', {
-  //     uri: imageUri,
-  //     type: 'image/jpeg',
-  //     name: fileName,
-  //   });
-  //   formData.append('userId', '9f518520-48de-4aca-b70c-09a21431065c')
-  //   console.log(formData, 'formdata-----------------------------')
-  //   const response = await NetworkManager.uploadDocument(formData)
-  //   console.log(response, 'response');
-  //   // Handle the API response here
-  //   const { data } = response;
 
-  //   setUploadStatus(`Upload Successful. Response: ${data}`);
-  // } catch (error) {
-  //   console.error('Upload error:', error.response);
-  //   setUploadStatus('Upload Failed');
-  // }
-  // };
-
-  const handleUpload = async () => {
-    console.log('before try');
+  const handlePickDocument = async () => {
     try {
-      console.log('inside try');
       const docs = await DocumentPicker.pick({
         type: [DocumentPicker.types.allFiles],
         allowMultiSelection: true
       });
-  
-      // Iterate over selected documents and add them to the pickedDocuments array
-      for (const doc of docs) {
-        console.log('inside for')
-        setPickedDocuments((prevDocuments) => [...prevDocuments, doc]);
-      }
+      const updatedDocuments = [...combinedDocuments];
+      updatedDocuments.push(...docs);
+      setCombinedDocuments(updatedDocuments);
+
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         console.log('User canceled the upload', err);
@@ -203,12 +171,10 @@ const DocumentScannerScreen = ({ navigation }) => {
     }
   }
   const blurredNextButton = {
-    opacity: scannedImages.length === 0 ? 0.5 : 1,
-
-    // color: scannedImages.length === 0 ? 'gray' : 'white',
+    opacity: combinedDocuments.length === 0 ? 0.5 : 1,
   };
   const handleNext = () => {
-    navigation.navigate('SaveDocumentScreen');
+    // navigation.navigate('SaveDocumentScreen');
   }
 
   return (
@@ -247,32 +213,34 @@ const DocumentScannerScreen = ({ navigation }) => {
         </View>
       ) : <>
         <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, flex: 1 }}>
+
           <FlatList
-            data={[...scannedImages]}
-            keyExtractor={(uri, index) => index.toString()}
+            data={combinedDocuments}
+            keyExtractor={(document, index) => `${document.uri}-${index}`}
+            // index.toString()}
             contentContainerStyle={styles.imageContainer}
             numColumns={2}
-            // showsVerticalScrollIndicator={false}
-            renderItem={({ item: uri }) => (
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item: document }) => (
               <View style={{ borderWidth: 0, flex: 1, height: normalize(250), maxWidth: screenWidth * 0.45, marginLeft: screenWidth * 0.035, }}>
                 <View style={styles.imageWrapper}>
-                  <TouchableOpacity onPress={() => toggleFullScreen(uri)}>
+                  <TouchableOpacity onPress={() => toggleFullScreen(document.uri)}>
                     <Image
                       resizeMode="contain"
                       style={[
                         styles.image,
-                        { transform: [{ rotate: `${rotateDegrees[uri] || 0}deg` }] },
+                        { transform: [{ rotate: `${rotateDegrees[document.uri] || 0}deg` }] },
                       ]}
-                      source={{ uri }}
+                      source={{ uri: document.uri }}
                     />
                   </TouchableOpacity>
                 </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     style={{ marginRight: normalize(20) }}
-                    onPress={() => toggleFullScreen(uri)}
+                    onPress={() => toggleFullScreen(document.uri)}
                   >
-                    {fullScreenImage === uri ? (
+                    {fullScreenImage === document.uri ? (
                       <Icon name="compress" size={24} color="#79aee7" />
                     ) : (
                       <Icon name="expand" size={24} color="#79aee7" />
@@ -280,7 +248,7 @@ const DocumentScannerScreen = ({ navigation }) => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{ marginRight: normalize(10) }}
-                    onPress={() => deleteImage(uri)}
+                    onPress={() => deleteItem(document)}
                   >
                     <Icon name="trash" size={24} color="#e34077" />
                   </TouchableOpacity>
@@ -288,41 +256,31 @@ const DocumentScannerScreen = ({ navigation }) => {
               </View>
             )}
           />
-          {pickedDocuments.map((document, index) => (
-            <View key={`document-${index}`}>
-              {/* Display document details or a link to the document */}
-              {document}
-              <Text>Picked Document #{index + 1}</Text>
-            </View>
-          ))}
         </ImageBackground>
-        <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', gap: normalize(10), padding: normalize(5), }}>
-          <TouchableOpacity style={[styles.nextButton, blurredNextButton, { right: 95, bottom: 6 }]} onPress={handleNext} disabled={scannedImages.length === 0}>
-            <Text style={[styles.nextButtonText,]}>NEXT</Text>
-          </TouchableOpacity>
+        <View style={{ backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', gap: normalize(10), padding: normalize(5), }}>
+          {/* <TouchableOpacity style={[styles.nextButton, blurredNextButton, { right: 95, bottom: 6 }]} onPress={handleNext} disabled={scannedImages.length === 0}>
+              <Text style={[styles.nextButtonText,]}>NEXT</Text>
+            </TouchableOpacity> */}
           <View style={styles.fabContainer}>
             {isFabOpen && (
               <View style={styles.fabBackground} onTouchStart={() => setIsFabOpen(false)} />
             )}
             {isFabOpen && (
-              // <Animated.View style={[styles.fabButton, { transform: [{ rotate: rotation }] }]}>
-                <TouchableOpacity style={styles.fabButton} onPress={handleScanner}>
-                  <Icon name="camera" size={24} color="white" />
-                </TouchableOpacity>
-              // </Animated.View>
+              <TouchableOpacity style={styles.fabButton} onPress={handleScanner}>
+                <Icon name="camera" size={24} color="white" />
+              </TouchableOpacity>
             )}
             {isFabOpen && (
-              // <Animated.View style={[styles.fabButton, { transform: [{ rotate: rotation }] }]}>
-                <TouchableOpacity style={styles.fabButton} onPress={handleUpload}>
-                  <Icon name="upload" size={24} color="white" />
-                </TouchableOpacity>
-              // </Animated.View>
+              <TouchableOpacity style={styles.fabButton} onPress={handlePickDocument}>
+                <Icon name="upload" size={24} color="white" />
+              </TouchableOpacity>
             )}
             <TouchableOpacity style={[styles.fabToggle, { transform: [{ rotate: rotation }] }]} onPress={toggleFab} >
               <MaterialIcon name={isFabOpen ? 'close' : 'add'} size={24} color="black" />
             </TouchableOpacity>
           </View>
         </View>
+
       </>
       }
     </SafeAreaView>
@@ -345,12 +303,13 @@ const styles = StyleSheet.create({
   },
   imageWrapper: {
     backgroundColor: '#f0f5f0',
-    flex: 0.9,
+    flex: 0.8,
   },
   image: {
     justifyContent: 'center',
-    width: '100%',
-    height: '90%',
+    alignSelf: 'center',
+    width: '90%',
+    height: screenHeight * 0.2,
     marginVertical: normalizeVertical(10),
   },
   buttonContainer: {
@@ -376,14 +335,6 @@ const styles = StyleSheet.create({
     width: screenWidth,
     margin: normalize(10),
   },
-  closeFullScreenButton: {
-    position: 'absolute',
-    top: normalize(20),
-    right: normalize(20),
-    padding: normalize(10),
-    backgroundColor: 'white',
-    flex: 1,
-  },
 
   nextButton: {
     backgroundColor: '#0e9b81',
@@ -391,7 +342,8 @@ const styles = StyleSheet.create({
     height: normalizeVertical(50),
     borderRadius: normalize(25),
     marginTop: 30,
-    marginBottom: normalize(10)
+    marginBottom: normalize(10),
+
   },
 
   nextButtonText: {
@@ -421,7 +373,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background color
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     position: 'absolute',
     top: 0,
     left: 0,

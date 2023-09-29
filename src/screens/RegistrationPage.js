@@ -36,7 +36,6 @@ const RegistrationPage = ({ navigation }) => {
     };
 
     const isAuthenticated = useSelector((state) => state.user);
-    // console.log('--respage ---redux--', isAuthenticated );
     const initialValues = {
         userName: '',
         phoneNo: '',
@@ -53,14 +52,6 @@ const RegistrationPage = ({ navigation }) => {
             const id = await DeviceInfo.getUniqueId();
             setUniqueId(id);
             const data = await retrieveUserSession();
-            console.log('****regpage***', data);
-            // if (!data?.phoneNo) {
-            //     console.log('InValid');
-            //     setIsLogedIn(false);
-            // } else {
-            //     setIsLogedIn(true);
-            //     navigation.navigate('LockScreen', { values: phoneNo });
-            // }
         })();
     }, []);
 
@@ -77,7 +68,7 @@ const RegistrationPage = ({ navigation }) => {
     const deviceId = DeviceInfo.getUniqueId();
     const handleRegistration = async (values, { resetForm }) => {
         try {
-            setIsLoading(true); // Show the loader
+            setIsLoading(true);
             dispatch(setUser(values));
             const payload = {
                 name: values.userName,
@@ -100,13 +91,9 @@ const RegistrationPage = ({ navigation }) => {
         } catch (error) {
             console.error('error', error);
         } finally {
-            setIsLoading(false); // Hide the loader when done
+            setIsLoading(false);
         }
     };
-
-    // if (isLogedIn) {
-    //     return null
-    // }
 
     const handleGender = (setFieldValue, option) => {
         setIsOpen(false)
@@ -114,7 +101,7 @@ const RegistrationPage = ({ navigation }) => {
     }
 
     const handleLogin = (resetForm) => {
-        navigation.navigate('LockScreen',{signInParam: false})
+        navigation.navigate('LockScreen', { signInParam: false })
         resetForm();
         cleanTextFields();
     }
@@ -164,7 +151,6 @@ const RegistrationPage = ({ navigation }) => {
                                         placeholder: 'Phone Number',
                                         placeholderTextColor: 'black'
                                     }}
-                                    // codeTextStyle={{fontSize: 17}}
                                     flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
                                     keyboardType="number-pad"
                                     onChangeText={handleChange('phoneNo')}
@@ -225,7 +211,7 @@ const RegistrationPage = ({ navigation }) => {
                                 )}
                             </TouchableOpacity>
                             <View style={{ flexDirection: 'row', marginBottom: normalize(20) }}>
-                                <Text style={{ color: 'black' }}>Already have an accound?</Text>
+                                <Text style={{ color: 'black' }}>Already have an account?</Text>
                                 <TouchableOpacity onPress={() => handleLogin(resetForm)}>
                                     <Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}> LOGIN</Text>
                                 </TouchableOpacity>
@@ -265,14 +251,6 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     button: {
-        // backgroundColor: '#0e9b81',
-        // width: screenWidth - normalize(30),
-        // alignSelf: 'center',
-        // height: normalizeVertical(50),
-        // borderRadius: normalize(25),
-        // elevation: 5,
-        // marginTop: normalize(30),
-        // marginBottom: normalize(10)
         backgroundColor: '#0e9b81',
         justifyContent: 'center',
         alignItems: 'center',
@@ -308,7 +286,6 @@ const styles = StyleSheet.create({
         borderRadius: normalize(5),
         backgroundColor: '#e3e3e3cc',
         marginBottom: normalize(15),
-        // borderWidth: normalize(1),
         borderColor: COLORS.gray,
         alignItems: FONTALIGNMENT.center,
         marginVertical: normalizeVertical(4),

@@ -53,20 +53,14 @@ const BUTTON = {
 }
 const LockScreen = ({ navigation, route }) => {
   const signInParam = route?.params?.signInParam;
-  const [isAuthenticated, setIsAuthenticated] = useState('');
   const [enableMask, setEnableMask] = useState(true);
   const [value, setValue] = useState('');
   const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
-  const deviceId = DeviceInfo.getUniqueId();
-  const [uniqueId, setUniqueId] = useState('');
-  const [error, setError] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  // const [isForgotPin, setIsForgotPin] = useState('');
-  const [isSendOtp, setIsSendOtp] = useState(false);
-  const [phone, setPhone] = useState(''); // Track if in "Forgot PIN" mode
+  const [phone, setPhone] = useState('');
   const [isPhoneExist, setIsPhoneExist] = useState(false);
-  const [loading, setLoading] = useState(false); // Track loading state
+  const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
@@ -74,18 +68,14 @@ const LockScreen = ({ navigation, route }) => {
   });
   const phoneInput = useRef(null);
   const [screen, setScreen] = useState(SCREENS.lockScreen);
-  console.log(signInParam, phone, 'signinparam')
+
 
   useEffect(() => {
     (async () => {
       try {
         const data = await retrieveUserSession();
-        // console.log(data, 'data...')
-        // setUniqueId(data.deviceId);
         setPhone(data?.phone);
         setIsPhoneExist(true);
-        // setIsAuthenticated(data.isAuthenticated === true);
-        // handlePinEntry(data);
       } catch (error) {
         console.error('Error in useEffect:', error);
       }
@@ -94,7 +84,6 @@ const LockScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     if (value.length === 4) {
-      // handlePinEntry()
       buttonFunction()
     }
   }, [value]);
@@ -126,61 +115,59 @@ const LockScreen = ({ navigation, route }) => {
 
 
   const handlePinEntry = async () => {
-
-    if (value.length === 4) {
-      try {
-        // console.log(isForgotPin)
-
-        setLoading(true); // Start loading
-        const payload = {
-          phone: phone,
-          verifyPin: value,
-        };
-        const verifyPinResponse = await NetworkManager.verifyPin(payload);
-        if (verifyPinResponse.data.code === 200) {
-          // If verification is successful, navigate to the destination screen
-          navigation.navigate('PinGenerationScreen', { fromForget: true, phone: phone });
-          setValue('');
-          // setIsForgotPin(false);
-          setScreen(SCREENS.lockScreen);
-        } else {
-          setSnackbarMessage('Invalid PIN. Please try again.');
+    if (phone?.length >= 10) {
+      if (value.length === 4) {
+        try {
+          setLoading(true);
+          const payload = {
+            phone: phone,
+            verifyPin: value,
+          };
+          const verifyPinResponse = await NetworkManager.verifyPin(payload);
+          if (verifyPinResponse.data.code === 200) {
+            // If verification is successful, navigate to the destination screen
+            navigation.navigate('PinGenerationScreen', { fromForget: true, phone: phone });
+            setValue('');
+            setScreen(SCREENS.lockScreen);
+          } else {
+            setSnackbarMessage('Invalid credentials. Please try again.');
+            setSnackbarVisible(true);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          setSnackbarMessage('Invalid PIN. Please try again. ');
           setSnackbarVisible(true);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error('Error:', error);
-        setSnackbarMessage('Invalid PIN. Please try again. ');
+      } else {
+        setSnackbarMessage('Please enter a 4-digit PIN.');
         setSnackbarVisible(true);
-      } finally {
-        setLoading(false); // Stop loading
       }
     } else {
-      setSnackbarMessage('Please enter a 4-digit PIN.');
+      setSnackbarMessage('Please enter a 10 digit phone number.');
       setSnackbarVisible(true);
     }
   };
 
   const handlelockpin = async () => {
-    //  console.log(phone?.length, value?.length,'-------lenght')
     if (phone?.length >= 10) {
       if (value?.length === 4) {
 
         try {
 
-          setLoading(true); // Start loading
-          // Call the login API here
+          setLoading(true);
           const payload = {
             phoneNumber: phone,
             password: value,
           }
-          // console.log('lock screen payload', payload)
+
           const loginResponse = await NetworkManager.login(payload);
-          // console.log(loginResponse.data.response.userDetails, '----------')
+
           const token = loginResponse.data.response.token
           await storeUserSession({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
           await storeUserDetail({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
           if (loginResponse.data.code === 200) {
-            // If login is successful, navigate to the dashboard screen
             navigation.navigate('Dashboard', { userData: value });
             setValue('');
           } else {
@@ -193,7 +180,7 @@ const LockScreen = ({ navigation, route }) => {
           setSnackbarMessage('Invalid PIN. Please try again. ');
           setSnackbarVisible(true);
         } finally {
-          setLoading(false); // Stop loading
+          setLoading(false);
         }
       } else {
         setSnackbarMessage('Please enter a 4-digit PIN.');
@@ -211,32 +198,21 @@ const LockScreen = ({ navigation, route }) => {
       try {
         setValue('')
         setLoading(true);
-        // setIsSendOtp(false)
-        // console.log(phone, 'phone.............')
-        // NetworkManager.forgotPin(phone).then(res => {
         const res = await NetworkManager.forgotPin(phone)
-        // console.log(res, 'res......')
         if (res.data.code === 200) {
-          // setLoading(true);
-          // console.log(res.data.message, 'OTP Send  Success')
           setSnackbarMessage('A PIN reset link has been sent to your registered mobile/email id');
           setSnackbarVisible(true);
-          // setIsSendOtp(true)
-          // setIsForgotPin(true);
           setScreen(SCREENS.verifyOTP);
         } else {
-          // console.log('else', res)
-          setSnackbarMessage('Phone number not found');
+          setSnackbarMessage('Phone number not Registered');
           setSnackbarVisible(true);
-          // setLoading(false);
         }
-        // })
       } catch (error) {
         console.log(error, 'error')
-        setSnackbarMessage('Phone number not found');
+        setSnackbarMessage('Phone number not Registered');
         setSnackbarVisible(true);
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     }
     else {
@@ -246,13 +222,10 @@ const LockScreen = ({ navigation, route }) => {
   }
   const buttonFunction = async () => {
     if (screen === SCREENS.lockScreen) {
-      // console.log('lockscreen to dash board');
       handlelockpin();
     } else if (screen === SCREENS.forgetPin) {
-      // console.log('otp to verfy screen')
       handleSendOtp();
     } else if (screen === SCREENS.verifyOTP) {
-      // console.log('verypin screen to pingeneration');
       handlePinEntry();
     }
 
@@ -268,16 +241,6 @@ const LockScreen = ({ navigation, route }) => {
     setScreen(SCREENS.lockScreen)
     cleanTextFields();
   }
-  // console.log(isSendOtp, 'issetotp')
-  // const handleSignUp = () => {
-  //   if (isAuthenticated === false) {
-  //     navigation.navigate('RegistrationPage')
-  //   } else {
-  //     setSnackbarMessage('Cant able to login more than 1 account');
-  //     setSnackbarVisible(true);
-  //   }
-  // }
-  // console.log(BUTTON[screen], screen, signInParam, 'screen button')
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -288,11 +251,6 @@ const LockScreen = ({ navigation, route }) => {
             {screen !== SCREENS.forgetPin ? <Text style={[styles.signup, { height: normalizeVertical(50), marginBottom: normalizeVertical(30) }]} >Login</Text> : null}
             {(screen === SCREENS.forgetPin) ? <Text style={{ fontSize: 15, color: 'white', fontWeight: '400', alignSelf: 'flex-start', marginTop: normalizeVertical(50), height: normalizeVertical(30), }}>Enter Your Registered Phone Number :</Text> : null}
             <TouchableOpacity style={[styles.mobileInputView,
-              // errors.phoneNo &&
-              // touched?.phoneNo && {
-              //     borderColor: '#ff00009c',
-              //     borderWidth: 2
-              // },
             ]}>
 
               <PhoneInput
@@ -300,10 +258,6 @@ const LockScreen = ({ navigation, route }) => {
                 ref={phoneInput}
                 defaultValue={phone}
                 defaultCode="IN"
-                // onChangeFormattedText={(text) => {
-                //   const formattedPhoneNumberWithoutCountryCode = text.replace(/^(\+\d{1,2})/, '');
-                //   setPhone(formattedPhoneNumberWithoutCountryCode)
-                // }}
                 onChangeText={(text) => {
                   setPhone(text);
                 }}
@@ -316,11 +270,8 @@ const LockScreen = ({ navigation, route }) => {
                   placeholder: 'Phone Number',
                   placeholderTextColor: 'black'
                 }}
-                // codeTextStyle={{fontSize: 17}}
                 flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
                 keyboardType="number-pad"
-              // onChangeText={handleChange('phoneNo')}
-              // onBlur={handleBlur('phoneNo')}
               />
             </TouchableOpacity>
           </View> : null}
@@ -343,7 +294,6 @@ const LockScreen = ({ navigation, route }) => {
               value={value}
               onChangeText={(text) => {
                 setValue(text)
-                // setError(false)
               }}
               cellCount={CELL_COUNT}
               keyboardType="number-pad"
@@ -386,7 +336,6 @@ const LockScreen = ({ navigation, route }) => {
         visible={snackbarVisible}
         onDismiss={() => setSnackbarVisible(false)}
         duration={3000}
-        // style={styles.Snackbar}
         style={[styles.Snackbar, snackbarMessage === 'A PIN reset link has been sent to your registered mobile/email id' && { backgroundColor: '#0e9b81' }]}
       >
         {snackbarMessage}
@@ -472,31 +421,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center'
   },
-  // cell: {
-  //   width: normalize(40),
-  //   height: normalize(40),
-  //   fontSize: 30,
-  //   fontWeight: '500',
-  //   textAlign: 'center',
-  //   marginLeft: 8,
-  //   borderRadius: 6,
-  //   borderWidth: 1,
-  //   borderColor: 'black',
-  //   backgroundColor: '#e3e3e3cc',
-  //   paddingVertical: 2
-  // },
-
-  // codeFieldRoot: {
-  //   alignSelf: 'center',
-  //   width: screenWidth - normalize(160),
-  // },
-
-  // focusCell: {
-  //   borderColor: '#000',
-  // },
   Snackbar: {
     backgroundColor: 'rgb(195,0,0)',
-    // color: 'white',
   },
   phoneInputContainer: {
     backgroundColor: 'transparent',
@@ -527,20 +453,13 @@ const styles = StyleSheet.create({
     height: normalizeVertical(50),
     borderRadius: normalize(5),
     backgroundColor: '#e3e3e3cc',
-    // marginBottom: normalize(15),
-    // borderWidth: normalize(1),
     borderColor: COLORS.gray,
-    // alignItems: FONTALIGNMENT.center,
-    // marginTop: normalize(30),
     marginBottom: normalize(0),
-    // alignSelf: 'center',
-    // justifyContent: 'center'
   },
   signup: {
     fontSize: 30,
     color: 'white',
     fontWeight: 'bold',
-    // marginVertical: normalize(0),
     alignSelf: 'center',
   },
 });

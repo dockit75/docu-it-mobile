@@ -21,7 +21,6 @@ const CELL_COUNT = 4;
 const PinGenerationScreen = ({ navigation, route }) => {
     const fromForget = route?.params?.fromForget;
     const phoneNo = route?.params?.phone;
-    // console.log(fromForget, 'route,.....')
     const [pin, setPin] = useState('');
     const [confirmedPin, setConfirmedPin] = useState('');
     const [error, setError] = useState(false)
@@ -46,18 +45,16 @@ const PinGenerationScreen = ({ navigation, route }) => {
         value: confirmedPin,
         setValue: setConfirmedPin,
     });
-    // console.log(fromForget, phoneNo)
     useEffect(() => {
         (async () => {
             const data = await retrieveUserSession();
-            console.log(data, '-----PinGenerationScreen')
             setPhone(data.phone)
             setName(data.name)
         })();
     }, []);
 
     useEffect(() => {
-        if (/^\d{4}$/.test(pin) && pin === confirmedPin) {
+        if (/^\d{4}$/.test(pin) && /^\d{4}$/.test(confirmedPin)) {
             handleGeneratePin()
         }
     }, [confirmedPin])
@@ -89,13 +86,6 @@ const PinGenerationScreen = ({ navigation, route }) => {
 
         if (symbol) {
             textChild = enableMaskPin ? '•' : symbol;
-            // (
-            //     <MaskSymbol
-            //         maskSymbol='•'
-            //         isLastFilledCell={isLastFilledCell({ index, value })}>
-            //         {symbol}
-            //     </MaskSymbol>
-            // );
         } else if (isFocused) {
             textChild = <Cursor />;
         }
@@ -138,12 +128,10 @@ const PinGenerationScreen = ({ navigation, route }) => {
                         phone: phone,
                         pinNumber: pin,
                     };
-                    // console.log(payload, 'payload')
-                    // console.log('fromOTPSCreen');
                     // Assuming NetworkManager.pinGeneration returns a promise
                     const res = await NetworkManager.pinGeneration(payload);
                     if (res.data.code === 200) {
-                        navigation.navigate('LockScreen',{ signInParam: true });
+                        navigation.navigate('LockScreen', { signInParam: true });
                     } else {
                         // Handle other response codes or errors here
                         console.log('Error response:', res);
@@ -154,7 +142,6 @@ const PinGenerationScreen = ({ navigation, route }) => {
                         phone: phoneNo,
                         pinNumber: pin,
                     };
-                    // console.log('fromforgetSCreen');
                     // Assuming NetworkManager.changePin returns a promise
                     const res = await NetworkManager.changePin(payload);
                     if (res.data.code === 200) {
@@ -184,13 +171,11 @@ const PinGenerationScreen = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.root}>
-            {/* <ScrollView> */}
             <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top }}>
                 <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
                 <View style={styles.container}>
                     <View style={{ gap: normalizeVertical(20) }}>
                         <View>
-                            {/* <Text style={styles.title}>{changePin? 'Enter PIN' : 'Enter New PIN'}</Text> */}
                             <View style={{ flexDirection: 'row', marginVertical: normalizeVertical(20), justifyContent: 'space-between', }}>
                                 <View />
                                 <Text style={styles.title}>Enter PIN</Text>
@@ -204,7 +189,6 @@ const PinGenerationScreen = ({ navigation, route }) => {
                             </View>
 
                             <CodeField
-                                // secureTextEntry={true}
                                 ref={refPin}
                                 {...propsPin}
                                 value={pin}
@@ -278,11 +262,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: normalize(18),
         fontWeight: 'bold',
-        // marginTop: normalize(20),
         color: COLORS.white,
-        // alignSelf: 'center',
-        // paddingVertical: normalize(10),
-        // marginLeft: 20
     },
     conform: {
         fontSize: normalize(18),
@@ -291,7 +271,6 @@ const styles = StyleSheet.create({
         color: COLORS.white,
         alignSelf: 'center',
         paddingVertical: normalize(10),
-        // marginLeft: normalize(45),
     },
     codeFieldRoot: {
         width: screenWidth - normalize(160),
@@ -306,13 +285,6 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         backgroundColor: '#e3e3e3cc',
     },
-    // toggle: {
-    //     width: normalize(30),
-    //     height: normalize(30),
-    //     marginBottom: 20,
-    //     marginTop: 10,
-    //     alignSelf: 'center'
-    // },
     focusCell: {
         borderColor: COLORS.white,
         textAlign: 'center',

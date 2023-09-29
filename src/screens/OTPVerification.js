@@ -13,11 +13,11 @@ import PhoneInput from 'react-native-phone-number-input';
 import { FONTALIGNMENT } from '../utilities/Fonts';
 import NetworkManager from '../services/NetworkManager';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { retrieveUserSession} from '../storageManager';
+import { retrieveUserSession } from '../storageManager';
 import { Snackbar } from 'react-native-paper';
 
-  const CELL_COUNT = 5;
-  const OTPVerification = ({ route, navigation }) => {
+const CELL_COUNT = 5;
+const OTPVerification = ({ route, navigation }) => {
   const userData = route?.params?.userData;
   const [verificationMethod, setVerificationMethod] = useState('email');
   const [error, setError] = useState(false)
@@ -29,14 +29,12 @@ import { Snackbar } from 'react-native-paper';
     value,
     setValue,
   });
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
-    // Get the unique device ID when the component mounts
     const fetchUniqueId = async () => {
       const data = await retrieveUserSession();
-              console.log('****regpage***', data);
     };
     fetchUniqueId();
   }, []);
@@ -45,7 +43,7 @@ import { Snackbar } from 'react-native-paper';
     if (value.trim().length === 5) {
       handleSubmit()
     }
-  },[value]);
+  }, [value]);
 
   const handleSubmit = async () => {
     try {
@@ -69,7 +67,7 @@ import { Snackbar } from 'react-native-paper';
           };
         }
         const res = await NetworkManager.verifyEmail(payload, verificationMethod);
-  
+
         if (res.status === 200) {
           setValue('');
           navigation.navigate("PinGenerationScreen");
@@ -88,11 +86,11 @@ import { Snackbar } from 'react-native-paper';
       // You can customize the error message here if needed
       setSnackbarMessage('Invalid PIN');
       setSnackbarVisible(true);
-    }finally {
-      setLoading(false); // Stop loading
+    } finally {
+      setLoading(false);
     }
   };
-  
+
   const handleResentCode = () => {
     try {
       payload = {
@@ -123,13 +121,11 @@ import { Snackbar } from 'react-native-paper';
                   defaultCode="IN"
                   disableArrowIcon={true}
                   disabled={true}
-                  // layout='second'
                   defaultValue={userData?.phoneNo}
                   containerStyle={styles.phoneInputContainer}
                   textContainerStyle={styles.phoneInputTextContainer}
                   textInputStyle={styles.phoneInputTextStyle}
                   codeTextStyle={{ fontSize: 18 }}
-                //  flagButtonStyle={{right: 0.5}}
                 />
               </View>
             ) : (
@@ -165,21 +161,20 @@ import { Snackbar } from 'react-native-paper';
               <TouchableOpacity onPress={handleResentCode}><Text style={{ color: 'white', fontWeight: 'bold', borderBottomWidth: 0 }}> Resend Code</Text></TouchableOpacity>
             </View>
             <View style={{ marginVertical: normalize(20) }}>
-              {/* {error ? <Text style={{ color: 'red', fontSize: 16, fontWeight: '500', letterSpacing: 1.5, }}>{error}</Text> : null} */}
             </View>
-           
-              <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
-               {loading ? (
-                       <ActivityIndicator color='white' />
-               ) : (
+
+            <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+              {loading ? (
+                <ActivityIndicator color='white' />
+              ) : (
                 <Text style={styles.buttonText}>
-                {`VERIFY ${verificationMethod === '' ? '' : ''}`}
-              </Text>
-               )             
-               }
-              </TouchableOpacity>
-        
-            <View >
+                  {`VERIFY ${verificationMethod === '' ? '' : ''}`}
+                </Text>
+              )
+              }
+            </TouchableOpacity>
+
+            <View>
               <TouchableOpacity onPress={handleToggleMethod}>
                 <Text style={styles.buttonText1}>
                   {`Verify with ${verificationMethod === 'email' ? 'Phone Number' : 'email'}`}
