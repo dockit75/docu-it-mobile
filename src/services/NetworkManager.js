@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/react-native'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { isJwtExpired } from 'jwt-check-expiration'
@@ -9,7 +8,7 @@ import { clearDBTables } from '../db/deleteDb'
 // import { ALERT_CANCEL_BUTTON_NAMES, ALERT_HEADER, ALERT_OK_BUTTON_NAMES } from '../utilities/strings'
 // import { IS_IOS, showAlert } from '../utilities/utils'
 import { BASE_API_CORE_URL } from './config'
-import { retrieveUserDetail, retrieveUserSession } from '../storageManager'
+import { retrieveUserDetail, retrieveUserSession, storeUserDetail } from '../storageManager'
 
 // export const IS_IOS = Platform.OS === 'ios';
 
@@ -27,7 +26,6 @@ const axiosHeaders = (isFormData) => {
 
 const axiosError = error => {
     // if (error.response.status !== 409 && error.response.status !== 403 && error.response.status !== 401 && error.response.status !== 400 && error.message !== 'Network Error') {
-        // Sentry.captureException(error)
         // showAlert({
         //     cancelButtonName: ALERT_CANCEL_BUTTON_NAMES.cancel,
         //     header: ALERT_HEADER,
@@ -79,7 +77,7 @@ const refreshTokenPerform = async () => {
     const payload = {
         email: userData.email
     }
-    const { data } = await NetworkManager.generateToken(payload)
+    const { data } = await NetworkManager.generateToken(userData.email)
     storeUserDetail({ ...userData, token: data.token })
     return
 }
@@ -107,9 +105,29 @@ const path = {
     forgotPin: 'auth/forgotPin',
     verifyPin: 'auth/verifyPin',
     changePin: 'auth/changePin',
+    updateProfile: 'auth/updateProfile',
     uploadDocument: 'document/uploadDocument',
     generateToken: 'auth/generateToken',
-    listCategories: 'category/listCategories,'
+    listCategories: 'category/listCategories',
+    listCategoryByUser: 'category/find/user/',
+    uploadDocument: 'document/uploadDocument?userId=',
+    saveDocument: 'document/saveDocument',
+    updateDocument: 'document/updateDocument',
+    getUserLastDocumentActivity: 'document/getUserLastDocumentActivity?userId=',
+    getDocumentsById: 'document/getDocumentDetails?documentId=',
+    deleteDocument: 'document/deleteDocument?documentId=',
+    addFamily :'family/addFamily',
+    listFamily :'family/listFamily?adminId=',
+    editFamily :'family/editFamily',
+    externalInvite : 'family/externalInvite',
+    listDocuitUsers : 'family/listDocuitUsers',
+    inviteDocuitUser : 'family/inviteDocuitUser',
+    listPendingInvites : 'family/listPendingInvites?userId=',
+    acceptInvite : 'family/acceptInvite',
+    listFamilyMembers : 'family/listFamilyMembers?familyId=',
+    inviteUser : 'family/inviteUser',
+    deleteFamily : 'family/deleteFamily',
+    removeFamilyMembers : 'family/removeFamilyMembers',
 }
 
 
@@ -160,6 +178,74 @@ const NetworkManager = {
     },
     listCategories: async () => {
         return await requests.getTokenize(path.listCategories, false)
+    },
+    listCategoriesByUser: async (userId) => {
+        return await requests.getTokenize(path.listCategoryByUser+userId, false)
+    },
+    getUploadedDocumentsByCategoryId: async (userId, categoryId) => {
+        return await requests.getTokenize(path.listCategoryByUser+userId+'/category/'+categoryId, false)
+    },
+    getDocumentsById: async (documentId) => {
+        return await requests.getTokenize(path.getDocumentsById+documentId, false)
+    },
+    documentUpload: async (userId, params) => {
+      return await requests.postTokenize(path.uploadDocument+userId, params, true)
+    },
+    documentDelete: async (documentId, params) => {
+      return await requests.deleteTokenize(path.deleteDocument+documentId, params, true)
+    },
+    saveDocument: async (params) => {
+        return await requests.postTokenize(path.saveDocument, params, false)
+    },
+    updateDocument: async (params) => {
+        return await requests.putTokenize(path.updateDocument, params, false)
+    },
+    getUserLastDocumentActivity: async (userId) => {
+        return await requests.getTokenize(path.getUserLastDocumentActivity+userId,false)
+    },
+
+    addFamily: async (params) =>{
+        return await requests.postTokenize(path.addFamily, params, false)
+      },
+    listFamily: async (adminId) => {
+        const paths = `${path.listFamily}${adminId}`
+        return await requests.getTokenize(paths,false)
+    },
+    editFamily: async (params) =>{
+        return await requests.putTokenize(path.editFamily, params, false)
+    },
+    externalInvite: async (params) =>{
+        return await requests.postTokenize(path.externalInvite, params, false)
+    },
+    listDocuitUsers: async () => {
+        const paths = `${path.listDocuitUsers}`
+        return await requests.getTokenize(paths,false)
+    },
+    inviteDocuitUser: async (params) =>{
+        return await requests.postTokenize(path.inviteDocuitUser, params, false)
+    },
+    listPendingInvites: async (userId) => {
+        const paths = `${path.listPendingInvites}${userId}`
+        return await requests.getTokenize(paths,false)
+    },
+    acceptInvite: async (params) =>{
+        return await requests.postTokenize(path.acceptInvite, params, false)
+    },
+    listFamilyMembers: async (familyId) => {
+        const paths = `${path.listFamilyMembers}${familyId}`
+        return await requests.getTokenize(paths,false)
+    },
+    inviteUser: async (params) =>{
+        return await requests.postTokenize(path.inviteUser, params, false)
+    },
+    deleteFamily: async (params) =>{
+        return await requests.deleteTokenize(path.deleteFamily, params, false)
+    },
+    removeFamilyMembers: async (params) =>{
+        return await requests.deleteTokenize(path.removeFamilyMembers, params, false)
+    },
+    updateProfile: async (params) => {
+        return await requests.putTokenize(path.updateProfile, params, false)
     }
 
 };

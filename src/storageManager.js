@@ -4,7 +4,7 @@ export async function storeUserSession(data) {
   try {
     await EncryptedStorage.setItem('user_session', JSON.stringify(data));
   } catch (error) {
-    console.log('EncryptedStorage_storeUserSession Error: ', error);
+    // console.log('EncryptedStorage_storeUserSession Error: ', error);
   }
 }
 
@@ -16,7 +16,7 @@ export async function retrieveUserSession() {
       return JSON.parse(session);
     }
   } catch (error) {
-    console.log('EncryptedStorage_retrieveUserSession Error: ', error);
+    // console.log('EncryptedStorage_retrieveUserSession Error: ', error);
   }
 }
 
@@ -24,7 +24,7 @@ export async function removeUserSession() {
   try {
     await EncryptedStorage.removeItem('user_session');
   } catch (error) {
-    console.log('EncryptedStorage_removeUserSession Error: ', error);
+    // console.log('EncryptedStorage_removeUserSession Error: ', error);
   }
 }
 
@@ -32,7 +32,7 @@ export async function clearStorage() {
   try {
     await EncryptedStorage.clear();
   } catch (error) {
-    console.log('EncryptedStorage_clearStorage Error: ', error);
+    // console.log('EncryptedStorage_clearStorage Error: ', error);
   }
 }
 
@@ -44,7 +44,7 @@ export async function retrieveCurrentScreen() {
       return JSON.parse(currentScreen);
     }
   } catch (error) {
-    console.log('EncryptedStorage_retrieveUserSession Error: ', error);
+    // console.log('EncryptedStorage_retrieveUserSession Error: ', error);
   }
 }
 
@@ -52,7 +52,7 @@ export async function storeUserDetail(data) {
   try {
     await EncryptedStorage.setItem('user_detail', JSON.stringify(data));
   } catch (error) {
-    console.log('EncryptedStorage_storeUserDetail Error: ', error);
+    // console.log('EncryptedStorage_storeUserDetail Error: ', error);
   }
 }
 
@@ -65,6 +65,6 @@ export async function retrieveUserDetail() {
       return JSON.parse(userDetail);
     }
   } catch (error) {
-    console.log('EncryptedStorage_retrieveUserDetail Error: ', error);
+    // console.log('EncryptedStorage_retrieveUserDetail Error: ', error);
   }
 }

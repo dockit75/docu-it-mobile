@@ -1,10 +1,6 @@
 module.exports = {
   presets: ['module:metro-react-native-babel-preset'],
   plugins: [
-        [
-          {
-            globals: ['__detect','__detectAndNormalize'],
-          },
-        ],
-      ]
+    'react-native-reanimated/plugin',
+  ],
 };

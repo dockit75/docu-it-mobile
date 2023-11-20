@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, ScrollView, ActivityIndicator, } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, ScrollView, ActivityIndicator, TouchableWithoutFeedback, Platform, } from 'react-native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { normalize, normalizeVertical, screenHeight, screenWidth } from '../utilities/measurement';
@@ -13,22 +13,41 @@ import { COLORS } from "../utilities/colors";
 import NetworkManager from '../services/NetworkManager';
 import { setUser } from '../slices/UserSlices';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Snackbar } from 'react-native-paper';
+import SplashScreen from 'react-native-splash-screen';
+import SmsRetriever from 'react-native-sms-retriever';
 const RegistrationPage = ({ navigation }) => {
     const [phoneNo, setPhoneNo] = useState('');
     const [isLogedIn, setIsLogedIn] = useState(true);
     const formikRef = useRef(null)
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(); // Initially value
-    const options = ['Male', 'Female'];
+    const options = ['Male', 'Female', 'Others', 'Unspecified'];
     const [uniqueId, setUniqueId] = useState('')
     const insets = useSafeAreaInsets();
     const phoneInput = useRef(null);
     const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [initialValues, setInitialValue] = useState({
+        userName: '',
+        phoneNo: '',
+        emailId: '',
+        gender: ''
+    })
+    const scrollRef = useRef()
+    
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     };
+
+    useEffect(() => {
+        if(isOpen) {
+            scrollRef.current.scrollToEnd()
+        }
+    }, [isOpen])
 
     const selectOption = (option) => {
         setSelectedOption(option);
@@ -36,12 +55,6 @@ const RegistrationPage = ({ navigation }) => {
     };
 
     const isAuthenticated = useSelector((state) => state.user);
-    const initialValues = {
-        userName: '',
-        phoneNo: '',
-        emailId: '',
-        gender: ''
-    };
 
     const cleanTextFields = () => {
         phoneInput.current.setState({ number: '' })
@@ -53,11 +66,24 @@ const RegistrationPage = ({ navigation }) => {
             setUniqueId(id);
             const data = await retrieveUserSession();
         })();
+        SplashScreen.hide()
     }, []);
 
     useEffect(() => {
         handleRegistration()
+        Platform.OS === 'android' && getPhoneNumbers()
     }, [])
+
+    const getPhoneNumbers = async () => {
+        try {
+            const phoneNumber = await SmsRetriever.requestPhoneNumber();
+            setInitialValue(prev => prev = { ...prev, phoneNo:  phoneNumber?.substr(phoneNumber.length - 10, phoneNumber.length)})
+            initialValues.phoneNo = phoneNumber?.substr(phoneNumber.length - 10, phoneNumber.length)
+            phoneInput.current.setState({ number: phoneNumber?.substr(phoneNumber.length - 10, phoneNumber.length) })
+        } catch (error) {
+            // console.log('getPhoneNumbers *******',error);
+        }
+    }
 
     const loginValidationSchema = yup.object().shape({
         userName: yup.string().required(' Please enter your username'),
@@ -69,7 +95,6 @@ const RegistrationPage = ({ navigation }) => {
     const handleRegistration = async (values, { resetForm }) => {
         try {
             setIsLoading(true);
-            dispatch(setUser(values));
             const payload = {
                 name: values.userName,
                 email: values.emailId,
@@ -77,21 +102,26 @@ const RegistrationPage = ({ navigation }) => {
                 phone: values.phoneNo,
                 deviceId: uniqueId.toString() + 'h5p'
             }
-            await storeUserSession({ ...payload, isAuthenticated: true });
-            NetworkManager.signUp(payload).then(res => {
+            NetworkManager.signUp(payload).then(async res => {
                 if (res.data.code === 200) {
-
+                    dispatch(setUser(values));
+                    await storeUserSession({ ...payload, isAuthenticated: true });
                     navigation.navigate("OTPVerification", { userData: values })
                     cleanTextFields();
                     resetForm();
+                    setIsLoading(false);
                 }
             }).catch(error => {
-                console.error('error', error.response);
+                setIsLoading(false);
+                console.error('error ------', error.response.data);
+                if(error?.response?.data?.message){
+                    setSnackbarMessage(error.response.data.message);
+                    setSnackbarVisible(true);
+                }
             })
         } catch (error) {
-            console.error('error', error);
-        } finally {
             setIsLoading(false);
+            console.error('error', error.response);
         }
     };
 
@@ -107,7 +137,8 @@ const RegistrationPage = ({ navigation }) => {
     }
 
     return (
-        <ScrollView>
+        <ScrollView ref={scrollRef}>
+        <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
             <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
                 <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
                 <Text style={styles.signup} >Registration</Text>
@@ -126,6 +157,7 @@ const RegistrationPage = ({ navigation }) => {
                                         borderColor: '#ff00009c',
                                         borderWidth: 2
                                     },]}
+                                    onFocus={() => setIsOpen(false)}
                                 />
                             </View>
                             <TouchableOpacity style={[styles.mobileInputView,
@@ -149,9 +181,11 @@ const RegistrationPage = ({ navigation }) => {
                                     textInputProps={{
                                         maxLength: 15,
                                         placeholder: 'Phone Number',
-                                        placeholderTextColor: 'black'
+                                        placeholderTextColor: 'black',
+                                        onFocus: () => setIsOpen(false)
                                     }}
                                     flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
+                                    codeTextStyle={{ height: normalize(18), marginBottom: 0 }}
                                     keyboardType="number-pad"
                                     onChangeText={handleChange('phoneNo')}
                                     onBlur={handleBlur('phoneNo')}
@@ -170,6 +204,7 @@ const RegistrationPage = ({ navigation }) => {
                                         borderWidth: 2,
                                     },]}
                                     keyboardType="email-address"
+                                    onFocus={() => setIsOpen(false)}
                                 />
                             </View>
                             <View>
@@ -182,9 +217,9 @@ const RegistrationPage = ({ navigation }) => {
                                     onPress={toggleDropdown}>
                                     <Text style={[styles.selectedOption, values.gender && { color: 'black', fontWeight: '600' }]}>{values.gender || 'Choose Gender'}</Text>
                                     {isOpen ? (
-                                        <Image source={Images.DROPDOWN_UP} style={styles.icon} />
+                                        <Icon name="chevron-up" size={30} color="black" style={styles.icon} />
                                     ) : (
-                                        <Image source={Images.DROPDOWN} style={styles.icon} />
+                                        <Icon name="chevron-down" size={30} color="black" style={styles.icon} />
                                     )
                                     }
                                 </TouchableOpacity>
@@ -203,7 +238,7 @@ const RegistrationPage = ({ navigation }) => {
                                     </View>
                                 )}
                             </View>
-                            <TouchableOpacity style={styles.button} onPress={() => handleSubmit(values, resetForm)} disabled={isLoading}>
+                            <TouchableOpacity style={[styles.button, isOpen && {zIndex: -1}]} onPress={() => handleSubmit(values, resetForm)} disabled={isLoading}>
                                 {isLoading ? (
                                     <ActivityIndicator color='white' /> // Show loader while loading
                                 ) : (
@@ -213,14 +248,23 @@ const RegistrationPage = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginBottom: normalize(20) }}>
                                 <Text style={{ color: 'black' }}>Already have an account?</Text>
                                 <TouchableOpacity onPress={() => handleLogin(resetForm)}>
-                                    <Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}> LOGIN</Text>
+                                    <Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}> SIGN IN</Text>
                                 </TouchableOpacity>
                             </View>
                             {(errors.userName && touched.userName) || (errors.phoneNo && touched.phoneNo) || (errors.emailId && touched.emailId) || (errors.gender && touched.gender) ? (<Text style={styles.errorText}>{errors.userName || errors.phoneNo || errors.emailId || errors.gender}</Text>) : null}
                         </View>
                     )}
                 </Formik>
+                <Snackbar
+                    visible={snackbarVisible}
+                    onDismiss={() => setSnackbarVisible(false)}
+                    duration={3000}
+                    style={[styles.Snackbar, snackbarMessage === 'A PIN reset link has been sent to your registered mobile/email id' && { backgroundColor: '#0e9b81' }]}
+                >
+                    {snackbarMessage}
+                </Snackbar>
             </ImageBackground>
+                            </TouchableWithoutFeedback>
         </ScrollView>
     );
 };
@@ -332,7 +376,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginVertical: normalize(5)
+        marginVertical: normalize(5),
+        // position: 'relative'
     },
     selectedOption: {
         fontSize: 15,
@@ -345,6 +390,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#3C3C43CC',
         marginTop: normalize(10),
         width: screenWidth - normalize(30),
+        position: 'absolute',
+        top: 0
     },
     optionItem: {
         padding: 15,

@@ -134,7 +134,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
                         navigation.navigate('LockScreen', { signInParam: true });
                     } else {
                         // Handle other response codes or errors here
-                        console.log('Error response:', res);
+                        // console.log('Error response:', res);
                     }
                 } else {
                     setLoading(true)
@@ -149,7 +149,7 @@ const PinGenerationScreen = ({ navigation, route }) => {
                         navigation.navigate('LockScreen', { signInParam: true });
                     } else {
                         // Handle other response codes or errors here
-                        console.log('Error response:', res);
+                        // console.log('Error response:', res);
                         setError('PIN generation failed');
                     }
                 }

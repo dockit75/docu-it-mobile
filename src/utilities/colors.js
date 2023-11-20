@@ -96,7 +96,8 @@ export const COLORS = {
     redIcon: '#EB003B',
     warnLight: '#F6F6F6',
     warnText: '#909090',
-    savedMessagesToolbar: 'rgba(103, 70, 245, 0.06)'
+    savedMessagesToolbar: 'rgba(103, 70, 245, 0.06)',
+    backdrop: 'rgba(0,0,0,0.5)'
   }
 
   

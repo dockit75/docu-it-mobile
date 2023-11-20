@@ -20,11 +20,17 @@ const userSlice = createSlice({
             state.isAuthenticated = false;
             // removeUserSession(); 
         },
+        setNotificationCount: (state, action) => {
+            state.notificationCount = action.payload.count;
+        },
+        setProfileCompletion: (state, action) => {
+            state.profileCompletion = action.payload.percentage;
+        }
     },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, setNotificationCount, setProfileCompletion } = userSlice.actions;
 
-export const selectUser = state => state.user;
+export const selectUser = state => state?.user;
 
 export default userSlice.reducer;

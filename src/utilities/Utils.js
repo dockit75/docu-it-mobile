@@ -55,3 +55,18 @@ function getRectFromPoints(points) {
     throw new Error("Invalid number of points");
   }
 }
+
+export const convertPdfUrlToBase64 = (pdfUrl) => {
+  return fetch(pdfUrl)
+    .then(response => response.blob())
+    .then(blob => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    }))
+    .then(dataUrl => {
+      const base64String = dataUrl.split(',')[1];
+      return base64String;
+    });
+}

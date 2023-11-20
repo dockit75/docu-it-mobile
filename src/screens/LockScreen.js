@@ -33,6 +33,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import PhoneInput from "react-native-phone-number-input";
 import { white } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
+import SplashScreen from 'react-native-splash-screen';
 
 
 const CELL_COUNT = 4;
@@ -71,16 +72,33 @@ const LockScreen = ({ navigation, route }) => {
 
 
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await retrieveUserSession();
-        setPhone(data?.phone);
-        setIsPhoneExist(true);
-      } catch (error) {
-        console.error('Error in useEffect:', error);
-      }
-    })();
+    // (async () => {
+    //   try {
+    //     const data = await retrieveUserSession();
+    //     setPhone(data?.phone);
+    //     setIsPhoneExist(true);
+    //   } catch (error) {
+    //     console.error('Error in useEffect:', error);
+    //   }
+    // })();
+      const unsubscribe = navigation.addListener('focus', async () => {
+        getUserData();
+   
+      });
+  
+      SplashScreen.hide()
+      return unsubscribe;
   }, []);
+
+  const getUserData = async () => {
+    try {
+      const data = await retrieveUserSession();
+      setPhone(data?.phone);
+      setIsPhoneExist(true);
+    } catch (error) {
+      console.error('Error in useEffect:', error);
+    }
+  }
 
   useEffect(() => {
     if (value.length === 4) {
@@ -171,6 +189,7 @@ const LockScreen = ({ navigation, route }) => {
             navigation.navigate('Dashboard', { userData: value });
             setValue('');
           } else {
+            setValue('')
             setSnackbarMessage('Invalid credentials. Please try again.');
             setSnackbarVisible(true);
           }
@@ -179,6 +198,7 @@ const LockScreen = ({ navigation, route }) => {
           console.error('Error:', error);
           setSnackbarMessage('Invalid PIN. Please try again. ');
           setSnackbarVisible(true);
+          setValue('')
         } finally {
           setLoading(false);
         }
@@ -208,7 +228,7 @@ const LockScreen = ({ navigation, route }) => {
           setSnackbarVisible(true);
         }
       } catch (error) {
-        console.log(error, 'error')
+        // console.log(error, 'error')
         setSnackbarMessage('Phone number not Registered');
         setSnackbarVisible(true);
       } finally {
@@ -268,10 +288,12 @@ const LockScreen = ({ navigation, route }) => {
                 textInputProps={{
                   maxLength: 15,
                   placeholder: 'Phone Number',
-                  placeholderTextColor: 'black'
+                  placeholderTextColor: 'black',
+                  autoComplete: 'tel'
                 }}
-                flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
-                keyboardType="number-pad"
+                flagButtonStyle={{ right: 0.5, paddingBottom: 0 }}
+                codeTextStyle={{ height: normalize(18), marginBottom: 3 }}
+                keyboardType="phone-pad"
               />
             </TouchableOpacity>
           </View> : null}
@@ -431,7 +453,7 @@ const styles = StyleSheet.create({
   phoneInputTextContainer: {
     backgroundColor: 'transparent',
     right: 35,
-    paddingTop: normalize(12),
+    // paddingTop: normalize(12),
   },
   phoneInputTextStyle: {
     paddingRight: normalize(8),
@@ -441,6 +463,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     left: 45,
     color: 'black',
+    marginTop: 10
   },
   phoneCountryFlag: {
     width: 'auto',

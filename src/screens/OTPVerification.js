@@ -125,7 +125,7 @@ const OTPVerification = ({ route, navigation }) => {
                   containerStyle={styles.phoneInputContainer}
                   textContainerStyle={styles.phoneInputTextContainer}
                   textInputStyle={styles.phoneInputTextStyle}
-                  codeTextStyle={{ fontSize: 18 }}
+                  codeTextStyle={{ fontSize: 18, paddingBottom: 10 }}
                 />
               </View>
             ) : (

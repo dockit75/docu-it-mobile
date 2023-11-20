@@ -5,6 +5,7 @@ import { Images } from '../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { COLORS } from '../utilities/colors';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 
@@ -12,32 +13,30 @@ const Settings = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     return (
         <SafeAreaView>
-            <View>
-                <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top }}>
-                    <View style={{ marginTop: 60, }}>
-                        <View style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'space-between' }}>
+                <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight }}>
+                    <View style={{ marginTop: insets.top, }}>
+                        <View style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'flex-start' }}>
                             <TouchableOpacity onPress={() => navigation.navigate('Dashboard')} style={{ alignSelf: 'center' }}>
                                 <Image source={Images.ARROW} style={{ width: 28, height: 28 }} />
                             </TouchableOpacity>
                             <Text style={styles.TextSettings}>Settings</Text>
-                            <View />
+                            {/* <View /> */}
                         </View>
                     </View>
                     <Text style={styles.HeaderLine}>Help & Support</Text>
 
                     <View style={styles.ViewContainer}>
-                        <TouchableOpacity style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'space-between' }}>
+                        <TouchableOpacity style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'space-between', alignItems: 'center' }}>
                             <Text style={styles.Text}>Terms & Conditions</Text>
-                            <Image source={Images.ARROWRIGHT} resizeMode='center' style={{ width: 20, height: 20, marginVertical: 20, }} />
+                            <MaterialCommunityIcons name='chevron-right' size={30} color={'black'} style={{height:40,width:40,marginTop:10}}/>
                         </TouchableOpacity>
                         <View style={{ borderBottomWidth: 0.5, borderBottomColor: COLORS.lightGray }} />
-                        <TouchableOpacity style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'space-between' }}>
+                        <TouchableOpacity style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'space-between', alignItems: 'center' }}>
                             <Text style={styles.Text}>Privacy Policy</Text>
-                            <Image source={Images.ARROWRIGHT} resizeMode='center' style={{ width: 20, height: 20, marginVertical: 20 }} />
+                            <MaterialCommunityIcons name='chevron-right' size={30} color={'black'} style={{height:40,width:40,marginTop:10}}/>
                         </TouchableOpacity>
                     </View>
                 </ImageBackground>
-            </View>
         </SafeAreaView>
     )
 }
@@ -62,7 +61,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginVertical: 15,
         color: 'white',
-        marginRight: normalize(15)
+        marginLeft: normalize(15)
     },
     HeaderLine: {
         fontSize: 20,
