@@ -24,7 +24,7 @@ import FamilyMember from '../screens/FamilyDocument/FamilyMember';
 import FamilyInvite from '../screens/FamilyDocument/FamilyInvite';
 import PendingUser from '../screens/FamilyDocument/PendingUser';
 import CommonInvite from '../screens/FamilyDocument/CommonInvite';
-import Onboard from '../screens/onboard';
+// import Onboard from '../screens/onboard';
 import DocumentFamily from '../screens/documentUpload/documentFamily';
 import DocumentMember from '../screens/documentUpload/documentMember';
 
