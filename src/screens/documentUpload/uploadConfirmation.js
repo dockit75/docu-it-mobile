@@ -10,6 +10,7 @@ import {
   Linking,
 } from 'react-native';
 import moment from 'moment';
+import { useDispatch } from 'react-redux';
 import { COLORS } from '../../utilities/colors';
 import React, { useState, useEffect } from 'react';
 import { Images } from '../../assets/images/images';
@@ -20,6 +21,7 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 import { retrieveUserDetail } from '../../storageManager';
 import { ScrollView } from 'react-native-gesture-handler';
 import NetworkManager from '../../services/NetworkManager';
+import { setProfileCompletion } from '../../slices/UserSlices';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { screenHeight, screenWidth } from '../../utilities/measurement';
 import { APP_BUTTON_NAMES, UPLOAD_DOCUMENT } from '../../utilities/strings';
@@ -33,6 +35,7 @@ const UploadConfirmation = ({ navigation, route }) => {
   const isEditDocument = route.params?.isEditDocument ?? false
 
   // hooks
+  const dispatch = useDispatch()
   const insets = useSafeAreaInsets();
 // console.log('categoryInfo *******', categoryInfo)
   // state
@@ -92,6 +95,10 @@ const UploadConfirmation = ({ navigation, route }) => {
       // console.log('handleUpdate params-->',  params)
       const udpateResult = await NetworkManager.updateDocument(params)
       if (udpateResult?.data.code === 200 && udpateResult?.data.status === 'SUCCESS') {
+        let profileStatusResult = await NetworkManager.getUserRanking(userData.id)
+        if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
+          dispatch(setProfileCompletion({ percentage: profileStatusResult?.data?.response?.userRanking ?? 0.0 }))
+        }
         setIsLoading(false)
         navigation.pop(2)
         refreshData && refreshData()
@@ -170,6 +177,10 @@ const UploadConfirmation = ({ navigation, route }) => {
       const saveResult = await NetworkManager.saveDocument(params)
       console.log('handleSave saveResult-->',  saveResult?.data)
       if (saveResult?.data.code === 200 && saveResult?.data.status === 'SUCCESS') {
+        let profileStatusResult = await NetworkManager.getUserRanking(userData.id)
+        if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
+          dispatch(setProfileCompletion({ percentage: profileStatusResult?.data?.response?.userRanking ?? 0.0 }))
+        }
         setIsLoading(false)
         navigation.pop(2)
         refreshData && refreshData()

@@ -34,6 +34,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import PhoneInput from "react-native-phone-number-input";
 import { white } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import SplashScreen from 'react-native-splash-screen';
+import { setProfileCompletion } from '../slices/UserSlices';
 
 
 const CELL_COUNT = 4;
@@ -53,6 +54,7 @@ const BUTTON = {
   verifyOTP: 'VERIFY',
 }
 const LockScreen = ({ navigation, route }) => {
+  const dispatch = useDispatch()
   const signInParam = route?.params?.signInParam;
   const [enableMask, setEnableMask] = useState(true);
   const [value, setValue] = useState('');
@@ -183,9 +185,14 @@ const LockScreen = ({ navigation, route }) => {
           const loginResponse = await NetworkManager.login(payload);
 
           const token = loginResponse.data.response.token
-          await storeUserSession({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
-          await storeUserDetail({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
+          let profileStatusResult = await NetworkManager.getUserRanking(loginResponse.data.response.userDetails.id)
+          // console.log('userRanking result ->', userRanking.data, loginResponse.data.response.userDetails.id, payload)
           if (loginResponse.data.code === 200) {
+            if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
+              dispatch(setProfileCompletion({ percentage: profileStatusResult?.data?.response?.userRanking ?? 0.0 }))
+            }
+            await storeUserSession({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
+            await storeUserDetail({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
             navigation.navigate('Dashboard', { userData: value });
             setValue('');
           } else {

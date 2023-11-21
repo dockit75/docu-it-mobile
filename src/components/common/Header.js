@@ -1,4 +1,4 @@
-import React, {useState, useRef, Fragment, useEffect} from 'react';
+import React, {useState, useRef, Fragment, useEffect, useMemo} from 'react';
 import {Text, View, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import {normalize} from '../../utilities/measurement';
 import {Images} from '../../assets/images/images';
@@ -26,7 +26,7 @@ const Header = props => {
   const profileCompletion = useSelector(State => State.user?.profileCompletion)
 
   // useEffect(() => {
-  //   console.log('profileCompletion ******', profileCompletion)
+    console.log('profileCompletion ******', profileCompletion)
   //   if(!profileCompletion){
   //     dispatch(setProfileCompletion({percentage: 0.8}))
   //   }
@@ -94,8 +94,16 @@ const handleScanner = async () => {
   }
 };
 
-
-
+const memoRenderProfileStatus = () =>  {
+  return (
+    <LinearProgress
+      style={{ width: 100, backgroundColor: COLORS.lightGray, borderWidth: 0.4, borderColor: COLORS.avatarBackground, height: 5, borderRadius: 5 }}
+      value={progress / 100}
+      color={progress > 70 ? '#7CFC00' : (progress > 30 && progress < 70) ? 'yellow' : 'red'}
+      animation={false}
+    />
+  )
+}
 const uploadFileList = async (files) => {
     navigation.navigate('uploadPreview', {uploadFiles: files, categoryInfo: null, refreshData: false})
 }
@@ -108,7 +116,9 @@ const uploadFileList = async (files) => {
     // console.log('open called');
     drawerRef.current.open();
   };
-  let progress = profileCompletion ?? 0.4
+  let progress = (profileCompletion) ?? 40
+  console.log('progress', progress)
+  const memoizedRenderChatsHeader = useMemo(memoRenderProfileStatus, [progress])
   return (
     <View style={{ position: 'relative' }}>
       <View
@@ -132,13 +142,7 @@ const uploadFileList = async (files) => {
           />
           <View style={{ position: 'absolute', right: 50, alignSelf: 'center', justifyContent: 'space-between', top: 5 }}>
             <Text style={{ fontSize: normalize(12), color: COLORS.white, marginBottom: 3 }}>Profile Status</Text>
-            <LinearProgress
-              style={{ width: 100, backgroundColor: COLORS.lightGray, borderWidth: 0.4, borderColor: COLORS.avatarBackground, height: 5, borderRadius: 5 }}
-              value={progress}
-              color={progress <= 0.3 ? 'red' : (progress <= 0.5 && progress <= 0.7) ? 'yellow' : '#7CFC00'}
-              // variant="determinate"
-              animation={false}
-            />
+            {memoizedRenderChatsHeader}
             {/* <View style={{ width: `${100 * progress}%`, backgroundColor: progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green', height: 100 }} /> */}
             {/* <ProgressBar progress={progress} color={progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green'} /> */}
           </View>

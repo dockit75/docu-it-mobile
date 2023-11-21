@@ -42,7 +42,7 @@ const axiosError = error => {
 /// Core API - No Auth
 const axiosNoAuthCoreInstance = axios.create({ baseURL: BASE_API_CORE_URL })
 axiosNoAuthCoreInstance.interceptors.request.use(config => {
-    console.log('Url Request', config.url, config.method)
+    // console.log('Url Request', config.url, config.method)
     return config
 })
 axiosNoAuthCoreInstance.interceptors.response.use(response => response, error => axiosError(error))
@@ -55,7 +55,7 @@ axiosCoreInstance.interceptors.request.use(config => axiosRequest(config))
 axiosCoreInstance.interceptors.response.use(response => response, error => axiosError(error))
 
 const axiosRequest = async request => {
-    console.log('Url Request', request.url, request.method)
+    // console.log('Url Request', request.url, request.method)
     let userData = await retrieveUserDetail()
     if (userData.token) {
         const decodedToken = jwtDecode((userData.token), { complete: true })
@@ -68,7 +68,7 @@ const axiosRequest = async request => {
             request.headers.Authorization = `Bearer ${userData?.token}`
         }
     }
-    console.log(request.headers,'request')
+    // console.log(request.headers,'request')
     return request
 }
 const refreshTokenPerform = async () => {
@@ -128,6 +128,7 @@ const path = {
     inviteUser : 'family/inviteUser',
     deleteFamily : 'family/deleteFamily',
     removeFamilyMembers : 'family/removeFamilyMembers',
+    userRanking: 'auth/getUserRanking?userId='
 }
 
 
@@ -246,6 +247,9 @@ const NetworkManager = {
     },
     updateProfile: async (params) => {
         return await requests.putTokenize(path.updateProfile, params, false)
+    },
+    getUserRanking: async (userId) => {
+        return await requests.getTokenize(path.userRanking+userId, false)
     }
 
 };
