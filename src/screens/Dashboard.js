@@ -25,6 +25,8 @@ import DocumentScanner from 'react-native-document-scanner-plugin';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { Dialog } from '@rneui/themed';
 import { BackHandler } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { setProfileCompletion } from '../slices/UserSlices';
 
 const tileList =  [{
   icon: 'ICON_PERSONAL_DOCS',
@@ -40,7 +42,7 @@ const tileList =  [{
 const Dashboard = ({}) => {
   // hooks
   const navigation = useNavigation();
-  
+  const dispatch = useDispatch()
   // state
   const [activityData, setactivityData] = useState([]);
 
@@ -61,8 +63,16 @@ const Dashboard = ({}) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
       fetchRecentActivity();
- 
+      getUserRanking()
     });
+
+    const getUserRanking = async () => {
+      let userDetails = await retrieveUserDetail();
+      let profileStatusResult = await NetworkManager.getUserRanking(userDetails.id)
+      if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
+        dispatch(setProfileCompletion({ percentage: profileStatusResult?.data?.response?.userRanking ?? 0.0 }))
+      }
+    }
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true)
     return () => {
