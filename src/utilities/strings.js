@@ -40,3 +40,10 @@
     save: 'Save',
     update: 'Update'
   }
+
+  export const FAMILY_LIST_EMPTY = {
+    familyEmpty: 'No more families added.',
+    memberEmpty: 'No more family members added.',
+    contactEmpty: 'No Contacts...',
+    pendingEmpty: 'No recent Invites'
+  }

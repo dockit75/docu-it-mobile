@@ -8,17 +8,17 @@ import { useNavigation, useIsFocused } from '@react-navigation/native'
 import Dashboard from '../Dashboard'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome6';
 import DrawerNavigator from '../../components/common/DrawerNavigator'
 import { Dialog, Tab, TabView } from '@rneui/themed';
 import { FONTALIGNMENT } from '../../utilities/Fonts';
 import PhoneInput from "react-native-phone-number-input";
 import { retrieveUserDetail } from '../../storageManager';
 import NetworkManager from '../../services/NetworkManager';
-// import { Checkbox } from 'react-native-paper';
 import Contacts from 'react-native-contacts';
 import CheckBox from '@react-native-community/checkbox';
 import { FlashList } from '@shopify/flash-list'
+import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 
 
 const CommonInvite = ({ navigation, props }) => {
@@ -42,9 +42,9 @@ const CommonInvite = ({ navigation, props }) => {
 
     useEffect(() => {
         setIsLoader(true)
-        // console.log('familyMember', familyMember)
-        // console.log('contacts====>>>', myContacts)
-        // console.log('newArray', arrayCombined)
+        console.log('familyMember', familyMember)
+        console.log('contacts====>>>', myContacts)
+        console.log('newArray', arrayCombined)
         getUser();
         filterContacts();
         setTimeout(() => setIsLoader(false), 1000)
@@ -144,7 +144,7 @@ const CommonInvite = ({ navigation, props }) => {
             resizeMode="cover"
             style={{ width: screenWidth, height: '100%' }}>
             <DrawerNavigator>
-                <View style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={styles.container}>
                     <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity onPress={() => navigation.navigate('FamilyMember', { familyItem: familyItem })} style={{ alignSelf: 'center' }}>
                         <Image source={Images.ARROW} style={{ width: 28, height: 28 }} />
@@ -169,13 +169,14 @@ const CommonInvite = ({ navigation, props }) => {
                 <FlashList
                     data={filteredContacts.slice().sort((a, b) => a.name.localeCompare(b.name))}
                     extraData={selectedItems}
-                    ListEmptyComponent={<View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 130 }}>
-                    <Text style={{ color: 'white', fontSize: 20 }}>No Contacts....</Text>
+                    ListEmptyComponent={<View style={styles.listEmptyComponent}>
+                        <Icon name='phone-slash' size={60} color={'white'}/>
+                    <Text style={{ color: 'white', fontSize: 20 ,marginTop:10}}>{FAMILY_LIST_EMPTY.contactEmpty}</Text>
                   </View>}
                     renderItem={({ item, index }) => (
                         <View style={styles.FlatListContainer}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <View style={{ backgroundColor: 'gray', alignItems: "center", justifyContent: 'center', height: 40, width: 40, borderRadius: 25 }}>
+                                <View style={styles.letterContainer}>
                                     <Text style={styles.iconText}>{item?.name[0] ?? ''}</Text>
                                 </View>
                                 <View style={{ marginLeft: 20 }}>
@@ -198,39 +199,9 @@ const CommonInvite = ({ navigation, props }) => {
                             </View>
                         </View>
                     )}
-                    // ItemSeparatorComponent={props => <View style={{ backgroundColor: COLORS.coolLight, height: 2, width: screenWidth }} />}
                     estimatedItemSize={45}
                 />
-                {/* <FlatList
-                    data={filteredContacts.slice().sort((a, b) => a.name.localeCompare(b.name))}
-                    style={{ flex: 1 }}
-                    renderItem={({ item }) => (
-                        <View style={styles.FlatListContainer}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <View style={{ backgroundColor: 'gray', alignItems: "center", justifyContent: 'center', height: 40, width: 40, borderRadius: 25 }}>
-                                    <Text style={styles.iconText}>{item.name[0]}</Text>
-                                </View>
-                                <View style={{ marginLeft: 20 }}>
-                                    <Text style={styles.text}>{item.name}</Text>
-                                    <Text style={{ color: 'white' }}>{item.phoneNumber}</Text>
-                                </View>
-                            </View>
-                            <View>
-                                <CheckBox
-                                    tintColors={{ true: 'red', false: 'white' }}
-                                    onCheckColor="white"
-                                    onTintColor="green"
-                                    offFillColor="white"
-                                    offTintColor="white"
-                                    onAnimationType="fill"
-                                    value={selectedItems.includes(item.phoneNumber)}
-                                    onValueChange={() => handleCheckboxChange(item.phoneNumber)}
-                                />
-
-                            </View>
-                        </View>
-                    )}
-                /> */}
+               
             </DrawerNavigator>
         </ImageBackground>
     )
@@ -281,4 +252,22 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    container:{ 
+        flexDirection: 'row', 
+        marginHorizontal: 20, 
+        justifyContent: 'space-between', 
+        alignItems: 'center' 
+    },
+    listEmptyComponent:{ 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        marginTop: 130 
+      },
+      letterContainer:{ 
+        backgroundColor: 'gray', 
+        alignItems: "center", 
+        justifyContent: 'center', 
+        height: 40, width: 40, 
+        borderRadius: 25 
+    }
 })

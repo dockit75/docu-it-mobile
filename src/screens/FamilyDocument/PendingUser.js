@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import { Image, ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, FlatList } from 'react-native'
+import { Image, ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, FlatList, ActivityIndicator, } from 'react-native'
 import { normalize, screenHeight, screenWidth } from '../../utilities/measurement'
 import { Images } from '../../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../utilities/colors';
 import DrawerNavigator from '../../components/common/DrawerNavigator';
 import { useRoute } from '@react-navigation/native';
 import { retrieveUserDetail } from '../../storageManager';
 import NetworkManager from '../../services/NetworkManager';
+import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
+import { Dialog } from '@rneui/themed';
 
 
 
@@ -20,28 +23,9 @@ const PendingUser = ({ navigation }) => {
     const pendingUserInvite = route.params.pendingUserInvite;
     const [invitesPending, setInvitesPending] = useState(familyInvitedLists)
     const [userAcount, setUserAccount] = useState(userDetails)
-    const myData = [
-        {
-            id: 0,
-            name: 'sasi',
-            date: '2023-09-13T14:08:06.285+00:00',
-            imageUri: 'https://placebear.com/g/200/200',
-        },
-        {
-            id: 1,
-            name: 'sathish',
-            date: '2023-09-12T14:08:06.285+00:00',
-            imageUri: 'https://via.placeholder.com/300.png/09f/fff',
-        },
-        {
-            id: 2,
-            name: 'hari',
-            date: '2023-09-11T14:08:06.285+00:00',
-            imageUri: 'https://source.unsplash.com/user/c_v_r/1900×800',
-        },
-    ];
-
-      
+    const [isLoading, setIsLoading] = useState(true);
+    
+ 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
         getPendingUserInvite();
@@ -57,6 +41,7 @@ const PendingUser = ({ navigation }) => {
             // console.log('pendingUser ----->>>response', response.data.response);
             if (response.data.code === 200) {
                 setInvitesPending(response.data.response)
+                setIsLoading(false)
             }
         } catch (error) {
             // console.log('error called===============>>>>')
@@ -64,33 +49,7 @@ const PendingUser = ({ navigation }) => {
         }
 
     }
-    // useEffect(() => {
-    //     setInvitesPending(familyInvitedLists);
-    //     setUserAccount(userDetails)
-    //     console.log('setInvitesPending', userAcount)
-
-    // }, [familyInvitedLists, userDetails]);
-
-    // const onDeclinePressed = async (item, type) => {
-    //     // console.log('deniedPressed', item)
-    //     const params = {
-    //         userId: userAcount.id,
-    //         familyId: item.family.id,
-    //         inviteStatus: 'rejected'
-    //     }
-    //     try {
-    //         let response = await NetworkManager.acceptInvite(params)
-    //         // console.log('response', response)
-    //         if (response.data.code === 200) {
-    //             alert(response.data.message)
-    //             setInvitesPending(prevInvites => prevInvites.filter(invite => invite !== item));
-    //         } else {
-    //             alert(response.data.message)
-    //         }
-    //     } catch (error) {
-    //         alert('Something went Wroung ')
-    //     }
-    // }
+   
     const handleInvite = async (item, type) => {
         const params = {
             userId: userAcount.id,
@@ -102,6 +61,7 @@ const PendingUser = ({ navigation }) => {
             if (response.data.code === 200) {
                 alert(response.data.message)
                 setInvitesPending(prevInvites => prevInvites.filter(invite => invite !== item));
+               
             } else {
                 alert(response.data.message)
             }
@@ -114,40 +74,30 @@ const PendingUser = ({ navigation }) => {
     return (
         <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: '100%' }}>
             <DrawerNavigator>
-
+                <View style={{flex:1}}>
                 <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', marginVertical: 10 }}>
                     <TouchableOpacity onPress={() => navigation.navigate('Dashboard')} style={{ marginLeft: 20 , alignContent: 'center' }}>
-                        <Image source={Images.ARROW} style={{ width: 22, height: 22 }} />
+                    <MaterialCommunityIcons name='arrow-u-left-top' size={30} color={'white'}/>
                     </TouchableOpacity>
-                    <Text
-                        style={{
-                            fontSize: 22,
-                            color: 'white',
-                            fontWeight: 'bold',
-                            // textTransform: 'uppercase',
-                            // marginTop: 20,
-                            // marginBottom: 10,
-                            // marginRight: 80,
-                            textAlign:'center',
-                            marginLeft: 20
-                            // flex:0.95
-                        }}>
-                        Pending Invites
-                    </Text>
+                    <Text style={styles.pendingText}> Pending Invites</Text>
                 </View>
-
+                {isLoading === true ?  (<Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
+                    <ActivityIndicator size={'large'} color={'#0e9b81'} />
+                    <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
+                   </Dialog> ): (
                 <FlatList
                     data={invitesPending.slice().reverse()}
                     style={{ flex: 1 }}
-                    ListEmptyComponent={<View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 130 }}>
-                        <Text style={{ color: 'white', fontSize: 20 }}>No recent Invites....</Text>
+                    ListEmptyComponent={<View style={styles.listEmptyComponent}>
+                        <MaterialCommunityIcons name='account-multiple-remove-outline' size={60} color={'white'}/>
+                        <Text style={{ color: 'white', fontSize: 20,textAlign:'center' }}>{FAMILY_LIST_EMPTY.pendingEmpty}</Text>
                     </View>}
                     renderItem={({ item }) => (
                         <View style={styles.FlatListContainer}>
                             <View>
                                 <Text style={{ fontSize: 14, color: "white", marginLeft: 10, }}><Text style={{ fontSize: 17, fontWeight: 'bold' }}>{item.invitedBy.name}</Text>{" "}inviting you to  {'\n'} join <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'yellow' }}>{item.family.name}</Text> famiy</Text>
                             </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '25%' }}>
+                            <View style={styles.buttons}>
                                 <TouchableOpacity onPress={() => handleInvite(item, 'Accepted')} style={styles.iconTouchable}>
                                     <Icon name="check" size={24} color="#50C878" />
                                 </TouchableOpacity>
@@ -155,11 +105,10 @@ const PendingUser = ({ navigation }) => {
                                     <Icon name="remove" size={24} color="red" />
                                 </TouchableOpacity>
                             </View>
-
                         </View>
                     )}
-                />
-
+                />)}
+              </View>
             </DrawerNavigator>
         </ImageBackground>
     )
@@ -174,13 +123,11 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     FlatListContainer: {
-        // height: normalize(70),
         backgroundColor: COLORS.darkTransparent,
         marginTop: 5,
         borderRadius: 8,
         padding: 15,
         flexDirection: 'row',
-        // width:'75%',
         marginLeft: 14,
         justifyContent: 'space-between',
         width: screenWidth - 25,
@@ -192,7 +139,21 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         width: 35,
         height: 35,
-        // margin:5,
-        // padding:20
+    },
+    pendingText:{
+        fontSize: 22,
+        color: 'white',
+        fontWeight: 'bold',
+        marginLeft: 20
+    },
+    listEmptyComponent:{ 
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 130 
+    },
+    buttons:{ 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        width: '25%' 
     }
 })
