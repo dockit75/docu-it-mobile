@@ -217,9 +217,11 @@ const UploadConfirmation = ({ navigation, route }) => {
                   "sharedUpdatedDate": null,
                   "uploadedByName": userData?.name ?? '',
                   ...params.documentDetails[0],
-                  ...params
+                  ...params,
+                  ...saveResult?.data.response,
+                  ...saveResult?.data.response?.[0]
                 }
-                navigation.navigate('DocumentFamily', { document: documentObj })
+                navigation.navigate('DocumentFamily', { document: documentObj, categoryInfo: categoryData })
                 refreshData && refreshData()
               },
             },

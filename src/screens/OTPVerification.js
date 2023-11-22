@@ -136,6 +136,7 @@ const OTPVerification = ({ route, navigation }) => {
             <View style={styles.otpContainer}>
               <CodeField
                 ref={ref}
+                autoFocus
                 {...props}
                 value={value}
                 onChangeText={(text) => {
