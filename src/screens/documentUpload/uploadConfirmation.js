@@ -206,7 +206,20 @@ const UploadConfirmation = ({ navigation, route }) => {
             {
               text: 'Yes',
               onPress: () => {
-                navigation.navigate('DocumentFamily', { document: document })
+                let documentObj = {
+                  "familyId": null,
+                  "familyName": null,
+                  "shareCreatedDate": null,
+                  "shareDocumentId": null,
+                  "shareId": null,
+                  "shareMemberId": null,
+                  "sharedBy":null,
+                  "sharedUpdatedDate": null,
+                  "uploadedByName": userData?.name ?? '',
+                  ...params.documentDetails[0],
+                  ...params
+                }
+                navigation.navigate('DocumentFamily', { document: documentObj })
                 refreshData && refreshData()
               },
             },

@@ -74,10 +74,10 @@ const Dashboard = ({}) => {
       }
     }
 
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true)
+    // const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true)
     return () => {
-      unsubscribe,
-      backHandler.remove()
+      unsubscribe
+      // backHandler.remove()
     }
   }, []);
 

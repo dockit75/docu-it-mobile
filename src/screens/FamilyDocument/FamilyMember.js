@@ -103,6 +103,7 @@ const FamilyMember = ({ navigation, props }) => {
         }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('arrayCombined ******', arrayCombined)
         isPressedAdd ?  navigation.navigate('CommonInvite', { familyItem: familyItem, familyMember: familyMember,arrayCombined : arrayCombined,myContacts:myContacts }) : loadContacts();
       }else {
         Alert.alert('Permission to access contacts was denied. You can update it in your device settings.');
@@ -116,7 +117,8 @@ const FamilyMember = ({ navigation, props }) => {
   const loadContacts = () => {
     Contacts.getAll()
       .then((contacts) => {
-        contacts.sort(
+        contacts.filter(filterItem => filterItem)
+        .sort(
           (a, b) =>
             a.givenName.toLowerCase() > b.givenName.toLowerCase(),)
             let contactList = contacts.map(contact =>{

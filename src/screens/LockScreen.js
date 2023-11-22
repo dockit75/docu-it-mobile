@@ -35,6 +35,7 @@ import PhoneInput from "react-native-phone-number-input";
 import { white } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import SplashScreen from 'react-native-splash-screen';
 import { setProfileCompletion } from '../slices/UserSlices';
+import { CommonActions } from '@react-navigation/native';
 
 
 const CELL_COUNT = 4;
@@ -188,7 +189,12 @@ const LockScreen = ({ navigation, route }) => {
           if (loginResponse.data.code === 200) {
             await storeUserSession({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
             await storeUserDetail({ ...loginResponse.data.response.userDetails, token, isAuthenticated: true })
-            navigation.navigate('Dashboard', { userData: value });
+            navigation.dispatch(
+              CommonActions.reset({
+                       index: 0,
+                       routes: [{ name: 'Dashboard', params: {userData: value} }],
+                  })
+               );
             setValue('');
           } else {
             setValue('')

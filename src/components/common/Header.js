@@ -26,7 +26,7 @@ const Header = props => {
   const profileCompletion = useSelector(State => State.user?.profileCompletion)
 
   // useEffect(() => {
-    console.log('profileCompletion ******', profileCompletion)
+    // console.log('profileCompletion ******', profileCompletion)
   //   if(!profileCompletion){
   //     dispatch(setProfileCompletion({percentage: 0.8}))
   //   }
@@ -116,8 +116,8 @@ const uploadFileList = async (files) => {
     // console.log('open called');
     drawerRef.current.open();
   };
-  let progress = (profileCompletion) ?? 40
-  console.log('progress', progress)
+  let progress = profileCompletion ?? 40
+  // console.log('progress', progress)
   const memoizedRenderChatsHeader = useMemo(memoRenderProfileStatus, [progress])
   return (
     <View style={{ position: 'relative' }}>
