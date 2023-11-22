@@ -12,7 +12,8 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
-  Linking
+  Linking,
+  TextInput
 } from 'react-native';
 import DocumentScanner from 'react-native-document-scanner-plugin';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -45,6 +46,7 @@ import { FlashList } from '@shopify/flash-list';
 import { Dialog, LinearProgress } from '@rneui/themed';
 import { setProfileCompletion } from '../../slices/UserSlices';
 import { useDispatch } from 'react-redux';
+import Popover from 'react-native-popover-view';
 const DocumentScannerScreen = ({ navigation, route }) => {
 
   // navigation params
@@ -61,11 +63,13 @@ const DocumentScannerScreen = ({ navigation, route }) => {
   const [categoryList, setCategoryList] = useState([])
   const [isLoader, setIsLoader] = useState(true);
   const [listExtraData, setListExtraData] = useState({})
-
+  const [isModalVisible, setIsModalVisible] = useState(null);
   const [isShowUploadOptions, setIsShowUpload] = useState(false)
   const [isViewPdf, setIsViewPdf] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isDownloadComplete, setIsDownloadComplete] = useState(false);
+  const [selectedName,setSelectedName] = useState('')
+  const [selectedDocument,setSelectedDocument] =useState('')
 
   const [userData, setUserData] = useState(null);
 
@@ -81,7 +85,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
   }, [])
 
   const getUploadedDocumentsList = async (isOpenLatest) => {
-    // console.log('getUploadedDocuments', categoryInfo)
+    console.log('getUploadedDocuments=====Called', categoryInfo)
     try {
       let userData = await retrieveUserDetail()
       setUserData(userData)
@@ -423,7 +427,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
       case (action.itemKey === 'downloadDocument') :
         return await handleDownloadDocument(document)
       case (action.itemKey === 'moveDocument') :
-        return await handleDownloadDocument(document)
+        return await toggleFullScreen(document)
       default:
         return null
     }
@@ -435,10 +439,55 @@ const DocumentScannerScreen = ({ navigation, route }) => {
     setCombinedDocuments(prev => prev.map(prevItem => prevItem = {...prevItem, showOptions: status ? (prevItem.documentId === item.documentId) : false}))
   }
 
+
+  const handleSelectedName = (document) => {
+
+    console.log('document',document)
+    setSelectedName(document.documentName)
+    setSelectedDocument(document.documentId)
+    setIsModalVisible(true)
+  }
+
+  const cancelModal = () =>{
+    setIsModalVisible(false)
+    setSelectedName(null)
+    setSelectedDocument(null)
+  }
+
+ const handleSaveName = async () =>{
+      console.log('document===>>',selectedDocument,selectedName,categoryInfo)
+      setIsModalVisible(false)
+      try {
+        let params = {
+          "documentId":selectedDocument,
+          "categoryId": categoryInfo.categoryId,
+          "documentName": selectedName.endsWith('.pdf') ? selectedName : `${selectedName}.pdf`
+        }
+        console.log('handleUpdate params-->',  params)
+        const udpateResult = await NetworkManager.updateDocument(params)
+        console.log('udpateResult------>>>>++++++++++++++++++++',udpateResult)
+        if(udpateResult.data.code === 200){
+          Alert.alert(udpateResult.data.message)
+          setSelectedDocument(null)
+          setSelectedName(null)
+          getUploadedDocumentsList();
+         
+        }
+        
+      } catch(error) {
+        console.log('error --->', error.response.data)
+      }
+     
+ }
+
+  console.log('setSelectedName==========>>>',selectedName)
+
   const renderItems = useCallback(({ item, index }) => {
 
     // const renderItems = ({ item, index }) => {
+      
     let document = item
+    // console.log('document',document)
     if(document?.isLoading) return <DocumentListItemLoader />
     let documentNameInfo = document?.documentName ?? document?.documentname
     let name = documentNameInfo
@@ -469,7 +518,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={{ flex: 0.98 }}>
+        <TouchableOpacity style={{ flex: 0.98 }} onPress={()=>(userData.id === document.uploadedBy) ? handleSelectedName( document ) : null}>
           <Text numberOfLines={2} style={{ color: COLORS.black, fontSize: 12 }} >{name}</Text>
         </TouchableOpacity>
         <Menu
@@ -477,7 +526,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
           animationDuration={10}
           visible={listExtraData?.length ? document.documentId === listExtraData[0].documentId : false}
           anchor={
-          <TouchableOpacity style={{ marginRight: normalize(0), marginTop: normalize(0) }} onPress={() => handleShowOption(document, true)}>
+          <TouchableOpacity style={{ marginRight: normalize(0), marginTop: normalize(0) }} onPress={() =>  handleShowOption(document, true)}>
             <MaterialCommunityIcons name="dots-vertical" size={24} color={COLORS.black} />
             {/* <Text style={{ color: COLORS.black, fontSize: 10 }} >{'More'}</Text> */}
           </TouchableOpacity>
@@ -631,6 +680,38 @@ const DocumentScannerScreen = ({ navigation, route }) => {
               />
             </>
           }
+          <Popover
+          isVisible={isModalVisible}
+          onRequestClose={() => {
+            // Keyboard.dismiss()
+            setTimeout(() => setIsModalVisible(false), 1000)
+            // setNewFamilyName('');
+            // setCurrentItemId([])
+          }}
+          popoverStyle={styles.popover}>
+             <View style={styles.modalContent}>
+             <Text style={styles.textInputHeader}> Change Document Name </Text>
+             <TextInput
+             numberOfLines={2}
+              // value={selectedName.toString().replace('.pdf', '')}
+              value={selectedName ? selectedName.replace('.pdf', '') : ''}
+              onChangeText={(text) => setSelectedName(text)}
+              style={styles.input}
+            />
+             <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity
+                onPress={cancelModal}
+                style={styles.cancelButton}>
+                <Text style={styles.buttonText}> Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+               onPress={handleSaveName}
+                style={styles.saveButton}>
+                <Text style={styles.buttonText}> Save </Text>
+              </TouchableOpacity>
+            </View>
+            </View>
+          </Popover>
 
 
           <Snackbar
@@ -822,6 +903,53 @@ snackBar: {
   alignContent: 'center',
   backgroundColor: 'white',
   position: 'absolute',
+},
+popover: {
+  width: normalize(290),
+  height: normalize(180),
+  backgroundColor: 'rgb(212, 215, 219)',
+  borderRadius: 8,
+},
+modalContent: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+textInputHeader:{
+  color: 'black',
+  fontSize: 18,
+  fontWeight: '500',
+  marginVertical: 10,
+},
+input: {
+  height: 40,
+  width: 235,
+  borderWidth: 1,
+  marginBottom: 18,
+  padding: 8,
+  fontSize: 18,
+  fontWeight: '500',
+},
+saveButton: {
+  width: normalize(90),
+  height: normalize(34),
+  borderRadius: 20,
+  color: 'white',
+  backgroundColor:'#0e9b81'
+},
+cancelButton: {
+  backgroundColor: 'red',
+  width: normalize(90),
+  height: normalize(34),
+  marginRight: 10,
+  borderRadius: 20,
+},
+buttonText:{
+  textAlign: 'center',
+  marginTop: 6,
+  fontSize: 16,
+  color: 'white',
+  fontWeight: '500',
 },
 });
 
