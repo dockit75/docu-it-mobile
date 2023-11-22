@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { Image, ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native'
+import { Image, ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Alert, Keyboard } from 'react-native'
 import { normalize, screenHeight, screenWidth, normalizeVertical } from '../utilities/measurement'
 import { Images } from '../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,28 +15,49 @@ import {
 import NetworkManager from '../services/NetworkManager';
 import { retrieveUserDetail } from '../storageManager';
 import DrawerNavigator from '../components/common/DrawerNavigator';
+import { Snackbar } from 'react-native-paper';
 
 const CELL_COUNT = 4;
 
 const ChangePin = ({ navigation }) => {
     const [value, setValue] = useState('');
     const [pin, setPin] = useState('');
+    const [confirmedPin, setConfirmedPin] = useState('');
     const refPin = useBlurOnFulfill({ value: pin, cellCount: CELL_COUNT });
+    const ref = useBlurOnFulfill({ value: confirmedPin, cellCount: CELL_COUNT });
     const insets = useSafeAreaInsets();
+    const [enableMask, setEnableMask] = useState(true);
     const [enableMaskPin, setEnableMaskPin] = useState(true);
     const [error, setError] = useState(false)
+    const [errorEqual, setErrorEqual] = useState(false)
+    const [clearedConfirmedPin, setClearedConfirmedPin] = useState('');
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
     const [props, getCellOnLayoutHandler] = useClearByFocusCell({
         value,
-        setValue,
+        setValue
     });
-
+    const [propsPin, getCellOnLayoutHandlerPin] = useClearByFocusCell({
+        value,
+        setValue
+    });
+    // const ref = useBlurOnFulfill({
+    //     value: clearedConfirmedPin,
+    //     cellCount: CELL_COUNT,
+    // });
     const toggleMaskPin = () => setEnableMaskPin(f => !f);
-    
+    const toggleMask = () => setEnableMask(f => !f);
     const handlePinChange = (value) => {
         if (/^\d*$/.test(value) && value.length <= CELL_COUNT) {
             setPin(value);
         }
     };
+    const handleConfirmedPinChange = (value) => {
+        if (/^\d*$/.test(value) && value.length <= CELL_COUNT) {
+            setConfirmedPin(value);
+        }
+    };
+
 
     const renderCell = ({ index, symbol, isFocused }) => {
         let textChild = null;
@@ -57,8 +78,45 @@ const ChangePin = ({ navigation }) => {
         );
     };
 
+    const renderCellConfirmPin = ({ index, symbol, isFocused }) => {
+        let textChild = null;
+        if (symbol) {
+            textChild = enableMask ? '•' : symbol;
+        } else if (isFocused) {
+            textChild = <Cursor />;
+        }
+
+        return (
+            <Text
+                key={index}
+                style={[styles.cell, isFocused && styles.focusCell]}
+                onLayout={getCellOnLayoutHandlerPin(index)}>
+                {textChild}
+            </Text>
+        );
+    };
+
+
     const handlePressSubmit = () => {
-        if (pin.length === CELL_COUNT) {
+       
+        if (pin.length === 0) {
+            // Empty value, show snackbar message
+            setSnackbarMessage('Please enter PIN');
+            setSnackbarVisible(true);
+        } else if (pin.length < 4) {
+            setSnackbarMessage('Please enter a 4-digit PIN');
+            setSnackbarVisible(true);
+        }
+        else if (confirmedPin.length === 0) {
+            setSnackbarMessage('Please enter Confirm PIN');
+            setSnackbarVisible(true);
+        }
+        else if (confirmedPin.length < 4) {
+            setSnackbarMessage('Please enter a 4-digit Confirm PIN');
+            setSnackbarVisible(true);
+        }
+        else if (/^\d{4}$/.test(pin) && pin === confirmedPin) {
+
             Alert.alert(
                 'Confirmation',
                 'Are you sure you want to Change Pin?',
@@ -77,7 +135,9 @@ const ChangePin = ({ navigation }) => {
                 { cancelable: false }
             );
         } else {
-            setError(true);
+            // Invalid PINs, show snackbar message
+            setSnackbarMessage("Pin doesn't match.");
+            setSnackbarVisible(true);
         }
     };
 
@@ -95,15 +155,18 @@ const ChangePin = ({ navigation }) => {
             if (response.data.code === 200) {
                 console.log('if called')
                 Alert.alert(response.data.message)
-                setPin('');
-                navigation.navigate('LockScreen')
+                // setPin('');
+                setTimeout(() => {
+                    navigation.navigate('LockScreen')
+                }, 700);
+                
 
             }
         } catch (error) {
             Alert.alert(error.response.data.message)
         }
     };
-
+    console.log('confirmedPin', pin, confirmedPin)
     return (
         <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight }}>
             <DrawerNavigator>
@@ -111,7 +174,7 @@ const ChangePin = ({ navigation }) => {
                     <View style={{ marginTop: 5 }}>
                         <View style={{ flexDirection: 'row', marginHorizontal: 20, justifyContent: 'flex-start' }}>
                             <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={{ alignSelf: 'center' }}>
-                                <MaterialCommunityIcons name='arrow-u-left-top' size={30} color={'white'}/>
+                                <MaterialCommunityIcons name='arrow-u-left-top' size={30} color={'white'} />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -129,6 +192,7 @@ const ChangePin = ({ navigation }) => {
                                 </TouchableOpacity>
                             </View>
 
+
                             <CodeField
                                 ref={refPin}
                                 {...props}
@@ -142,15 +206,54 @@ const ChangePin = ({ navigation }) => {
                                 keyboardType="number-pad"
                                 textContentType="oneTimeCode"
                                 renderCell={renderCell}
+                                onEndEditing={() => Keyboard.dismiss()}
                             />
                         </View>
-                        { pin && pin.length !== CELL_COUNT  && <Text style={styles.errorMessage}>Please enter 4-digit PIN"</Text>}
 
-                        <TouchableOpacity style={[styles.generateButton, { backgroundColor : pin.length === CELL_COUNT ?'#0e9b81':'gray'}]} onPress={handlePressSubmit}  >
+                        <View>
+                            <View style={{ flexDirection: 'row', marginVertical: normalizeVertical(20), justifyContent: 'space-between', }}>
+                                <View />
+                                <Text style={styles.title}> Confirm PIN</Text>
+                                <TouchableOpacity onPress={toggleMask} style={{ alignSelf: 'center' }}>
+                                    {enableMask ? (
+                                        <Icon name='eye' size={24} color="white" />
+                                    ) : (
+                                        <Icon name="eye-slash" size={24} color="white" />
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                            <CodeField
+                                ref={ref}
+                                {...propsPin}
+                                value={confirmedPin}
+                                onChangeText={(text) => {
+                                    handleConfirmedPinChange(text)
+                                    setError(false)
+                                }}
+                                cellCount={CELL_COUNT}
+                                rootStyle={styles.codeFieldRoot}
+                                keyboardType="number-pad"
+                                textContentType="oneTimeCode"
+                                renderCell={renderCellConfirmPin}
+                                onSubmitEditing={() => Keyboard.dismiss()}
+                            />
+                        </View>
+
+                        <TouchableOpacity style={[styles.generateButton, { backgroundColor: '#0e9b81' }]} onPress={handlePressSubmit}  >
                             <Text style={styles.generateButtonText}>SUBMIT</Text>
                         </TouchableOpacity>
+
                     </View>
+                    <Snackbar
+                        visible={snackbarVisible}
+                        onDismiss={() => setSnackbarVisible(false)}
+                        duration={2000}
+                        style={styles.Snackbar}
+                    >
+                        {snackbarMessage}
+                    </Snackbar>
                 </View>
+
             </DrawerNavigator>
         </ImageBackground>
     )
@@ -236,5 +339,10 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold'
     },
+    Snackbar: {
+        backgroundColor: 'rgb(195,0,0)',
+        color: 'white',
+        marginTop: 100
+    }
 })
 export default ChangePin
