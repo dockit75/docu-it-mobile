@@ -35,6 +35,7 @@ const DocumentMember = ({ navigation, props }) => {
     const route = useRoute();
     const NewItem = route.params.familyItem;
     const Document = route.params.document;
+    const isSaveDocumentFlow = route.params.isSaveDocumentFlow;
     const [document, setDocument] = useState(Document)
     const CategoryInfo = route.params.categoryInfo;
     const [categoryInfo, setCategoryInfo] = useState(CategoryInfo)
@@ -147,7 +148,7 @@ const DocumentMember = ({ navigation, props }) => {
                             text: 'OK',
                             onPress: () => {
                                 setChecked(false)
-                                navigation.pop(2)
+                                navigation.pop( isSaveDocumentFlow ? 4 : 2)
                             },
                         },
                     ],

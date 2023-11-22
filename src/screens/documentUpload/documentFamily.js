@@ -33,6 +33,7 @@ const DocumentFamily = ({ navigation }) => {
   const route = useRoute();
   const Document = route.params.document;
   const CategoryInfo = route.params.categoryInfo;
+  const isSaveDocumentFlow = route.params.isSaveDocumentFlow;
   const [categoryInfo,setCategoryInfo] = useState(CategoryInfo)
   const [document,setDocument] = useState(Document)
   const [familyDetails, setFamilyDetail] = useState([]);
@@ -109,7 +110,11 @@ const DocumentFamily = ({ navigation }) => {
                         text: 'OK',
                         onPress: () => {
                           setSelectedFamily(false)
-                          navigation.goBack()
+                          if(isSaveDocumentFlow){
+                            navigation.pop(3)
+                          } else {
+                            navigation.goBack()
+                          }
                         }
                       },
                   ],
@@ -157,7 +162,7 @@ const DocumentFamily = ({ navigation }) => {
         <View style={{flex:1}}>
         <View style={styles.header}>
           <View>
-            <TouchableOpacity onPress={() => navigation.navigate('DocumentScannerScreen', {document:document,categoryInfo:categoryInfo })}>
+            <TouchableOpacity onPress={() => isSaveDocumentFlow ? navigation.pop(3) : navigation.navigate('DocumentScannerScreen', {document:document,categoryInfo:categoryInfo })}>
             <Icon name="arrow-left" size={25} color="black" />
             </TouchableOpacity>
           </View>
@@ -203,7 +208,7 @@ const DocumentFamily = ({ navigation }) => {
                   <Icon name="account-group" size={30} color="white" />
                   <TouchableOpacity onPress={() => {
                     setSelectedFamily(false)
-                    navigation.navigate('DocumentMember', { familyItem: item, document:document, categoryInfo:categoryInfo,userDetails:userDetails })
+                    navigation.navigate('DocumentMember', { familyItem: item, document:document, categoryInfo:categoryInfo,userDetails:userDetails, isSaveDocumentFlow })
                   }}>
                     <Text style={styles.text}>{item.name}</Text>
                   </TouchableOpacity>

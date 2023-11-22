@@ -221,7 +221,7 @@ const UploadConfirmation = ({ navigation, route }) => {
                   ...saveResult?.data.response,
                   ...saveResult?.data.response?.[0]
                 }
-                navigation.navigate('DocumentFamily', { document: documentObj, categoryInfo: categoryData })
+                navigation.navigate('DocumentFamily', { document: documentObj, categoryInfo: categoryData, isSaveDocumentFlow: true })
                 refreshData && refreshData()
               },
             },
@@ -261,7 +261,6 @@ const UploadConfirmation = ({ navigation, route }) => {
                 {/* <ScrollView style={{ marginHorizontal: 20, marginTop: 10, maxHeight: 180 }} contentContainerStyle={{ flexDirection: "row", flexWrap: "wrap" }}>
                   {categoryList.map((item, index) => (<TouchableOpacity onPress={() => setCategoryData(item)}><Text style={{ opacity: (categoryData?.categoryId === item.categoryId) ? 1 : 0.7, color: (categoryData?.categoryId === item.categoryId) ? COLORS.warnLight : COLORS.transparentWhite, marginHorizontal: 10, padding: 5, borderWidth: 1, borderColor: (categoryData?.categoryId === item.categoryId) ? COLORS.warnLight : COLORS.transparentWhite, borderRadius: 20, paddingHorizontal: 10, marginBottom: 10 }}>{item.categoryName}</Text></TouchableOpacity>))}
                 </ScrollView> */}
-                {console.log('categoryList===>>>', categoryList,categoryData)}
                 <FlatList
                   data={categoryList}
                   renderItem={({ item }) => (
@@ -277,7 +276,7 @@ const UploadConfirmation = ({ navigation, route }) => {
                         offFillColor="white"
                         offTintColor="white"
                         onAnimationType="fill"
-                        value={item.categoryId === categoryData.categoryId}
+                        value={item.categoryId === categoryData?.categoryId}
                         onValueChange={() => setCategoryData(item)}
                       />
                        </View>
