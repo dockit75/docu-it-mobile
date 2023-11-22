@@ -43,6 +43,8 @@ import { DocumentListItemLoader } from './documentListItemLoader';
 import { maxFileSizeLimit } from '../../services/config';
 import { FlashList } from '@shopify/flash-list';
 import { Dialog, LinearProgress } from '@rneui/themed';
+import { setProfileCompletion } from '../../slices/UserSlices';
+import { useDispatch } from 'react-redux';
 const DocumentScannerScreen = ({ navigation, route }) => {
 
   // navigation params
@@ -66,6 +68,8 @@ const DocumentScannerScreen = ({ navigation, route }) => {
   const [isDownloadComplete, setIsDownloadComplete] = useState(false);
 
   const [userData, setUserData] = useState(null);
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     setIsLoader(true)
@@ -166,6 +170,8 @@ const DocumentScannerScreen = ({ navigation, route }) => {
 
   const handleDeleteDocument = async (item) => {
     handleShowOption(item, false)
+    let userData = await retrieveUserDetail()
+    const docmentFilterList = combinedDocuments.filter((doc) => ((doc.documentUrl ?? doc?.url) !== (item?.documentUrl ?? item.url))).filter(item => item.uploadedBy === userData.id);
     // Alert.alert(deleteResult.data?.message)
     Alert.alert(
       'Are you want to delete the document?',
@@ -180,6 +186,12 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         let deleteResult = await NetworkManager.documentDelete(item.documentId ?? item?.documentId)
         if(deleteResult.data?.status === 'SUCCESS' && deleteResult.data?.code === 200){
           Alert.alert(deleteResult.data?.message)
+          if(docmentFilterList?.length === 0) {
+            let profileStatusResult = await NetworkManager.getUserRanking(userData.id)
+            if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
+              dispatch(setProfileCompletion({ percentage: profileStatusResult?.data?.response?.userRanking ?? 0.0 }))
+            }
+          }
           const updatedDocuments = combinedDocuments.filter((doc) => ((doc.documentUrl ?? doc?.url) !== (item?.documentUrl ?? item.url)));
           setCombinedDocuments(updatedDocuments.map(prevItem => prevItem = {...prevItem, showOptions: false}));
           if (fullScreenImage && fullScreenImage.uri === item.documentUrl) {
@@ -410,6 +422,8 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         return await handleDeleteDocument(document)
       case (action.itemKey === 'downloadDocument') :
         return await handleDownloadDocument(document)
+      case (action.itemKey === 'moveDocument') :
+        return await handleDownloadDocument(document)
       default:
         return null
     }
@@ -465,7 +479,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
           anchor={
           <TouchableOpacity style={{ marginRight: normalize(0), marginTop: normalize(0) }} onPress={() => handleShowOption(document, true)}>
             <MaterialCommunityIcons name="dots-vertical" size={24} color={COLORS.black} />
-            <Text style={{ color: COLORS.black, fontSize: 10 }} >{'More'}</Text>
+            {/* <Text style={{ color: COLORS.black, fontSize: 10 }} >{'More'}</Text> */}
           </TouchableOpacity>
           }
           onRequestClose={() => handleShowOption(document, false)}>
@@ -473,8 +487,9 @@ const DocumentScannerScreen = ({ navigation, route }) => {
             UPLOAD_DOCUMENT.listItemAction.filter(filterItem => ((userData.id === document.uploadedBy) || (filterItem.itemKey === 'viewDocument' || filterItem.itemKey === 'downloadDocument'))).map(item => 
               <MenuItem
                 key={item.itemKey}
-                onPress={() => handleItemAction(item, document)}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                style={item.disable ? { backgroundColor: 'lightgray', opacity: 0.5 }: {}}
+                onPress={item.disable ? null : () => handleItemAction(item, document)}>
+                <View style={[{ flexDirection: 'row', alignItems: 'center' }]}>
                   <MaterialCommunityIcons name={item.icon} size={28} color="black" />
                   <Text style={{fontSize: 16, color: 'black' }}>{`  ${item.label}`}</Text>
                 </View>
@@ -496,8 +511,8 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         <SafeAreaView style={{ flex: 1 }}>
           {/* <View style={{ margin: 10 }}> */}
             <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }} onPress={() => navigation.navigate('CategoryScreen')}>
-              <MaterialCommunityIcons name='arrow-left-thin' color={'white'} size={32} />
-              <Text style={{ color: 'white', fontSize: 15, marginLeft: 5, fontWeight: 'bold' }}>Back</Text>
+              <MaterialCommunityIcons name='arrow-u-left-top' color={'white'} size={32} />
+              {/* <Text style={{ color: 'white', fontSize: 15, marginLeft: 5, fontWeight: 'bold' }}>Back</Text> */}
             </TouchableOpacity>
           {/* </View> */}
           {fullScreenImage ? (

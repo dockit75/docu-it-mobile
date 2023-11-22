@@ -1,5 +1,5 @@
 import { COLORS } from '../../utilities/colors';
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Images } from '../../assets/images/images'
 import { Card, Paragraph } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -10,6 +10,7 @@ import { retrieveUserDetail } from '../../storageManager';
 import DrawerNavigator from '../../components/common/DrawerNavigator';
 import { CategoryItemLoader } from './categoryLoader';
 import { Dialog } from '@rneui/themed';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 const CategoryScreen = ({navigation, route}) => {
 
     const insets = useSafeAreaInsets();
@@ -68,15 +69,21 @@ const CategoryScreen = ({navigation, route}) => {
 								data={['categoryList']}
 								keyExtractor={(item) => item.toString()}
 								renderItem = {() => 
-									<FlatList
-										nestedScrollEnabled
-                                        scrollEnabled={!isLoading}
-										numColumns={2}
-										data={categoryList}
-                                        extraData={categoryList}
-										renderItem={renderItems}
-										keyExtractor={(item) => item?.categoryId}
-									/>
+                                    <Fragment>
+                                    <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }} onPress={() => navigation.goBack()}>
+                                      <MaterialCommunityIcons name='arrow-u-left-top' color={'white'} size={32} />
+                                      {/* <Text style={{ color: 'white', fontSize: 15, marginLeft: 5, fontWeight: 'bold' }}>Back</Text> */}
+                                    </TouchableOpacity>
+                                        <FlatList
+                                            nestedScrollEnabled
+                                            scrollEnabled={!isLoading}
+                                            numColumns={2}
+                                            data={categoryList}
+                                            extraData={categoryList}
+                                            renderItem={renderItems}
+                                            keyExtractor={(item) => item?.categoryId}
+                                        />
+                                    </Fragment>
 								}
 							/>
             </DrawerNavigator>

@@ -18,6 +18,7 @@ import { Images } from '../../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Popover from 'react-native-popover-view';
 import { COLORS } from '../../utilities/colors';
 import NetworkManager from '../../services/NetworkManager';
@@ -25,6 +26,7 @@ import { Snackbar } from 'react-native-paper';
 import { retrieveUserDetail } from '../../storageManager';
 import DrawerNavigator from '../../components/common/DrawerNavigator';
 import { Dialog } from '@rneui/themed';
+import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 
 const FamilyDocument = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -59,13 +61,13 @@ const FamilyDocument = ({ navigation }) => {
   const editFamilyName = async () => {
     try {
       let params = {
-        name: newFamilyName, 
+        name: newFamilyName,
         familyId: currentItemId.id,
         adminId: userDetails.id,
       };
       // console.log('params',params)
       let editFamilyRes = await NetworkManager.editFamily(params);
-        // console.log('editFamilyRes',editFamilyRes)
+      // console.log('editFamilyRes',editFamilyRes)
       if (editFamilyRes.data.code === 200) {
         Keyboard.dismiss()
         setErrorMessage('')
@@ -148,35 +150,37 @@ const FamilyDocument = ({ navigation }) => {
 
 
   const handleFamilyDelete = async (item) => {
-  const  params = {
-      familyId : item.id,
-      adminId : userDetails.id
+    const params = {
+      familyId: item.id,
+      adminId: userDetails.id
     }
 
     Alert.alert(
       'Are you want to delete the family?',
       '',
-    [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-        onPress: () => {}
-      },
-      { text: 'Ok', onPress: async () => {
-        try {
-          let response = await NetworkManager.deleteFamily(params);
-          if (response.data.code === 200) {
-            Alert.alert(response.data.message)
-            const updatedFamilyDetails = familyDetails.filter((family) => family.id !== item.id);
-            setFamilyDetail(updatedFamilyDetails);
-            // getFamilyList();
-          }
-        } catch (error) {
-          // console.error('Error fetching unique id:', error.response);
-          Alert.alert(error.response.data.message)
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => { }
+        },
+        {
+          text: 'Ok', onPress: async () => {
+            try {
+              let response = await NetworkManager.deleteFamily(params);
+              if (response.data.code === 200) {
+                Alert.alert(response.data.message)
+                const updatedFamilyDetails = familyDetails.filter((family) => family.id !== item.id);
+                setFamilyDetail(updatedFamilyDetails);
+                // getFamilyList();
+              }
+            } catch (error) {
+              // console.error('Error fetching unique id:', error.response);
+              Alert.alert(error.response.data.message)
+            }
+          }, style: 'destructive'
         }
-      }, style: 'destructive' }
-    ]
+      ]
     )
   }
 
@@ -188,13 +192,13 @@ const FamilyDocument = ({ navigation }) => {
       resizeMode="cover"
       style={{ width: screenWidth, height: '100%' }}>
       <DrawerNavigator>
+        <View style={{flex:1}}>
         <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
-
-         <TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()} >
-            <Image source={Images.ARROW} style={{ width: 22, height: 22 }} />
+          <TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()} >
+            <Icon name='arrow-u-left-top' color={'white'} size={32} />
           </TouchableOpacity>
           <TouchableOpacity onPress={showModalAdd} style={styles.addTouchable}>
-            <Text style={styles.addText}>{` ${'Add'}`}</Text>
+            <Icon name='plus' size={30} color={'white'} />
           </TouchableOpacity>
         </View>
 
@@ -209,27 +213,10 @@ const FamilyDocument = ({ navigation }) => {
           popoverStyle={styles.popover}>
           <View style={styles.modalContent}>
             {editFamilyCall ? (
-              <Text
-                style={{
-                  color: 'black',
-                  fontSize: 18,
-                  fontWeight: '500',
-                  marginVertical: 10,
-                }}>
-                Change Family Name
-              </Text>
+              <Text style={styles.textInputHeader}> Change Family Name </Text>
             ) : (
-              <Text
-                style={{
-                  color: 'black',
-                  fontSize: 18,
-                  fontWeight: '500',
-                  marginVertical: 10,
-                }}>
-                Enter Family Name
-              </Text>
+              <Text style={styles.textInputHeader}> Enter Family Name </Text>
             )}
-
             <TextInput
               value={editFamilyCall ? currentItemId.name : newFamilyName}
               onChangeText={text => {
@@ -257,104 +244,71 @@ const FamilyDocument = ({ navigation }) => {
               style={styles.input}
             />
             {errorMessage !== '' && (
-              <Text style={{ color: 'red', fontSize: 15, marginVertical: 5, marginBottom: 10 }}>
-                {errorMessage}
-              </Text>
+              <Text style={styles.errorMessage}> {errorMessage} </Text>
             )}
             <View style={{ flexDirection: 'row' }}>
               <TouchableOpacity
                 onPress={cancelModal}
                 style={styles.cancelButton}>
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    marginTop: 6,
-                    fontSize: 16,
-                    color: 'white',
-                    fontWeight: '500',
-                  }}>
-                  Cancel
-                </Text>
+                <Text style={styles.buttonText}> Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={isNameValid?(editFamilyCall ? editFamilyName : handleSaveFamily):null}
-                style={[styles.saveButton,{ backgroundColor: isNameValid ? '#0e9b81' : 'gray',}]}>
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    marginTop: 6,
-                    fontSize: 16,
-                    color: 'white',
-                    fontWeight: '500',
-                  }}>
-                  Save
-                </Text>
+                onPress={isNameValid ? (editFamilyCall ? editFamilyName : handleSaveFamily) : null}
+                style={[styles.saveButton, { backgroundColor: isNameValid ? '#0e9b81' : 'gray', }]}>
+                <Text style={styles.buttonText}> Save </Text>
               </TouchableOpacity>
             </View>
           </View>
         </Popover>
         <View style={styles.header}>
           <View>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: '500',
-                color: 'black',
-                marginLeft: 20,
-              }}>
-              Family Name
-            </Text>
+            <Text style={styles.familyName}> Family Name </Text>
           </View>
           <View>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: '500',
-                color: 'black',
-                marginRight: 30,
-              }}>
-              Action
-            </Text>
+            <Text style={styles.actionText}>Action</Text>
           </View>
         </View>
-        <Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
+        {isLoader === true ? (<Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
           <ActivityIndicator size={'large'} color={'#0e9b81'} />
-          <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-        </Dialog> 
-        <FlatList
-          data={familyDetails}
-          style={{ flex: 1 }}
-          ListEmptyComponent={<View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 130 }}>
-            <Text style={{ color: 'white', fontSize: 20 }}>No more families added.</Text>
-          </View>}
-          renderItem={({ item }) => (
-            <View style={styles.FlatListContainer}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <View style={{ height: 37, width: 37, borderRadius: 25, alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name="account-group" size={25} color="white" />
+          <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Loading...</Text>
+        </Dialog>) : (
+          <FlatList
+            data={familyDetails}
+            style={{ flex: 1 }}
+            ListEmptyComponent={<View style={styles.listEmptyComponent}>
+              <Icon name='account-group' size={80} color={'white'}/>
+              <Text style={{ color: 'white', fontSize: 20 }}>{FAMILY_LIST_EMPTY.familyEmpty}</Text>
+            </View>}
+            renderItem={({ item }) => (
+              <View style={styles.FlatListContainer}>
+                <View style={styles.innerContainer}>
+                  <View style={styles.iconContainer}>
+                    <Icon name="account-group" size={25} color="white" />
+                  </View>
+                  <View>
+                    <TouchableOpacity onPress={() => navigation.navigate('FamilyMember', { familyItem: item })}>
+                      <Text style={styles.text}>{item.name}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <View>
-                  <TouchableOpacity onPress={() => navigation.navigate('FamilyMember', { familyItem: item })}>
-                    <Text style={styles.text}>{item.name}</Text>
-                  </TouchableOpacity>
-                </View>
+                {item.createdBy === userDetails.id ?
+                  <View style={styles.iconView}>
+                    <TouchableOpacity
+                      onPress={() => showModal(item)}
+                      style={{ marginRight: 20 }}>
+                      <Icon name="square-edit-outline" size={20} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleFamilyDelete(item)}
+                      style={{ marginRight: 20 }}>
+                      <Icon name="delete" size={20} color="white" />
+                    </TouchableOpacity>
+                  </View> : null}
               </View>
-              {item.createdBy === userDetails.id ?
-              <View style={{flexDirection:'row',justifyContent:'space-between', alignItems: 'center'}}>
-                <TouchableOpacity
-                  onPress={() => showModal(item)}
-                  style={{ marginRight: 20 }}>
-                  <Icon name="square-edit-outline" size={20} color="white" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={()=>handleFamilyDelete(item)}
-                  style={{ marginRight: 20 }}>
-                  <Icon name="delete" size={20} color="white" />
-                </TouchableOpacity>
-              </View> : null }
-            </View>
+            )}
+          />
           )}
-        />
+          </View>
       </DrawerNavigator>
     </ImageBackground>
   );
@@ -382,9 +336,9 @@ const styles = StyleSheet.create({
   addTouchable: {
     backgroundColor: COLORS.darkTransparent,
     marginTop: 5,
-    borderRadius: 8,
+    borderRadius: 25,
     marginRight: 20,
-    width: 60,
+    // width: 60,
     padding: 5,
   },
   addText: {
@@ -403,7 +357,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   saveButton: {
-   
+
     width: normalize(90),
     height: normalize(34),
     borderRadius: 20,
@@ -449,4 +403,57 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: screenWidth - 25,
   },
+  familyName:{
+    fontSize: 20,
+    fontWeight: '500',
+    color: 'black',
+    marginLeft: 20,
+  },
+  actionText:{
+    fontSize: 20,
+    fontWeight: '500',
+    color: 'black',
+    marginRight: 30,
+  },
+  listEmptyComponent:{ 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginTop: 130 
+  },
+  iconView:{ 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center' 
+  },
+  innerContainer:{ 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center' 
+  },
+  iconContainer:{ 
+    height: 37, 
+    width: 37, 
+    borderRadius: 25, 
+    alignItems: 'center', 
+    justifyContent: 'center' 
+  },
+  buttonText:{
+    textAlign: 'center',
+    marginTop: 6,
+    fontSize: 16,
+    color: 'white',
+    fontWeight: '500',
+  },
+  textInputHeader:{
+    color: 'black',
+    fontSize: 18,
+    fontWeight: '500',
+    marginVertical: 10,
+  },
+  errorMessage:{ 
+    color: 'red', 
+    fontSize: 15, 
+    marginVertical: 5, 
+    marginBottom: 10 
+  }
 });

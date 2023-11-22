@@ -26,6 +26,7 @@ import { retrieveUserDetail } from '../../storageManager';
 import DrawerNavigator from '../../components/common/DrawerNavigator';
 import CheckBox from '@react-native-community/checkbox';
 import { Dialog } from '@rneui/themed';
+import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 
 const DocumentFamily = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -52,7 +53,7 @@ const DocumentFamily = ({ navigation }) => {
     setUserDetails(UserId);
     try {
       let response = await NetworkManager.listFamily(UserId.id);
-      // console.log('response================>>>',response)
+      console.log('response================>>>',response)
       let FamilyList = response.data.response.familyList;
       if (response.data.code === 200) {
         setFamilyDetail(FamilyList);
@@ -81,47 +82,68 @@ const DocumentFamily = ({ navigation }) => {
     }
   }
   const handleShareDocument = async () => {
+    // console.log('selectedFamily',selectedFamily)
     let familyMembersResult = await NetworkManager.listFamilyMembers(selectedFamily)
-    const params = {
-      familyId: selectedFamily,
-      documentId: document.documentId,
-      revokeAccess: [],
-      provideAccess: familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id && !currentShareMembersList?.includes(filterItem.id)))?.map(item => item.id) ?? [],
-      updatedBy: document.uploadedBy
-    }
-    // console.log('params========>>>', params, familyMembersResult?.data?.response?.MemberList)
-    try {
-        let response = await NetworkManager.updateDocument(params)
-        // console.log('response==>handleShareDocument', response?.data)
-        if (response.data.code === 200) {
-            Alert.alert(
-                'Success',
-                'Document shared successfully',
-                [
-                    {
-                      text: 'OK',
-                      onPress: () => {
-                        setSelectedFamily(false)
-                        navigation.goBack()
-                      }
-                    },
-                ],
-                { cancelable: false }
-            );
-        }
-    } catch (error) {
+    // console.log('response',familyMembersResult)
+    let familyMembersList = familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id))
+    // console.log('familyMembersList', familyMembersList?.length)
+
+    if(familyMembersList?.length) {
+      const params = {
+        familyId: selectedFamily,
+        documentId: document.documentId,
+        revokeAccess: [],
+        provideAccess: familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id && filterItem.inviteStatus === "Accepted"))?.map(item => item.id) ?? [],
+        updatedBy: document.uploadedBy
+      }
+      // console.log('params========>>>', params, familyMembersResult?.data?.response?.MemberList)
+      try {
+          let response = await NetworkManager.updateDocument(params)
+          // console.log('response==>handleShareDocument', response?.data)
+          if (response.data.code === 200) {
+              Alert.alert(
+                  'Success',
+                  'Document shared successfully',
+                  [
+                      {
+                        text: 'OK',
+                        onPress: () => {
+                          setSelectedFamily(false)
+                          navigation.goBack()
+                        }
+                      },
+                  ],
+                  { cancelable: false }
+              );
+          }
+      } catch (error) {
+        Alert.alert(
+          '',
+          error.response.data.message,
+            [
+                {
+                  text: 'OK',
+                  onPress: () => {}
+                },
+            ],
+            { cancelable: false }
+        );
+          console.error('Error in listFamilyMembers:', error.response.data);
+      }
+
+    } else {
       Alert.alert(
-        '',
-        error.response.data.message,
-          [
-              {
-                text: 'OK',
-                onPress: () => {}
-              },
-          ],
-          { cancelable: false }
+        'Waring',
+        'No more members in this family',
+        [
+            {
+              text: 'OK',
+              onPress: () => {
+              }
+            },
+        ],
+        { cancelable: false }
       );
-        console.error('Error in listFamilyMembers:', error.response.data);
     }
   }
   const filteredFamilyDetails = document.familyId ? familyDetails.filter(item => item.id === Document.familyId) : familyDetails;
@@ -132,6 +154,7 @@ const DocumentFamily = ({ navigation }) => {
       resizeMode="cover"
       style={{ width: screenWidth, height: '100%' }}>
       <DrawerNavigator>
+        <View style={{flex:1}}>
         <View style={styles.header}>
           <View>
             <TouchableOpacity onPress={() => navigation.navigate('DocumentScannerScreen', {document:document,categoryInfo:categoryInfo })}>
@@ -140,16 +163,18 @@ const DocumentFamily = ({ navigation }) => {
           </View>
           <View>
             <Text
-              style={{
-                fontSize: 20,
-                fontWeight: '500',
-                color: 'black',
-                marginLeft:20
-              }}>
-              Family Name
+              style={styles.documentName}>
+              {document.documentName}
             </Text>
           </View>
         </View>
+        <View>
+            <Text
+              style={styles.familyHeader}>
+             Families
+            </Text>
+          </View>
+       
         {selectedFamily ? <View style={{ alignItems: 'flex-end', marginBottom: 10 }}>
               <TouchableOpacity
                   style={styles.addTouchable}
@@ -159,16 +184,22 @@ const DocumentFamily = ({ navigation }) => {
               </TouchableOpacity>
           </View> : null
         }
+     
+     {isLoading === true ?  (<Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
+            <ActivityIndicator size={'large'} color={'#0e9b81'} />
+            <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
+        </Dialog> ): (
         <FlatList
           data={filteredFamilyDetails}
           style={{ flex: 1 }}
-          ListEmptyComponent={<View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 130 }}>
-            <Text style={{ color: 'white', fontSize: 20 }}>No more family added.</Text>
+          ListEmptyComponent={<View style={styles.listEmptyComponent}>
+             <Icon name='account-group' size={80} color={'white'}/>
+            <Text style={{ color: 'white', fontSize: 20 }}>{FAMILY_LIST_EMPTY.familyEmpty}</Text>
           </View>}
           renderItem={({ item }) => (
             <View style={styles.FlatListContainer}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 10, alignSelf: 'center' }}>
+              <View style={styles.innerContainer}>
+                <View style={styles.iconContainer}>
                   <Icon name="account-group" size={30} color="white" />
                   <TouchableOpacity onPress={() => {
                     setSelectedFamily(false)
@@ -185,12 +216,9 @@ const DocumentFamily = ({ navigation }) => {
               </View>
             </View>
           )}
-        /> 
+        /> )}
 
-        <Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
-            <ActivityIndicator size={'large'} color={'#0e9b81'} />
-            <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-        </Dialog>
+       </View>
       </DrawerNavigator>
     </ImageBackground>
   );
@@ -211,7 +239,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(212, 215, 219)',
     borderRadius: normalize(8),
     marginTop: 10,
-    padding: 15,
+    padding: 10,
     marginBottom: 10,
     alignItems:'center',
     justifyContent:'flex-start',
@@ -289,4 +317,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: screenWidth - 25,
   },
+  documentName:{
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'black',
+    marginLeft:10
+  },
+  familyHeader:{
+    fontSize: 20,
+    fontWeight: '500',
+    color: 'white',
+    marginLeft:10,
+    textAlign:'center'
+  },
+  listEmptyComponent:{ 
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 130 
+},
+innerContainer:{ 
+  flexDirection: 'row', 
+  justifyContent: 'space-between', 
+  alignItems: 'center', 
+  flex: 1 
+},iconContainer:{ 
+  flexDirection: 'row', 
+  alignItems: 'center', 
+  paddingLeft: 10, 
+  alignSelf: 'center' 
+}
 });

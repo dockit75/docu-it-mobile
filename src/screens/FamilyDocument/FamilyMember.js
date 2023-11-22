@@ -28,6 +28,7 @@ import { color } from '@rneui/base';
 import { retrieveUserDetail } from '../../storageManager';
 import Contacts from 'react-native-contacts';
 import { Dialog } from '@rneui/themed';
+import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 
 const FamilyMember = ({ navigation, props }) => {
   const route = useRoute();
@@ -241,19 +242,14 @@ const FamilyMember = ({ navigation, props }) => {
       resizeMode="cover"
       style={{ width: screenWidth, height: '100%' }}>
       <DrawerNavigator>
-        <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent:'space-between',marginTop:10,marginLeft:20 }}>
-         <View style={{alignItems:'center',flexDirection:'row',justifyContent:'flex-start'}}>
+        <View style={{flex:1}}> 
+        <View style={styles.container}>
+         <View style={styles.innerContainer}>
          <TouchableOpacity onPress={() => navigation.navigate('FamilyDocument')} >
-            <Image source={Images.ARROW} style={{ width: 22, height: 22 }} />
+            <Icon name='arrow-u-left-top' color={'white'} size={32} />
           </TouchableOpacity>
           <Text
-            style={{
-              fontSize: 20,
-              color: 'white',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              marginLeft:30
-            }}>
+            style={styles.familyItemName}>
             {familyItem.name}
           </Text>
          </View>
@@ -262,45 +258,30 @@ const FamilyMember = ({ navigation, props }) => {
           {userDetails.id === familyItem.createdBy ? <TouchableOpacity
             style={styles.addTouchable}
             onPress={()=>requestContactPermissionAgain(true)}>
-            <Text style={styles.addText}> Add</Text>
+            <Icon name='plus' size={30} color={'white'}/>
           </TouchableOpacity>: null}
         </View>
         </View>
         
         <View style={styles.header}>
           <View>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: '500',
-                color: 'black',
-                marginLeft: 20,
-              }}>
-              Member Name
-            </Text>
+            <Text  style={styles.memberText}> Member Name </Text>
           </View>
           <View>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: '500',
-                color: 'black',
-                marginRight: 30,
-              }}>
-              Action
-            </Text>
+            <Text style={styles.actionText}> Action </Text>
           </View>
         </View>
 
-        <Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
+        {isLoader === true ?(<Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
           <ActivityIndicator size={'large'} color={'#0e9b81'} />
           <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-        </Dialog>
+        </Dialog> ) : (
         <FlatList
           data={arrayCombined}
           style={{ flex: 1 }}
-          ListEmptyComponent={<View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 130 }}>
-            <Text style={{ color: 'white', fontSize: 20 }}>No more family members added.</Text>
+          ListEmptyComponent={<View style={styles.listEmptyComponent}>
+            <Icon name='account' size={80} color={'white'}/>
+            <Text style={{ color: 'white', fontSize: 20 }}>{FAMILY_LIST_EMPTY.memberEmpty}</Text>
           </View>}
           renderItem={({ item }) => (
             <View style={styles.FlatListContainer}>
@@ -315,7 +296,7 @@ const FamilyMember = ({ navigation, props }) => {
                   <Text style={styles.text}>{item.phone}</Text>
                 </View>
               )}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={styles.iconView}>
                 {item.inviteStatus === 'Invited' ? (
                   <View>
                     <TouchableOpacity onPress={() => handleInviteUser(item)} style={{ marginRight: 20 }}>
@@ -333,6 +314,8 @@ const FamilyMember = ({ navigation, props }) => {
             </View>
           )}
         />
+        )}
+        </View>
       </DrawerNavigator>
     </ImageBackground>
   );
@@ -342,9 +325,8 @@ const styles = StyleSheet.create({
   addTouchable: {
     backgroundColor: COLORS.darkTransparent,
     marginTop: 5,
-    borderRadius: 8,
+    borderRadius: 25,
     marginRight: 20,
-    width: 60,
     padding: 5,
   },
   addText: {
@@ -355,7 +337,6 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    // textAlign: 'center',
     color: COLORS.white,
     fontSize: 18,
     fontWeight: 'bold',
@@ -386,6 +367,47 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
   },
+  familyItemName:{
+    fontSize: 20,
+    color: 'white',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    marginLeft:30
+  },
+  memberText:{
+    fontSize: 20,
+    fontWeight: '500',
+    color: 'black',
+    marginLeft: 20,
+  },
+  actionText:{
+    fontSize: 20,
+    fontWeight: '500',
+    color: 'black',
+    marginRight: 30,
+  },
+  listEmptyComponent:{ 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginTop: 100 
+  },
+  iconView:{ 
+    flexDirection: 'row', 
+    justifyContent: 'space-between' 
+  },
+  container:{ 
+    alignItems: 'center', 
+    flexDirection: 'row', 
+    justifyContent:'space-between',
+    marginTop:10,
+    marginLeft:20 
+  },
+  innerContainer:{
+    alignItems:'center',
+    flexDirection:'row',
+    justifyContent:'flex-start'
+  }
+  
 });
 
 export default FamilyMember;

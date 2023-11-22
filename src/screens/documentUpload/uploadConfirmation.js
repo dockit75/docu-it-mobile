@@ -10,16 +10,18 @@ import {
   Linking,
 } from 'react-native';
 import moment from 'moment';
+import { useDispatch } from 'react-redux';
 import { COLORS } from '../../utilities/colors';
 import React, { useState, useEffect } from 'react';
 import { Images } from '../../assets/images/images';
 import { createPdf } from 'react-native-images-to-pdf';
 import { Dialog, LinearProgress } from '@rneui/themed';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { retrieveUserDetail } from '../../storageManager';
 import { ScrollView } from 'react-native-gesture-handler';
 import NetworkManager from '../../services/NetworkManager';
+import { setProfileCompletion } from '../../slices/UserSlices';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { screenHeight, screenWidth } from '../../utilities/measurement';
 import { APP_BUTTON_NAMES, UPLOAD_DOCUMENT } from '../../utilities/strings';
@@ -33,6 +35,7 @@ const UploadConfirmation = ({ navigation, route }) => {
   const isEditDocument = route.params?.isEditDocument ?? false
 
   // hooks
+  const dispatch = useDispatch()
   const insets = useSafeAreaInsets();
 // console.log('categoryInfo *******', categoryInfo)
   // state
@@ -92,6 +95,10 @@ const UploadConfirmation = ({ navigation, route }) => {
       // console.log('handleUpdate params-->',  params)
       const udpateResult = await NetworkManager.updateDocument(params)
       if (udpateResult?.data.code === 200 && udpateResult?.data.status === 'SUCCESS') {
+        let profileStatusResult = await NetworkManager.getUserRanking(userData.id)
+        if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
+          dispatch(setProfileCompletion({ percentage: profileStatusResult?.data?.response?.userRanking ?? 0.0 }))
+        }
         setIsLoading(false)
         navigation.pop(2)
         refreshData && refreshData()
@@ -170,6 +177,10 @@ const UploadConfirmation = ({ navigation, route }) => {
       const saveResult = await NetworkManager.saveDocument(params)
       console.log('handleSave saveResult-->',  saveResult?.data)
       if (saveResult?.data.code === 200 && saveResult?.data.status === 'SUCCESS') {
+        let profileStatusResult = await NetworkManager.getUserRanking(userData.id)
+        if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
+          dispatch(setProfileCompletion({ percentage: profileStatusResult?.data?.response?.userRanking ?? 0.0 }))
+        }
         setIsLoading(false)
         navigation.pop(2)
         refreshData && refreshData()
@@ -186,20 +197,20 @@ const UploadConfirmation = ({ navigation, route }) => {
         <View style={styles.wrapper}>
           <View style={{ height: screenHeight * 0.075 }}>
             <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }}  style={styles.headerView} onPress={() => navigation.goBack()}>
-              <Icon name="long-arrow-left" size={24} color={COLORS.white}  />
-              <Text style={styles.headerViewText}>{UPLOAD_DOCUMENT.back}</Text>
+              <MaterialCommunityIcons name="arrow-u-left-top" size={24} color={COLORS.white}  />
+              {/* <Text style={styles.headerViewText}>{UPLOAD_DOCUMENT.back}</Text> */}
             </TouchableOpacity>
           </View>
           <View style={styles.contentView}>
             <View>
-              <View>
+              {!isEditDocument ? <View>
                 <Text style={styles.categoryTitle}>{UPLOAD_DOCUMENT.changeDocumentTitle}</Text>
                 <TextInput
                   value={documentName}
                   style={[styles.input, {marginHorizontal: 20, marginTop: 10, borderColor: COLORS.transparentWhite, borderRadius: 5, width: screenWidth * 0.88, color: COLORS.transparentWhite }]}
                   onChangeText={text => setDocumentName(text)}
                 />
-              </View>
+              </View> : null}
               <View>
                 <Text style={{ color: COLORS.white, marginHorizontal: 20, textTransform: 'uppercase', fontWeight: 'bold' }}>{UPLOAD_DOCUMENT.categoryTitle}</Text>
                 <ScrollView style={{ marginHorizontal: 20, marginTop: 10, maxHeight: 180 }} contentContainerStyle={{ flexDirection: "row", flexWrap: "wrap"}}>
