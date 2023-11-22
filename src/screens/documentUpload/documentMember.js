@@ -94,8 +94,8 @@ const DocumentMember = ({ navigation, props }) => {
     const getDocumentDetails = async () => {
         // console.log('getDocumentDetails==========>>.><<<<>>><///',document.documentId)
         try {
-            let response = await NetworkManager.getDocumentsById(document.documentId)
-            // console.log('response==>getDocumentDetails_____))____)_)_)_)))_', JSON.stringify(response.data))
+            let response = await NetworkManager.getDocumentsById( document.documentId ?? Document.id,)
+            console.log('response==>getDocumentDetails_____))____)_)_)_)))_', JSON.stringify(response.data))
             if (response.data.code === 200) {
                 let memberIdArray = response.data.response.memberIds
                 setAddMembers(memberIdArray)
@@ -128,12 +128,12 @@ const DocumentMember = ({ navigation, props }) => {
         let uniqueAddMembers = addMembers.filter(id => !commonIds.includes(id));
         const params = {
             familyId: familyItem.id,
-            documentId: document.documentId,
+            documentId: document.documentId ?? Document.id,
             // categoryId: categoryInfo.categoryId,
             revokeAccess: revokeMembers,
             provideAccess: uniqueAddMembers,
             // documentName: document.documentName,
-            updatedBy: document.uploadedBy
+            updatedBy: document.uploadedBy ?? Document.updatedBy
         }
         // console.log('params========>>>', params)
         try {

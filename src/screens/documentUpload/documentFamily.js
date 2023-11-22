@@ -70,7 +70,7 @@ const DocumentFamily = ({ navigation }) => {
   const getDocumentDetails = async () => {
     // console.log('getDocumentDetails==========>>.><<<<>>><///',document.documentId)
     try {
-        let response = await NetworkManager.getDocumentsById(document.documentId)
+        let response = await NetworkManager.getDocumentsById(document.documentId ?? Document.id,)
         // console.log('response==>getDocumentDetails_____))____)_)_)_)))_', JSON.stringify(response.data))
         if (response.data.code === 200) {
             let memberIdArray = response.data.response.memberIds
@@ -87,14 +87,14 @@ const DocumentFamily = ({ navigation }) => {
     // console.log('response',familyMembersResult)
     let familyMembersList = familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id))
     // console.log('familyMembersList', familyMembersList?.length)
-
+      
     if(familyMembersList?.length) {
       const params = {
         familyId: selectedFamily,
-        documentId: document.documentId,
+        documentId: document.documentId ?? Document.id,
         revokeAccess: [],
         provideAccess: familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id && filterItem.inviteStatus === "Accepted"))?.map(item => item.id) ?? [],
-        updatedBy: document.uploadedBy
+        updatedBy: document.uploadedBy ?? Document.updatedBy
       }
       // console.log('params========>>>', params, familyMembersResult?.data?.response?.MemberList)
       try {
