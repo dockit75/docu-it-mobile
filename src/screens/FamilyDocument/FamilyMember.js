@@ -246,7 +246,7 @@ const FamilyMember = ({ navigation, props }) => {
         <View style={styles.container}>
          <View style={styles.innerContainer}>
          <TouchableOpacity onPress={() => navigation.navigate('FamilyDocument')} >
-            <Image source={Images.ARROW} style={{ width: 22, height: 22 }} />
+            <Icon name='arrow-u-left-top' color={'white'} size={32} />
           </TouchableOpacity>
           <Text
             style={styles.familyItemName}>

@@ -195,7 +195,7 @@ const FamilyDocument = ({ navigation }) => {
         <View style={{flex:1}}>
         <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
           <TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()} >
-            <Image source={Images.ARROW} style={{ width: 22, height: 22 }} />
+            <Icon name='arrow-u-left-top' color={'white'} size={32} />
           </TouchableOpacity>
           <TouchableOpacity onPress={showModalAdd} style={styles.addTouchable}>
             <Icon name='plus' size={30} color={'white'} />

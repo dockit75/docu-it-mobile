@@ -16,7 +16,7 @@ import React, { useState, useEffect } from 'react';
 import { Images } from '../../assets/images/images';
 import { createPdf } from 'react-native-images-to-pdf';
 import { Dialog, LinearProgress } from '@rneui/themed';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { retrieveUserDetail } from '../../storageManager';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -197,20 +197,20 @@ const UploadConfirmation = ({ navigation, route }) => {
         <View style={styles.wrapper}>
           <View style={{ height: screenHeight * 0.075 }}>
             <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }}  style={styles.headerView} onPress={() => navigation.goBack()}>
-              <Icon name="long-arrow-left" size={24} color={COLORS.white}  />
-              <Text style={styles.headerViewText}>{UPLOAD_DOCUMENT.back}</Text>
+              <MaterialCommunityIcons name="arrow-u-left-top" size={24} color={COLORS.white}  />
+              {/* <Text style={styles.headerViewText}>{UPLOAD_DOCUMENT.back}</Text> */}
             </TouchableOpacity>
           </View>
           <View style={styles.contentView}>
             <View>
-              <View>
+              {!isEditDocument ? <View>
                 <Text style={styles.categoryTitle}>{UPLOAD_DOCUMENT.changeDocumentTitle}</Text>
                 <TextInput
                   value={documentName}
                   style={[styles.input, {marginHorizontal: 20, marginTop: 10, borderColor: COLORS.transparentWhite, borderRadius: 5, width: screenWidth * 0.88, color: COLORS.transparentWhite }]}
                   onChangeText={text => setDocumentName(text)}
                 />
-              </View>
+              </View> : null}
               <View>
                 <Text style={{ color: COLORS.white, marginHorizontal: 20, textTransform: 'uppercase', fontWeight: 'bold' }}>{UPLOAD_DOCUMENT.categoryTitle}</Text>
                 <ScrollView style={{ marginHorizontal: 20, marginTop: 10, maxHeight: 180 }} contentContainerStyle={{ flexDirection: "row", flexWrap: "wrap"}}>

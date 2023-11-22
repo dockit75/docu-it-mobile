@@ -85,46 +85,65 @@ const DocumentFamily = ({ navigation }) => {
     // console.log('selectedFamily',selectedFamily)
     let familyMembersResult = await NetworkManager.listFamilyMembers(selectedFamily)
     // console.log('response',familyMembersResult)
-    const params = {
-      familyId: selectedFamily,
-      documentId: document.documentId,
-      revokeAccess: [],
-      provideAccess: familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id && filterItem.inviteStatus === "Accepted" && !currentShareMembersList?.includes(filterItem.id)))?.map(item => item.id) ?? [],
-      updatedBy: document.uploadedBy
-    }
-    // console.log('params========>>>', params, familyMembersResult?.data?.response?.MemberList)
-    try {
-        let response = await NetworkManager.updateDocument(params)
-        // console.log('response==>handleShareDocument', response?.data)
-        if (response.data.code === 200) {
-            Alert.alert(
-                'Success',
-                'Document shared successfully',
-                [
-                    {
-                      text: 'OK',
-                      onPress: () => {
-                        setSelectedFamily(false)
-                        navigation.goBack()
-                      }
-                    },
-                ],
-                { cancelable: false }
-            );
-        }
-    } catch (error) {
+    let familyMembersList = familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id))
+    // console.log('familyMembersList', familyMembersList?.length)
+
+    if(familyMembersList?.length) {
+      const params = {
+        familyId: selectedFamily,
+        documentId: document.documentId,
+        revokeAccess: [],
+        provideAccess: familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id && filterItem.inviteStatus === "Accepted"))?.map(item => item.id) ?? [],
+        updatedBy: document.uploadedBy
+      }
+      // console.log('params========>>>', params, familyMembersResult?.data?.response?.MemberList)
+      try {
+          let response = await NetworkManager.updateDocument(params)
+          // console.log('response==>handleShareDocument', response?.data)
+          if (response.data.code === 200) {
+              Alert.alert(
+                  'Success',
+                  'Document shared successfully',
+                  [
+                      {
+                        text: 'OK',
+                        onPress: () => {
+                          setSelectedFamily(false)
+                          navigation.goBack()
+                        }
+                      },
+                  ],
+                  { cancelable: false }
+              );
+          }
+      } catch (error) {
+        Alert.alert(
+          '',
+          error.response.data.message,
+            [
+                {
+                  text: 'OK',
+                  onPress: () => {}
+                },
+            ],
+            { cancelable: false }
+        );
+          console.error('Error in listFamilyMembers:', error.response.data);
+      }
+
+    } else {
       Alert.alert(
-        '',
-        error.response.data.message,
-          [
-              {
-                text: 'OK',
-                onPress: () => {}
-              },
-          ],
-          { cancelable: false }
+        'Waring',
+        'No more members in this family',
+        [
+            {
+              text: 'OK',
+              onPress: () => {
+              }
+            },
+        ],
+        { cancelable: false }
       );
-        console.error('Error in listFamilyMembers:', error.response.data);
     }
   }
   const filteredFamilyDetails = document.familyId ? familyDetails.filter(item => item.id === Document.familyId) : familyDetails;

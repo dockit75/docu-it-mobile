@@ -422,6 +422,8 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         return await handleDeleteDocument(document)
       case (action.itemKey === 'downloadDocument') :
         return await handleDownloadDocument(document)
+      case (action.itemKey === 'moveDocument') :
+        return await handleDownloadDocument(document)
       default:
         return null
     }
@@ -485,8 +487,9 @@ const DocumentScannerScreen = ({ navigation, route }) => {
             UPLOAD_DOCUMENT.listItemAction.filter(filterItem => ((userData.id === document.uploadedBy) || (filterItem.itemKey === 'viewDocument' || filterItem.itemKey === 'downloadDocument'))).map(item => 
               <MenuItem
                 key={item.itemKey}
-                onPress={() => handleItemAction(item, document)}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                style={item.disable ? { backgroundColor: 'lightgray', opacity: 0.5 }: {}}
+                onPress={item.disable ? null : () => handleItemAction(item, document)}>
+                <View style={[{ flexDirection: 'row', alignItems: 'center' }]}>
                   <MaterialCommunityIcons name={item.icon} size={28} color="black" />
                   <Text style={{fontSize: 16, color: 'black' }}>{`  ${item.label}`}</Text>
                 </View>

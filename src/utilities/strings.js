@@ -13,11 +13,12 @@
 
   export const UPLOAD_DOCUMENT = {
     listItemAction: [
-      {itemKey: 'editDocument', icon: 'square-edit-outline', path: '', label: 'Edit Document'},
-      {itemKey: 'shareDocument', icon: 'share-circle', path: '', label: 'Share Document'},
-      {itemKey: 'viewDocument', icon: 'eye-outline', path: '', label: 'View Document'},
-      {itemKey: 'downloadDocument', icon: 'download', path: '', label: 'Download Document'},
-      {itemKey: 'deleteDocument', icon: 'trash-can-outline', path: '', label: 'Delete Document'},
+      {itemKey: 'editDocument', icon: 'square-edit-outline', path: '', label: 'Edit Document', disable: true},
+      {itemKey: 'moveDocument', icon: 'file-move-outline', path: '', label: 'Move Document', disable: false},
+      {itemKey: 'shareDocument', icon: 'share-circle', path: '', label: 'Share Document', disable: false},
+      {itemKey: 'viewDocument', icon: 'eye-outline', path: '', label: 'View Document', disable: false},
+      {itemKey: 'downloadDocument', icon: 'download', path: '', label: 'Download Document', disable: false},
+      {itemKey: 'deleteDocument', icon: 'trash-can-outline', path: '', label: 'Delete Document', disable: false},
     ],
     addNewPageText: ['Tap ', ' to add new page'],
     back: 'Back',

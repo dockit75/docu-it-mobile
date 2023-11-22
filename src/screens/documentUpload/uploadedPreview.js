@@ -291,8 +291,8 @@ const UploadedPreview = ({ navigation, route }) => {
             <View style={styles.wrapper}>
               <View style={{ minHeight: screenHeight * 0.075 }}>
                 <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }} style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', padding: 15, paddingHorizontal: 15 }} onPress={() => navigation.goBack()}>
-                  <Icon name="long-arrow-left" size={24} color={COLORS.white}  />
-                  <Text style={{ fontSize: 14, fontWeight: '700', alignItems: 'center', paddingLeft: 10, color: COLORS.white }}>{UPLOAD_DOCUMENT.back}</Text>
+                  <MaterialCommunityIcons name="arrow-u-left-top" size={24} color={COLORS.white}  />
+                  {/* <Text style={{ fontSize: 14, fontWeight: '700', alignItems: 'center', paddingLeft: 10, color: COLORS.white }}>{UPLOAD_DOCUMENT.back}</Text> */}
                 </TouchableOpacity>
               </View>
               {

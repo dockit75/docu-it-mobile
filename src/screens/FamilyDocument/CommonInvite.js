@@ -9,6 +9,7 @@ import Dashboard from '../Dashboard'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DrawerNavigator from '../../components/common/DrawerNavigator'
 import { Dialog, Tab, TabView } from '@rneui/themed';
 import { FONTALIGNMENT } from '../../utilities/Fonts';
@@ -147,7 +148,7 @@ const CommonInvite = ({ navigation, props }) => {
                 <View style={styles.container}>
                     <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity onPress={() => navigation.navigate('FamilyMember', { familyItem: familyItem })} style={{ alignSelf: 'center' }}>
-                        <Image source={Images.ARROW} style={{ width: 28, height: 28 }} />
+                        <MaterialCommunityIcons name='arrow-u-left-top' color={'white'} size={32} />
                     </TouchableOpacity>
                     <Text style={styles.TextSettings}>Invite User</Text>
                     <View />
