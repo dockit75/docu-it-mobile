@@ -953,7 +953,9 @@ modalContent: {
   width: screenWidth * 0.75,
   backgroundColor: 'rgb(212, 215, 219)',
   borderRadius: 8,
-  padding: 15
+  padding: 15,
+  borderWidth: 0.5,
+  borderColor: COLORS.avatarBackground
 },
 textInputHeader:{
   color: 'black',

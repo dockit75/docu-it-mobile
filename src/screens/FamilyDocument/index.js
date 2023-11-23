@@ -448,7 +448,9 @@ const styles = StyleSheet.create({
     width: screenWidth * 0.75,
     backgroundColor: 'rgb(212, 215, 219)',
     padding: 20, 
-    borderRadius: 8
+    borderRadius: 8,
+    borderWidth: 0.5,
+    borderColor: COLORS.avatarBackground
   },
   text: {
     textAlign: 'center',

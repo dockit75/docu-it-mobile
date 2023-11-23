@@ -203,8 +203,9 @@ const LockScreen = ({ navigation, route }) => {
           }
 
         } catch (error) {
-          console.error('Error:', error);
-          setSnackbarMessage('Invalid PIN. Please try again. ');
+          console.error('Error:', error?.response);
+          let message = error?.response?.data?.message === 'Invalid credential' ? 'Invalid PIN. Please try again. ' : error?.response?.data?.message
+          setSnackbarMessage(message);
           setSnackbarVisible(true);
           setValue('')
         } finally {
