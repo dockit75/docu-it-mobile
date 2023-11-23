@@ -202,7 +202,7 @@ const FamilyDocument = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <Popover
+        {/* <Popover
           isVisible={isModalVisible}
           onRequestClose={() => {
             Keyboard.dismiss()
@@ -259,7 +259,73 @@ const FamilyDocument = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-        </Popover>
+        </Popover> */}
+        <Modal
+          animationType={'fade'}
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => {
+            Keyboard.dismiss()
+            setTimeout(() => setIsModalVisible(false), 1000)
+            setNewFamilyName('');
+            setCurrentItemId([])
+          }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={styles.modalContent}>
+          {editFamilyCall ? (
+            <Text style={styles.textInputHeader}> Change Family Name </Text>
+          ) : (
+            <Text style={styles.textInputHeader}> Enter Family Name </Text>
+          )}
+          <TextInput
+            value={editFamilyCall ? currentItemId.name : newFamilyName}
+            onChangeText={text => {
+              if(text?.trim().length > 0) {
+              const alphabetRegex = /^[A-Za-z_ ]+$/;
+              if (setEditFamilyCall) {
+                // Handle edit mode (update currentItemId.name)
+                setCurrentItemId(prevState => ({ ...prevState, name: text }));
+                setNewFamilyName(text);
+              } else {
+                // Handle non-edit mode (update newFamilyName)
+                  setNewFamilyName(text);
+              }
+              const isValid = alphabetRegex.test(text);
+              setIsNameValid(isValid);
+
+              // Set the error message if the input is not valid
+              if (!isValid) {
+                setErrorMessage('Name must contain only alphabets.');
+              } else {
+                setErrorMessage('');
+              }
+
+            } else {
+              editFamilyCall && setCurrentItemId([]);
+              setNewFamilyName('');
+            }
+            }}
+
+            style={styles.input}
+          />
+          {errorMessage !== '' && (
+            <Text style={styles.errorMessage}> {errorMessage} </Text>
+          )}
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+              onPress={cancelModal}
+              style={styles.cancelButton}>
+              <Text style={styles.buttonText}> Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={isNameValid ? (editFamilyCall ? editFamilyName : handleSaveFamily) : null}
+              style={[styles.saveButton, { backgroundColor: isNameValid ? '#0e9b81' : 'gray', }]}>
+              <Text style={styles.buttonText}> Save </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        </View>
+        </Modal>
         <View style={styles.header}>
           <View>
             <Text style={styles.familyName}> Family Name </Text>
@@ -377,9 +443,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   modalContent: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    width: screenWidth * 0.75,
+    backgroundColor: 'rgb(212, 215, 219)',
+    padding: 20, 
+    borderRadius: 8
   },
   text: {
     textAlign: 'center',

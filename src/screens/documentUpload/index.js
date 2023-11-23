@@ -13,7 +13,8 @@ import {
   Alert,
   ActivityIndicator,
   Linking,
-  TextInput
+  TextInput,
+  Modal
 } from 'react-native';
 import DocumentScanner from 'react-native-document-scanner-plugin';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -518,7 +519,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={{ flex: 0.98 }} onPress={()=>(userData.id === document.uploadedBy) ? handleSelectedName( document ) : null}>
+        <TouchableOpacity style={{ flex: 0.98 }} disabled={!(userData.id === document.uploadedBy) } onPress={(userData.id === document.uploadedBy) ?  ()=> handleSelectedName( document ) : null}>
           <Text numberOfLines={2} style={{ color: COLORS.black, fontSize: 12 }} >{name}</Text>
         </TouchableOpacity>
         <Menu
@@ -680,7 +681,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
               />
             </>
           }
-          <Popover
+          {/* <Popover
           isVisible={isModalVisible}
           onRequestClose={() => {
             // Keyboard.dismiss()
@@ -711,8 +712,43 @@ const DocumentScannerScreen = ({ navigation, route }) => {
               </TouchableOpacity>
             </View>
             </View>
-          </Popover>
+          </Popover> */}
 
+          <Modal
+          animationType={'fade'}
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => {
+            Keyboard.dismiss()
+            setTimeout(() => setIsModalVisible(false), 1000)
+            setSelectedName('')
+          }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={styles.modalContent}>
+             <Text style={styles.textInputHeader}> Change Document Name </Text>
+             <TextInput
+             autoFocus
+             numberOfLines={2}
+              // value={selectedName.toString().replace('.pdf', '')}
+              value={selectedName ? selectedName.replace('.pdf', '') : ''}
+              onChangeText={(text) => text.trim().length ? setSelectedName(text) : setSelectedName('')}
+              style={styles.input}
+            />
+             <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity
+                onPress={cancelModal}
+                style={styles.cancelButton}>
+                <Text style={styles.buttonText}> Cancel</Text>{console.log('name text -->', selectedName)}
+              </TouchableOpacity>
+              <TouchableOpacity
+               onPress={selectedName?.length ? handleSaveName : null}
+                style={[styles.saveButton, !selectedName?.length && {backgroundColor: 'gray'}]}>
+                <Text style={styles.buttonText}> Save </Text>
+              </TouchableOpacity>
+            </View>
+        </View>
+        </View>
+        </Modal>
 
           <Snackbar
             elevation={5}
@@ -911,9 +947,13 @@ popover: {
   borderRadius: 8,
 },
 modalContent: {
-  flex: 1,
+  // flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
+  width: screenWidth * 0.75,
+  backgroundColor: 'rgb(212, 215, 219)',
+  borderRadius: 8,
+  padding: 15
 },
 textInputHeader:{
   color: 'black',
