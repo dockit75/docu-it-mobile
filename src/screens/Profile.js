@@ -28,7 +28,7 @@ const Profile = ({ navigation }) => {
     const [isProfileUpdate, setIsProfileUpdate] = useState(false)
     const [isImageUpload, setIsImageUpload] = useState(true)
     const [isLoading, setIsLoading] = useState(true)
-    const options = ['Male', 'Female', 'Others', 'Unspecified'];
+    const options = ['Male', 'Female', 'Other', 'Unspecified'];
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
           fetchProfile();
@@ -132,7 +132,7 @@ const Profile = ({ navigation }) => {
         imageUrl: imageUrl ? imageUrl : profileData.imageUrl ?? null,
         userId: userData.id
     }
-
+      
     let profileResult = await NetworkManager.updateProfile(params)
 
     if (profileResult.data.code === 200) {
@@ -264,7 +264,7 @@ const Profile = ({ navigation }) => {
                           {/* <Skeleton circle width={70} height={70} animation="wave"  /> */}
                         </TouchableOpacity>
                       </View>
-                      <FlatList
+                      {/* <ScrollView
                         renderItem={mapInputs}
                         data={PROFILE_SCREEN.fields}
                         removeClippedSubviews={false}
@@ -277,7 +277,13 @@ const Profile = ({ navigation }) => {
                             </Text>
                           </TouchableOpacity>
                         }
-                      />
+                      /> */}
+                      {PROFILE_SCREEN.fields.map((item, index)=>mapInputs({item, index}))}
+                      <TouchableOpacity style={{ backgroundColor: (buttonEnable) ? '#17826b' : COLORS.gray, alignItems: 'center', alignSelf: 'center', width: 120, height: 40, alignContent: 'center', justifyContent: 'center', marginTop: 30, borderRadius: 20 }} disabled={isLoading || !isValueChange} onPress={() => handleUpdate()}>
+                            <Text style={[styles.done, { color: (buttonEnable) ? COLORS.warnLight : COLORS.backdrop }, !buttonEnable && { opacity: 0.5 }]}>
+                              {'Done'}
+                            </Text>
+                          </TouchableOpacity>
                   </ScrollView>
                   <SnackBar
                     message={'Profile Updated Successfully!'}

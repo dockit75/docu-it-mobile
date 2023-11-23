@@ -120,7 +120,7 @@ const FamilyMember = ({ navigation, props }) => {
         contacts.filter(filterItem => filterItem)
         .sort(
           (a, b) =>
-            a.givenName.toLowerCase() > b.givenName.toLowerCase(),)
+            a.givenName?.toLowerCase() > b.givenName?.toLowerCase(),)
             let contactList = contacts.map(contact =>{
                       if (contact.phoneNumbers.length > 0) {
                             return {
