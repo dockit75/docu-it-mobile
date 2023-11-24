@@ -24,7 +24,9 @@
     back: 'Back',
     categoryTitle: 'Category',
     changeDocumentTitle: 'Document Name',
-    pageNumberAppendText: 'Page No: '
+    pageNumberAppendText: 'Page No: ',
+    documentNameError: 'Please enter the document name',
+    categorySelectError: 'Please select any one category'
   }
 
   export const PROFILE_SCREEN = {

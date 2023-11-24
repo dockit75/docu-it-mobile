@@ -78,7 +78,7 @@ const UploadConfirmation = ({ navigation, route }) => {
       if (categoryResult.data?.status === 'SUCCESS' && categoryResult.data?.code === 200) {
         setCategoryList(categoryResult.data.response.categoryDetails)
         if (!categoryInfo) {
-          setCategoryData(categoryResult.data.response.categoryDetails[0])
+          // setCategoryData(categoryResult.data.response.categoryDetails[0])
           let documentName = `${userData.name}_${'Draft'}_Doc_${moment().valueOf()}`
           setDocumentName(documentInfo?.[0]?.documentName?.split('.pdf')[0] ?? documentName)
         }
@@ -248,21 +248,24 @@ const UploadConfirmation = ({ navigation, route }) => {
           </View>
           <View style={styles.contentView}>
             <View>
-              {!isEditDocument ? <View>
-                <Text style={styles.categoryTitle}>{UPLOAD_DOCUMENT.changeDocumentTitle}</Text>
+              {!isEditDocument ? <View style={{ position: 'relative', marginBottom: 5 }}>
+                <Text style={styles.categoryTitle}>{UPLOAD_DOCUMENT.changeDocumentTitle}<Text style={{ color: COLORS.red }}>{' *'}</Text></Text>
                 <TextInput
                   value={documentName}
                   style={[styles.input, { marginHorizontal: 20, marginTop: 10, borderColor: COLORS.transparentWhite, borderRadius: 5, width: screenWidth * 0.88, color: COLORS.transparentWhite }]}
                   onChangeText={text => setDocumentName(text)}
                 />
+                {!documentName?.length ?<Text style={{ marginHorizontal: 20, color: COLORS.red }}>{UPLOAD_DOCUMENT.documentNameError}</Text> : null}
               </View> : null}
               <View>
-                <Text style={{ color: COLORS.white, marginHorizontal: 20, textTransform: 'uppercase', fontWeight: 'bold' }}>{UPLOAD_DOCUMENT.categoryTitle}</Text>
+                <Text style={{ color: COLORS.white, marginHorizontal: 20, textTransform: 'uppercase', fontWeight: 'bold' }}>{UPLOAD_DOCUMENT.categoryTitle}<Text style={{ color: COLORS.red }}>{' *'}</Text></Text>
                 {/* <ScrollView style={{ marginHorizontal: 20, marginTop: 10, maxHeight: 180 }} contentContainerStyle={{ flexDirection: "row", flexWrap: "wrap" }}>
                   {categoryList.map((item, index) => (<TouchableOpacity onPress={() => setCategoryData(item)}><Text style={{ opacity: (categoryData?.categoryId === item.categoryId) ? 1 : 0.7, color: (categoryData?.categoryId === item.categoryId) ? COLORS.warnLight : COLORS.transparentWhite, marginHorizontal: 10, padding: 5, borderWidth: 1, borderColor: (categoryData?.categoryId === item.categoryId) ? COLORS.warnLight : COLORS.transparentWhite, borderRadius: 20, paddingHorizontal: 10, marginBottom: 10 }}>{item.categoryName}</Text></TouchableOpacity>))}
                 </ScrollView> */}
+                {(!categoryData && categoryList?.length) ?<Text style={{ marginHorizontal: 20, color: COLORS.red }}>{UPLOAD_DOCUMENT.categorySelectError}</Text> : null}
                 <FlatList
                   data={categoryList}
+                  contentContainerStyle={{ marginHorizontal: 10 }}
                   renderItem={({ item }) => (
                     <View style={{ backgroundColor: COLORS.darkTransparent, padding:5, margin: 5 ,borderRadius:8,marginLeft:10}}>
                       <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
@@ -287,7 +290,7 @@ const UploadConfirmation = ({ navigation, route }) => {
               </View>
             </View>
             <View style={styles.buttonView}>
-              <TouchableOpacity style={styles.button} onPress={isEditDocument ? handleUpdate : handleSave} >
+              <TouchableOpacity disabled={!(categoryData && documentName?.length)} style={[styles.button, !(categoryData && documentName?.length) && {backgroundColor: 'gray'}]} onPress={isEditDocument ? handleUpdate : handleSave} >
                 <Text style={styles.buttonText}>{isEditDocument ? APP_BUTTON_NAMES.update : APP_BUTTON_NAMES.save}</Text>
               </TouchableOpacity>
             </View>
