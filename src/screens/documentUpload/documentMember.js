@@ -81,7 +81,7 @@ const DocumentMember = ({ navigation, props }) => {
         try {
             let userData = await retrieveUserDetail()
             let response = await NetworkManager.listFamilyMembers(family.id)
-            // console.log('response==>listFamilyMembers', response.data?.response.MemberList, response.data?.response.MemberList?.length)
+            console.log('response==>listFamilyMembers', response.data?.response.MemberList, response.data?.response.MemberList?.length)
             if (response.data.code === 200) {
                 let memberList = response.data.response.MemberList.filter(filterItem => filterItem.user.id !== userData.id)
                 setFamilyMember(memberList)
@@ -160,6 +160,9 @@ const DocumentMember = ({ navigation, props }) => {
         }
     }
 
+    const acceptedFamilyMembers = familyMember.filter((member) => member.inviteStatus === 'Accepted');
+    console.log("acceptedFamilyMembers",acceptedFamilyMembers)
+
     return (
         <ImageBackground
             source={Images.REGISTRATION}
@@ -194,7 +197,7 @@ const DocumentMember = ({ navigation, props }) => {
                         <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Loading...</Text>
                     </Dialog>) : (
                         <FlatList
-                            data={familyMember}
+                            data={acceptedFamilyMembers}
                             style={{ flex: 1 }}
                             ListEmptyComponent={<View style={styles.listEmptyComponent}>
                                 <Icon name='account' size={80} color={'white'}/>

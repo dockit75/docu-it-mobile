@@ -40,9 +40,13 @@ const FamilyDocument = ({ navigation }) => {
   const [isNameValid, setIsNameValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoader, setIsLoader] = useState(true);
+  const [isNameEdited, setIsNameEdited] = useState(false);
+  const [previousCurrentItemId,SetPreviousCurrentItemId] = useState([])
+  const [savePressed,setSavePressed] = useState(false)
 
   const showModal = (item) => {
     setCurrentItemId(item);
+    SetPreviousCurrentItemId(item)
     setEditFamilyCall(true);
     setIsModalVisible(true);
   };
@@ -59,6 +63,7 @@ const FamilyDocument = ({ navigation }) => {
     setErrorMessage('')
   };
   const editFamilyName = async () => {
+    console.log('editFamilyName==called')
     try {
       let params = {
         name: newFamilyName,
@@ -182,6 +187,18 @@ const FamilyDocument = ({ navigation }) => {
         }
       ]
     )
+  }
+
+  const handleFamily = () => {
+    if(isNameValid){
+      if(editFamilyCall && currentItemId.name != previousCurrentItemId.name ){
+        editFamilyName()
+      }else if (!editFamilyCall){ 
+        handleSaveFamily()
+      }else{
+        null
+      }
+    }
   }
 
 
@@ -318,8 +335,16 @@ const FamilyDocument = ({ navigation }) => {
               <Text style={styles.buttonText}> Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={isNameValid ? (editFamilyCall ? editFamilyName : handleSaveFamily) : null}
-              style={[styles.saveButton, { backgroundColor: isNameValid ? '#0e9b81' : 'gray', }]}>
+              // onPress={isNameValid ? (editFamilyCall && currentItemId.name !==  currentItemId.name ? editFamilyName : handleSaveFamily) : null}
+              onPress = {handleFamily}
+              style={[
+                styles.saveButton,
+                {
+                  backgroundColor: isNameValid && (!editFamilyCall || (editFamilyCall && currentItemId.name !== previousCurrentItemId.name))
+                    ? '#0e9b81'  // Background color when conditions are true
+                    : 'gray',    // Background color when conditions are false
+                }
+              ]}>
               <Text style={styles.buttonText}> Save </Text>
             </TouchableOpacity>
           </View>

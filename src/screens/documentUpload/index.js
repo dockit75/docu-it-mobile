@@ -71,6 +71,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
   const [isDownloadComplete, setIsDownloadComplete] = useState(false);
   const [selectedName,setSelectedName] = useState('')
   const [selectedDocument,setSelectedDocument] =useState('')
+  const [prevSelectedName,SetPrevSelectedName] = useState('')
 
   const [userData, setUserData] = useState(null);
 
@@ -447,6 +448,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
     setSelectedName(document.documentName)
     setSelectedDocument(document.documentId)
     setIsModalVisible(true)
+    SetPrevSelectedName(document.documentName)
   }
 
   const cancelModal = () =>{
@@ -481,7 +483,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
      
  }
 
-  console.log('setSelectedName==========>>>',selectedName)
+  console.log('setSelectedName==========>>>',selectedName,prevSelectedName)
 
   const renderItems = useCallback(({ item, index }) => {
 
@@ -741,8 +743,8 @@ const DocumentScannerScreen = ({ navigation, route }) => {
                 <Text style={styles.buttonText}> Cancel</Text>{console.log('name text -->', selectedName)}
               </TouchableOpacity>
               <TouchableOpacity
-               onPress={selectedName?.length ? handleSaveName : null}
-                style={[styles.saveButton, !selectedName?.length && {backgroundColor: 'gray'}]}>
+               onPress={selectedName?.length  && (selectedName && selectedName.replace('.pdf', '')) != (prevSelectedName && prevSelectedName.replace('.pdf', '')) ? handleSaveName : null}
+                style={[styles.saveButton,  {backgroundColor:  (selectedName && selectedName.replace('.pdf', '')) != (prevSelectedName && prevSelectedName.replace('.pdf', '')) ?'#0e9b81': 'gray'}]}>
                 <Text style={styles.buttonText}> Save </Text>
               </TouchableOpacity>
             </View>

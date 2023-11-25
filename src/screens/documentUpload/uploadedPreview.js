@@ -34,6 +34,7 @@ import { APP_BUTTON_NAMES, UPLOAD_DOCUMENT } from '../../utilities/strings';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { DocumentItemLoader } from './documentItemLoader';
+import DrawerNavigator from '../../components/common/DrawerNavigator';
 
 const UploadedPreview = ({ navigation, route }) => {
 
@@ -288,6 +289,7 @@ const UploadedPreview = ({ navigation, route }) => {
           </View>
         </View>
       ) : <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight, flex: 1, justifyContent: 'space-between' }}>
+          <DrawerNavigator>
             <View style={styles.wrapper}>
               <View style={{ minHeight: screenHeight * 0.075 }}>
                 <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }} style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', padding: 15, paddingHorizontal: 15 }} onPress={() => navigation.goBack()}>
@@ -386,6 +388,7 @@ const UploadedPreview = ({ navigation, route }) => {
             </View>
           </View>
         </Popover> */}
+        </DrawerNavigator>
         </ImageBackground>
 }
     </SafeAreaView>

@@ -86,7 +86,7 @@ const DocumentFamily = ({ navigation }) => {
     // console.log('selectedFamily',selectedFamily)
     let familyMembersResult = await NetworkManager.listFamilyMembers(selectedFamily)
     // console.log('response',familyMembersResult)
-    let familyMembersList = familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id))
+    let familyMembersList = familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id && filterItem.inviteStatus === "Accepted"))
     // console.log('familyMembersList', familyMembersList?.length)
       
     if(familyMembersList?.length) {

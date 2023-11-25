@@ -29,6 +29,7 @@ import { screenHeight, screenWidth } from '../../utilities/measurement';
 import { APP_BUTTON_NAMES, UPLOAD_DOCUMENT } from '../../utilities/strings';
 import { validatePathConfig } from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox';
+import DrawerNavigator from '../../components/common/DrawerNavigator';
 
 const UploadConfirmation = ({ navigation, route }) => {
 
@@ -193,9 +194,10 @@ const UploadConfirmation = ({ navigation, route }) => {
         }
         setIsLoading(false)
         // navigation.pop(2)
+  
         Alert.alert(
           'Confirmation',
-          'Are you sure you want to Share Document?',
+          'Document saved sucessfully,\nAre you sure you want to share document ?',
           [
             {
               text: 'No',
@@ -239,6 +241,7 @@ const UploadConfirmation = ({ navigation, route }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={[styles.imageBackground, { paddingTop: insets.top }]}>
+        <DrawerNavigator>
         <View style={styles.wrapper}>
           <View style={{ height: screenHeight * 0.075 }}>
             <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }} style={styles.headerView} onPress={() => navigation.goBack()}>
@@ -301,6 +304,7 @@ const UploadConfirmation = ({ navigation, route }) => {
           <LinearProgress style={{ marginVertical: 10 }} color={'#0e9b81'} />
           <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Processing...</Text>
         </Dialog>
+        </DrawerNavigator>
       </ImageBackground>
     </SafeAreaView>
   );
