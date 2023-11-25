@@ -14,6 +14,7 @@ import { PermissionsAndroid } from 'react-native';
 import NetworkManager from '../services/NetworkManager';
 import { Snackbar } from 'react-native-paper';
 import { Skeleton } from '@rneui/themed';
+import DrawerNavigator from '../components/common/DrawerNavigator';
 
 const Profile = ({ navigation }) => {
     // hooks
@@ -240,7 +241,9 @@ const Profile = ({ navigation }) => {
     let buttonEnable = (!isLoading && isValueChange)
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight, paddingTop: insets.top }}>
+            <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight }}>
+                <DrawerNavigator>
+                <View style={{ flex: 1 }}>
                 <View style={styles.editProfileHeader} >
                     <TouchableOpacity onPress={() => navigation.navigate('Dashboard')} style={{ alignSelf: 'center' }}>
                         <Image source={Images.ARROW} style={{ width: 26, height: 26 }} />
@@ -273,7 +276,6 @@ const Profile = ({ navigation }) => {
                           <View style={{ position: 'absolute', bottom: 20, right: -2, border: 1, backgroundColor: COLORS.dodgerBlue, borderRadius: 20, borderWidth: 2, borderColor: COLORS.warnLight }}>
                             <Icon name="pencil" size={14} color={COLORS.white} style={{ padding: 2 }} />
                           </View>
-                          {/* <Skeleton circle width={70} height={70} animation="wave"  /> */}
                         </TouchableOpacity>
                       </View>
                       {/* <ScrollView
@@ -312,6 +314,8 @@ const Profile = ({ navigation }) => {
                   />
                 </KeyboardAvoidingView>
               </TouchableWithoutFeedback>
+              </View>
+              </DrawerNavigator>
             </ImageBackground>
         </SafeAreaView>
     )

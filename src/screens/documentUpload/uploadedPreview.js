@@ -288,15 +288,13 @@ const UploadedPreview = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </View>
-      ) : <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight, flex: 1, justifyContent: 'space-between' }}>
+      ) : <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight }}>
           <DrawerNavigator>
             <View style={styles.wrapper}>
-              <View style={{ minHeight: screenHeight * 0.075 }}>
-                <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }} style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', padding: 15, paddingHorizontal: 15 }} onPress={() => navigation.goBack()}>
-                  <MaterialCommunityIcons name="arrow-u-left-top" size={24} color={COLORS.white}  />
-                  {/* <Text style={{ fontSize: 14, fontWeight: '700', alignItems: 'center', paddingLeft: 10, color: COLORS.white }}>{UPLOAD_DOCUMENT.back}</Text> */}
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }} style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', paddingHorizontal: 15, paddingBottom: 10 }} onPress={() => navigation.goBack()}>
+                <MaterialCommunityIcons name="arrow-u-left-top" size={24} color={COLORS.white}  />
+                {/* <Text style={{ fontSize: 14, fontWeight: '700', alignItems: 'center', paddingLeft: 10, color: COLORS.white }}>{UPLOAD_DOCUMENT.back}</Text> */}
+              </TouchableOpacity>
               {
                 (uploadFiles[0]?.fileType !== 'application/pdf') ? 
                   <ScrollView style={{ paddingBottom: 20 }}>
@@ -596,8 +594,9 @@ text: {
 wrapper:{
   width:'100%',
   height: '100%',
+  flex: 1,
   justifyContent:'center',
-  paddingTop: 20
+  paddingTop: 10
 },
 });
 

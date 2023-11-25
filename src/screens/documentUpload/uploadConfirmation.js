@@ -240,9 +240,9 @@ const UploadConfirmation = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={[styles.imageBackground, { paddingTop: insets.top }]}>
+      <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={[styles.imageBackground]}>
         <DrawerNavigator>
-        <View style={styles.wrapper}>
+        <View style={{ flex: 1 }}>
           <View style={{ height: screenHeight * 0.075 }}>
             <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }} style={styles.headerView} onPress={() => navigation.goBack()}>
               <MaterialCommunityIcons name="arrow-u-left-top" size={24} color={COLORS.white} />
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   categoryTitle: { color: COLORS.white, marginHorizontal: 20, textTransform: 'uppercase', fontWeight: 'bold' },
   headerViewText: { fontSize: 14, fontWeight: '700', alignItems: 'center', paddingLeft: 10, color: COLORS.white },
   button: { width: 150, height: 50, backgroundColor: '#17826b', padding: 10, borderRadius: 10, alignItems: 'center' },
-  buttonView: { backgroundColor: 'lightgray', alignItems: 'center', flexDirection: 'row-reverse', padding: 10, justifyContent: 'space-between' },
+  buttonView: { backgroundColor: 'lightgray', alignItems: 'center', flexDirection: 'row-reverse', padding: 15, justifyContent: 'space-between', paddingTop: 8 },
   headerView: { alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', padding: 15, paddingHorizontal: 15 },
   input: {
     height: 40,
