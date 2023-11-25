@@ -347,10 +347,11 @@ const styles = StyleSheet.create({
         paddingRight: normalize(8),
         position: 'absolute',
         width: screenWidth * 0.58,
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: '600',
-        left: 45,
-        color: 'black'
+        left: 50,
+        color: 'black',
+        top:0.1,
     },
     phoneCountryFlag: {
         width: 'auto',

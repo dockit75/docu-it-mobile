@@ -28,6 +28,7 @@ const Profile = ({ navigation }) => {
     const [isProfileUpdate, setIsProfileUpdate] = useState(false)
     const [isImageUpload, setIsImageUpload] = useState(true)
     const [isLoading, setIsLoading] = useState(true)
+    const [inputError, setInputError] = useState(false); 
     const options = ['Male', 'Female', 'Other', 'Unspecified'];
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
@@ -157,6 +158,15 @@ const Profile = ({ navigation }) => {
       setIsSnackbarVisible(true)
     }
   }
+  const handleInputChange = (value, item) => {
+    if (value.length <= 50) {
+      setProfileData((prev) => ({ ...prev, [item.id]: value }));
+      setInputError(false); // Clear error if within limit
+    } else {
+      setInputError(true); // Set error if exceeded limit
+      // Keyboard.dismiss()
+    }
+  };
 
     const mapInputs = ({item, index}) => {
         return (
@@ -205,7 +215,9 @@ const Profile = ({ navigation }) => {
                 placeholderTextColor={COLORS.warnLight}
                 value={profileData?.[item.itemKeyName]}
                 style={[{ borderColor: item.isEdit ? COLORS.warnLight :COLORS.gray, borderWidth: normalize(1), borderRadius: normalize(8), marginTop: normalize(8), color: COLORS.black, height: normalize(48), paddingHorizontal: 10 }]}
-                onChangeText={(value) => setProfileData(prev => prev = { ...prev, [item.id]: value })}
+                // onChangeText={(value) => setProfileData(prev => prev = { ...prev, [item.id]: value })}
+                onChangeText={(value) => handleInputChange(value, item)}
+                maxLength={51}
             />
           </React.Fragment>
         )
@@ -279,6 +291,7 @@ const Profile = ({ navigation }) => {
                         }
                       /> */}
                       {PROFILE_SCREEN.fields.map((item, index)=>mapInputs({item, index}))}
+                      {inputError && <Text style={{ color: 'red' }}>Max length exceeded (50 characters)</Text>}
                       <TouchableOpacity style={{ backgroundColor: (buttonEnable) ? '#17826b' : COLORS.gray, alignItems: 'center', alignSelf: 'center', width: 120, height: 40, alignContent: 'center', justifyContent: 'center', marginTop: 30, borderRadius: 20 }} disabled={isLoading || !isValueChange} onPress={() => handleUpdate()}>
                             <Text style={[styles.done, { color: (buttonEnable) ? COLORS.warnLight : COLORS.backdrop }, !buttonEnable && { opacity: 0.5 }]}>
                               {'Done'}
