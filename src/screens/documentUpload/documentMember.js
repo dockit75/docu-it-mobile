@@ -128,7 +128,7 @@ const DocumentMember = ({ navigation, props }) => {
         // Filter out common IDs from both arrays
         let uniqueAddMembers = addMembers.filter(id => !commonIds.includes(id));
         const params = {
-            familyId: familyItem.id,
+            familyId: [familyItem.id],
             documentId: document.documentId ?? Document.id,
             categoryId: categoryInfo.categoryId,
             revokeAccess: revokeMembers,
@@ -157,6 +157,7 @@ const DocumentMember = ({ navigation, props }) => {
             }
         } catch (error) {
             console.error('Error in listFamilyMembers:', error);
+            Alert.alert(error.response.data.message)
         }
     }
 
