@@ -244,7 +244,7 @@ const FamilyMember = ({ navigation, props }) => {
       resizeMode="cover"
       style={{ width: screenWidth, height: '100%' }}>
       <DrawerNavigator>
-        <View style={{flex:1}}> 
+        <View style={{flex:1,height: '100%' }}> 
         <View style={styles.container}>
          <View style={styles.innerContainer}>
          <TouchableOpacity onPress={() => navigation.navigate('FamilyDocument')} >

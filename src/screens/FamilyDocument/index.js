@@ -76,11 +76,13 @@ const FamilyDocument = ({ navigation }) => {
       if (editFamilyRes.data.code === 200) {
         Keyboard.dismiss()
         setErrorMessage('')
-        setTimeout(() => alert(editFamilyRes.data.message), 1000)
+        // setTimeout(() => alert(editFamilyRes.data.message), 1000)
+        Alert.alert(res.data.message)
       } else {
         Keyboard.dismiss()
         setErrorMessage('')
-        setTimeout(() => alert(response.data.message), 1000)
+        // setTimeout(() => alert(response.data.message), 1000)
+        Alert.alert(res.data.message)
       }
 
       setCurrentItemId([]);
@@ -90,7 +92,8 @@ const FamilyDocument = ({ navigation }) => {
       Keyboard.dismiss()
       setErrorMessage('')
       // console.error('Error fetching unique id:', error.response);
-      setTimeout(() => alert(error.response.data.message), 1000)
+      // setTimeout(() => alert(error.response.data.message), 1000)
+      Alert.alert(error.response.data.message)
     }
     getFamilyList();
     setIsModalVisible(false);
@@ -135,17 +138,20 @@ const FamilyDocument = ({ navigation }) => {
         Keyboard.dismiss()
         setNewFamilyName('')
         setErrorMessage('')
-        setTimeout(() => alert(res.data.message), 1000)
+        // setTimeout(() => alert(res.data.message), 1000)
+        Alert.alert(res.data.message)
       } else {
         Keyboard.dismiss()
         setNewFamilyName('')
         setErrorMessage('')
-        setTimeout(() => alert(res.data.message), 1000)
+        // setTimeout(() => alert(res.data.message), 1000)
+        Alert.alert(res.data.message)
       }
     } catch (error) {
       Keyboard.dismiss()
       // console.error('Error fetching unique id:', error.response);
-      setTimeout(() => alert(error.response.data.message), 1000)
+      // setTimeout(() => alert(error.response.data.message), 1000)
+      Alert.alert(error.response.data.message)
       setNewFamilyName('')
       setErrorMessage('')
     }
@@ -209,7 +215,7 @@ const FamilyDocument = ({ navigation }) => {
       resizeMode="cover"
       style={{ width: screenWidth, height: '100%' }}>
       <DrawerNavigator>
-        <View style={{flex:1}}>
+        <View style={{flex:1,height:'100%'}}>
         <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
           <TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()} >
             <Icon name='arrow-u-left-top' color={'white'} size={32} />
