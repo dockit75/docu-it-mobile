@@ -119,6 +119,7 @@ const DrawerContent = ({route, drawerRef}) => {
             src={userData?.imageUrl ?? null}
           />
         </TouchableOpacity>
+        <View style={{width:'90%'}}>
         <Text
           style={{
             fontSize: 20,
@@ -131,6 +132,7 @@ const DrawerContent = ({route, drawerRef}) => {
         >
           {name}
         </Text>
+        </View>
       </View>
       <View style={styles.editProfile}>
         {

@@ -206,12 +206,14 @@ const DocumentMember = ({ navigation, props }) => {
                             </View>}
                             renderItem={({ item }) => (
                                 <View style={styles.FlatListContainer}>
-                                    <View>
+                                    <View style={{alignItems:'center', flexDirection:'row',justifyContent:'space-between'}}>
+                                    <View style={{width:'80%'}}>
                                         <Text style={styles.text}>
                                             {item.user.name}
                                         </Text>
                                     </View>
                                     { item.inviteStatus === "Accepted" &&
+                                     <View >
                                     <CheckBox
                                         tintColors={{ true: 'red', false: 'white' }}
                                         onCheckColor="white"
@@ -221,7 +223,10 @@ const DocumentMember = ({ navigation, props }) => {
                                         onAnimationType="fill"
                                         value={addMembers.includes(`${item.id}`)}
                                         onValueChange={() => handleCheckboxChange(item.id)}
-                                    />}
+                                    />
+                                    </View>
+                                    }
+                                    </View>
                                 </View>
                             )}
                         />)}

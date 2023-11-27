@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import { Image, ImageBackground, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard, TouchableWithoutFeedback, FlatList } from 'react-native'
+import { Image, ImageBackground, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard, TouchableWithoutFeedback, FlatList,ActivityIndicator } from 'react-native'
 import { normalize, normalizeVertical, screenHeight, screenWidth } from '../utilities/measurement'
 import { Images } from '../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +15,8 @@ import NetworkManager from '../services/NetworkManager';
 import { Snackbar } from 'react-native-paper';
 import { Skeleton } from '@rneui/themed';
 import DrawerNavigator from '../components/common/DrawerNavigator';
+import { Dialog } from '@rneui/themed';
+
 
 const Profile = ({ navigation }) => {
     // hooks
@@ -30,6 +32,8 @@ const Profile = ({ navigation }) => {
     const [isImageUpload, setIsImageUpload] = useState(true)
     const [isLoading, setIsLoading] = useState(true)
     const [inputError, setInputError] = useState(false); 
+    const [loader, setLoader] = useState(true);
+
     const options = ['Male', 'Female', 'Other', 'Unspecified'];
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
@@ -40,6 +44,7 @@ const Profile = ({ navigation }) => {
 
       useEffect(() => {
         setIsValueChange(checkChangesMade())
+        setInterval(() => { setLoader(false)}, 1000);
       }, [profileData])
     
     
@@ -244,6 +249,11 @@ const Profile = ({ navigation }) => {
             <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: '100%' }}>
                 <DrawerNavigator>
                 <View style={{ flex: 1 }}>
+                {loader === true ?  (<Dialog overlayStyle={{ width: 120 }} isVisible={loader} >
+                    <ActivityIndicator size={'large'} color={'#0e9b81'} />
+                    <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
+                   </Dialog> ): (
+                    <View  style={{ flex: 1}}  >
                 <View style={styles.editProfileHeader} >
                     <TouchableOpacity onPress={() => navigation.navigate('Dashboard')} style={{ alignSelf: 'center' }}>
                         <Image source={Images.ARROW} style={{ width: 26, height: 26 }} />
@@ -314,6 +324,8 @@ const Profile = ({ navigation }) => {
                   />
                 </KeyboardAvoidingView>
               </TouchableWithoutFeedback>
+              </View>
+              )}
               </View>
               </DrawerNavigator>
             </ImageBackground>

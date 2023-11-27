@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Snackbar } from 'react-native-paper';
 import SplashScreen from 'react-native-splash-screen';
 import SmsRetriever from 'react-native-sms-retriever';
+import CheckBox from '@react-native-community/checkbox';
 const RegistrationPage = ({ navigation }) => {
     const [phoneNo, setPhoneNo] = useState('');
     const [isLogedIn, setIsLogedIn] = useState(true);
@@ -31,6 +32,7 @@ const RegistrationPage = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [checked, setChecked] = useState(false)
     const [initialValues, setInitialValue] = useState({
         userName: '',
         phoneNo: '',
@@ -38,13 +40,13 @@ const RegistrationPage = ({ navigation }) => {
         gender: ''
     })
     const scrollRef = useRef()
-    
+
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     };
 
     useEffect(() => {
-        if(isOpen) {
+        if (isOpen) {
             scrollRef.current.scrollToEnd()
         }
     }, [isOpen])
@@ -77,7 +79,7 @@ const RegistrationPage = ({ navigation }) => {
     const getPhoneNumbers = async () => {
         try {
             const phoneNumber = await SmsRetriever.requestPhoneNumber();
-            setInitialValue(prev => prev = { ...prev, phoneNo:  phoneNumber?.substr(phoneNumber.length - 10, phoneNumber.length)})
+            setInitialValue(prev => prev = { ...prev, phoneNo: phoneNumber?.substr(phoneNumber.length - 10, phoneNumber.length) })
             initialValues.phoneNo = phoneNumber?.substr(phoneNumber.length - 10, phoneNumber.length)
             phoneInput.current.setState({ number: phoneNumber?.substr(phoneNumber.length - 10, phoneNumber.length) })
         } catch (error) {
@@ -114,7 +116,7 @@ const RegistrationPage = ({ navigation }) => {
             }).catch(error => {
                 setIsLoading(false);
                 console.error('error ------', error.response.data);
-                if(error?.response?.data?.message){
+                if (error?.response?.data?.message) {
                     setSnackbarMessage(error.response.data.message);
                     setSnackbarVisible(true);
                 }
@@ -138,133 +140,156 @@ const RegistrationPage = ({ navigation }) => {
 
     return (
         <ScrollView ref={scrollRef}>
-        <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
-            <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
-                <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
-                <Text style={styles.signup} >Registration</Text>
-                <Formik innerRef={formikRef} validationSchema={loginValidationSchema} initialValues={initialValues} onSubmit={(values, resetForm) => { handleRegistration(values, resetForm) }}>
-                    {({ values, handleChange, handleBlur, errors, handleSubmit, touched, resetForm, isSubmitting, setFieldValue }) => (
-                        <View style={styles.container}>
-                            <View>
-                                <TextInput
-                                    placeholder="Name"
-                                    placeholderTextColor='black'
-                                    onChangeText={handleChange('userName')}
-                                    onBlur={handleBlur('userName')}
-                                    value={values.userName}
-                                    style={[styles.input, errors.userName &&
-                                        touched?.userName && {
-                                        borderColor: '#ff00009c',
-                                        borderWidth: 2
-                                    },]}
-                                    onFocus={() => setIsOpen(false)}
-                                />
-                            </View>
-                            <TouchableOpacity style={[styles.mobileInputView,
-                            errors.phoneNo &&
-                            touched?.phoneNo && {
-                                borderColor: '#ff00009c',
-                                borderWidth: 2
-                            },]}>
-                                <PhoneInput
-                                    ref={phoneInput}
-                                    defaultValue={values.phoneNo}
-                                    defaultCode="IN"
-                                    onChangeFormattedText={(text) => {
-                                        setPhoneNo(text)
-                                    }}
-                                    disableArrowIcon={true}
-                                    containerStyle={styles.phoneInputContainer
-                                    }
-                                    textContainerStyle={styles.phoneInputTextContainer}
-                                    textInputStyle={styles.phoneInputTextStyle}
-                                    textInputProps={{
-                                        maxLength: 15,
-                                        placeholder: 'Phone Number',
-                                        placeholderTextColor: 'black',
-                                        onFocus: () => setIsOpen(false)
-                                    }}
-                                    flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
-                                    codeTextStyle={{ height: normalize(18), marginBottom: 0 }}
-                                    keyboardType="number-pad"
-                                    onChangeText={handleChange('phoneNo')}
-                                    onBlur={handleBlur('phoneNo')}
-                                />
-                            </TouchableOpacity>
-                            <View>
-                                <TextInput
-                                    placeholder="Email"
-                                    placeholderTextColor='black'
-                                    onChangeText={handleChange('emailId')}
-                                    onBlur={handleBlur('emailId')}
-                                    value={values.emailId}
-                                    style={[styles.input, errors.emailId &&
-                                        touched?.emailId && {
-                                        borderColor: '#ff00009c',
-                                        borderWidth: 2,
-                                    },]}
-                                    keyboardType="email-address"
-                                    onFocus={() => setIsOpen(false)}
-                                />
-                            </View>
-                            <View>
-                                <TouchableOpacity style={[styles.dropdownContainer,
-                                errors.gender && touched?.gender && {
+            <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
+                <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
+                    <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
+                    <Text style={styles.signup} >Registration</Text>
+                    <Formik innerRef={formikRef} validationSchema={loginValidationSchema} initialValues={initialValues} onSubmit={(values, resetForm) => { handleRegistration(values, resetForm) }}>
+                        {({ values, handleChange, handleBlur, errors, handleSubmit, touched, resetForm, isSubmitting, setFieldValue }) => (
+                            <View style={styles.container}>
+                                <View>
+                                    <TextInput
+                                        placeholder="Name"
+                                        placeholderTextColor='black'
+                                        onChangeText={handleChange('userName')}
+                                        onBlur={handleBlur('userName')}
+                                        value={values.userName}
+                                        style={[styles.input, errors.userName &&
+                                            touched?.userName && {
+                                            borderColor: '#ff00009c',
+                                            borderWidth: 2
+                                        },]}
+                                        onFocus={() => setIsOpen(false)}
+                                    />
+                                </View>
+                                <TouchableOpacity style={[styles.mobileInputView,
+                                errors.phoneNo &&
+                                touched?.phoneNo && {
                                     borderColor: '#ff00009c',
-                                    borderWidth: 1.5
-                                }]}
-                                    onBlur={handleBlur('gender')}
-                                    onPress={toggleDropdown}>
-                                    <Text style={[styles.selectedOption, values.gender && { color: 'black', fontWeight: '600' }]}>{values.gender || 'Choose Gender'}</Text>
-                                    {isOpen ? (
-                                        <Icon name="chevron-up" size={30} color="black" style={styles.icon} />
-                                    ) : (
-                                        <Icon name="chevron-down" size={30} color="black" style={styles.icon} />
-                                    )
-                                    }
+                                    borderWidth: 2
+                                },]}>
+                                    <PhoneInput
+                                        ref={phoneInput}
+                                        defaultValue={values.phoneNo}
+                                        defaultCode="IN"
+                                        onChangeFormattedText={(text) => {
+                                            setPhoneNo(text)
+                                        }}
+                                        disableArrowIcon={true}
+                                        containerStyle={styles.phoneInputContainer
+                                        }
+                                        textContainerStyle={styles.phoneInputTextContainer}
+                                        textInputStyle={styles.phoneInputTextStyle}
+                                        textInputProps={{
+                                            maxLength: 15,
+                                            placeholder: 'Phone Number',
+                                            placeholderTextColor: 'black',
+                                            onFocus: () => setIsOpen(false)
+                                        }}
+                                        flagButtonStyle={{ right: 0.5, paddingBottom: 2 }}
+                                        codeTextStyle={{ height: normalize(18), marginBottom: 0 }}
+                                        keyboardType="number-pad"
+                                        onChangeText={handleChange('phoneNo')}
+                                        onBlur={handleBlur('phoneNo')}
+                                    />
                                 </TouchableOpacity>
-                                {isOpen && (
-                                    <View style={styles.optionsContainer}>
-                                        {options.map((option) => (
-                                            <TouchableOpacity
-                                                key={option}
-                                                style={styles.optionItem}
-                                                onPress={() => handleGender(setFieldValue, option)}                                                    >
-                                                <Text style={styles.text} >
-                                                    {option}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        ))}
+                                <View>
+                                    <TextInput
+                                        placeholder="Email"
+                                        placeholderTextColor='black'
+                                        onChangeText={handleChange('emailId')}
+                                        onBlur={handleBlur('emailId')}
+                                        value={values.emailId}
+                                        style={[styles.input, errors.emailId &&
+                                            touched?.emailId && {
+                                            borderColor: '#ff00009c',
+                                            borderWidth: 2,
+                                        },]}
+                                        keyboardType="email-address"
+                                        onFocus={() => setIsOpen(false)}
+                                    />
+                                </View>
+                                <View>
+                                    <TouchableOpacity style={[styles.dropdownContainer,
+                                    errors.gender && touched?.gender && {
+                                        borderColor: '#ff00009c',
+                                        borderWidth: 1.5
+                                    }]}
+                                        onBlur={handleBlur('gender')}
+                                        onPress={toggleDropdown}>
+                                        <Text style={[styles.selectedOption, values.gender && { color: 'black', fontWeight: '600' }]}>{values.gender || 'Choose Gender'}</Text>
+                                        {isOpen ? (
+                                            <Icon name="chevron-up" size={30} color="black" style={styles.icon} />
+                                        ) : (
+                                            <Icon name="chevron-down" size={30} color="black" style={styles.icon} />
+                                        )
+                                        }
+                                    </TouchableOpacity>
+                                    {isOpen && (
+                                        <View style={styles.optionsContainer}>
+                                            {options.map((option) => (
+                                                <TouchableOpacity
+                                                    key={option}
+                                                    style={styles.optionItem}
+                                                    onPress={() => handleGender(setFieldValue, option)}                                                    >
+                                                    <Text style={styles.text} >
+                                                        {option}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
+                                    )}
+                                </View>
+                                <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start',  marginRight:70}}>
+                                    <View >
+                                        <CheckBox
+                                            tintColors={{ true: 'red', false: 'black' }}
+                                            onCheckColor="white"
+                                            onTintColor="green"
+                                            offFillColor="white"
+                                            offTintColor="white"
+                                            onAnimationType="fill"
+                                            value={checked}
+                                            onValueChange={() => setChecked(!checked)}
+                                        />
                                     </View>
-                                )}
-                            </View>
-                            <TouchableOpacity style={[styles.button, isOpen && {zIndex: -1}]} onPress={() => handleSubmit(values, resetForm)} disabled={isLoading}>
-                                {isLoading ? (
-                                    <ActivityIndicator color='white' /> // Show loader while loading
-                                ) : (
-                                    <Text style={styles.buttonText}>SUBMIT</Text>
-                                )}
-                            </TouchableOpacity>
-                            <View style={{ flexDirection: 'row', marginBottom: normalize(20) }}>
-                                <Text style={{ color: 'black' }}>Already have an account?</Text>
-                                <TouchableOpacity onPress={() => handleLogin(resetForm)}>
-                                    <Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}> SIGN IN</Text>
+                                    <View>
+                                        <Text style={{ color: 'black' }}>
+                                            <Text>Check to accept</Text>
+                                            <Text style={{ fontWeight: 'bold' }}> terms and conditions</Text>
+                                            <Text> and</Text>
+                                            <Text>{'\n'}</Text>
+                                            <Text style={{ fontWeight: 'bold' }}> privacy policies</Text>
+                                        </Text>
+                                    </View>
+                                </View>
+                                <TouchableOpacity style={[styles.button, isOpen && { zIndex: -1 },{backgroundColor:checked ? '#0e9b81': 'gray',}]} onPress={() => checked ? handleSubmit(values, resetForm):null} disabled={isLoading}>
+                                    {isLoading ? (
+                                        <ActivityIndicator color='white' /> // Show loader while loading
+                                    ) : (
+                                        <Text style={styles.buttonText}>SUBMIT</Text>
+                                    )}
                                 </TouchableOpacity>
+                                <View style={{ flexDirection: 'row', marginBottom: normalize(20) }}>
+                                    <Text style={{ color: 'black' }}>Already have an account?</Text>
+                                    <TouchableOpacity onPress={() => handleLogin(resetForm)}>
+                                        <Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}> SIGN IN</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                {(errors.userName && touched.userName) || (errors.phoneNo && touched.phoneNo) || (errors.emailId && touched.emailId) || (errors.gender && touched.gender) ? (<Text style={styles.errorText}>{errors.userName || errors.phoneNo || errors.emailId || errors.gender}</Text>) : null}
                             </View>
-                            {(errors.userName && touched.userName) || (errors.phoneNo && touched.phoneNo) || (errors.emailId && touched.emailId) || (errors.gender && touched.gender) ? (<Text style={styles.errorText}>{errors.userName || errors.phoneNo || errors.emailId || errors.gender}</Text>) : null}
-                        </View>
-                    )}
-                </Formik>
-                <Snackbar
-                    visible={snackbarVisible}
-                    onDismiss={() => setSnackbarVisible(false)}
-                    duration={3000}
-                    style={[styles.Snackbar, snackbarMessage === 'A PIN reset link has been sent to your registered mobile/email id' && { backgroundColor: '#0e9b81' }]}
-                >
-                    {snackbarMessage}
-                </Snackbar>
-            </ImageBackground>
-                            </TouchableWithoutFeedback>
+                        )}
+                    </Formik>
+                    <Snackbar
+                        visible={snackbarVisible}
+                        onDismiss={() => setSnackbarVisible(false)}
+                        duration={3000}
+                        style={[styles.Snackbar, snackbarMessage === 'A PIN reset link has been sent to your registered mobile/email id' && { backgroundColor: '#0e9b81' }]}
+                    >
+                        {snackbarMessage}
+                    </Snackbar>
+                </ImageBackground>
+            </TouchableWithoutFeedback>
         </ScrollView>
     );
 };
@@ -295,7 +320,7 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     button: {
-        backgroundColor: '#0e9b81',
+        
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 5,
@@ -351,7 +376,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         left: 50,
         color: 'black',
-        top:0.1,
+        top: 0.1,
     },
     phoneCountryFlag: {
         width: 'auto',

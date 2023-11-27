@@ -51,13 +51,16 @@ const PendingUser = ({ navigation }) => {
     }
    
     const handleInvite = async (item, type) => {
+        let UserId = await retrieveUserDetail();
         const params = {
-            userId: userAcount.id,
+            userId: UserId.id,
             familyId: item.family.id,
             inviteStatus: type
         }
+        // console.log('params',params)
         try {
             let response = await NetworkManager.acceptInvite(params)
+            // console.log("response",response)
             if (response.data.code === 200) {
                 alert(response.data.message)
                 setInvitesPending(prevInvites => prevInvites.filter(invite => invite !== item));
@@ -94,8 +97,13 @@ const PendingUser = ({ navigation }) => {
                     </View>}
                     renderItem={({ item }) => (
                         <View style={styles.FlatListContainer}>
-                            <View>
-                                <Text style={{ fontSize: 14, color: "white", marginLeft: 10, }}><Text style={{ fontSize: 17, fontWeight: 'bold' }}>{item.invitedBy.name}</Text>{" "}inviting you to  {'\n'} join <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'yellow' }}>{item.family.name}</Text> famiy</Text>
+                            <View style={{alignItems:'center',flexDirection:'row',justifyContent:'space-between'}}>
+                            <View style={{width:'70%'}}>
+                                <Text style={{ fontSize: 14, color: "white", marginLeft: 10, }}>
+                                    <Text style={{ fontSize: 17, fontWeight: 'bold' }}>{item.invitedBy.name}</Text>
+                                    {" "}inviting you to  {'\n'} join 
+                                    <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'yellow' }}>{" "}{item.family.name}</Text> famiy
+                                    </Text>
                             </View>
                             <View style={styles.buttons}>
                                 <TouchableOpacity onPress={() => handleInvite(item, 'Accepted')} style={styles.iconTouchable}>
@@ -104,6 +112,7 @@ const PendingUser = ({ navigation }) => {
                                 <TouchableOpacity onPress={() => handleInvite(item, 'rejected')} style={styles.iconTouchable}>
                                     <Icon name="remove" size={24} color="red" />
                                 </TouchableOpacity>
+                            </View>
                             </View>
                         </View>
                     )}
@@ -127,9 +136,9 @@ const styles = StyleSheet.create({
         marginTop: 5,
         borderRadius: 8,
         padding: 15,
-        flexDirection: 'row',
+        // flexDirection: 'row',
         marginLeft: 14,
-        justifyContent: 'space-between',
+        // justifyContent: 'space-between',
         width: screenWidth - 25,
     },
     iconTouchable: {

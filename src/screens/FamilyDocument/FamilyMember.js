@@ -120,7 +120,7 @@ const FamilyMember = ({ navigation, props }) => {
         contacts.filter(filterItem => filterItem)
         .sort(
           (a, b) =>
-            a.givenName?.toLowerCase() > b.givenName?.toLowerCase())
+            a.givenName?.toLowerCase() > b.givenName?.toLowerCase(),)
             let contactList = contacts.map(contact =>{
                       if (contact.phoneNumbers.length > 0) {
                             return {
@@ -244,7 +244,7 @@ const FamilyMember = ({ navigation, props }) => {
       resizeMode="cover"
       style={{ width: screenWidth, height: '100%' }}>
       <DrawerNavigator>
-        <View style={{flex:1,height: '100%' }}> 
+        <View style={{flex:1}}> 
         <View style={styles.container}>
          <View style={styles.innerContainer}>
          <TouchableOpacity onPress={() => navigation.navigate('FamilyDocument')} >
@@ -288,7 +288,7 @@ const FamilyMember = ({ navigation, props }) => {
           renderItem={({ item }) => (
             <View style={styles.FlatListContainer}>
               {typeof item === 'object' ? ( // Check if item is an object (family member)
-                <View>
+                <View style={{width:'70%'}}>
                   <Text style={styles.text}>
                   {item.user ? item.user.name : ''} {item.displayName ? `(${item.displayName})` : ''}
                   </Text>
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   FlatListContainer: {
-    height: normalize(50),
+    // height: normalize(50),
     backgroundColor: COLORS.darkTransparent,
     marginTop: 5,
     borderRadius: 8,
