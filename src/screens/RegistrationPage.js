@@ -240,7 +240,7 @@ const RegistrationPage = ({ navigation }) => {
                                         </View>
                                     )}
                                 </View>
-                                <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start',  marginRight:70}}>
+                                <View style={{  flexDirection: 'row', justifyContent: 'flex-start',  marginRight:49,marginTop:10}}>
                                     <View >
                                         <CheckBox
                                             tintColors={{ true: 'red', false: 'black' }}
@@ -254,7 +254,7 @@ const RegistrationPage = ({ navigation }) => {
                                         />
                                     </View>
                                     <View>
-                                        <Text style={{ color: 'black' }}>
+                                        <Text style={{ color: 'black',fontSize: 16}}>
                                             <Text>Check to accept</Text>
                                             <Text style={{ fontWeight: 'bold' }}> terms and conditions</Text>
                                             <Text> and</Text>
