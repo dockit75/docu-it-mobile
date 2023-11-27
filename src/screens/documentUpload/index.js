@@ -460,11 +460,16 @@ const DocumentScannerScreen = ({ navigation, route }) => {
  const handleSaveName = async () =>{
       console.log('document===>>',selectedDocument,selectedName,categoryInfo)
       setIsModalVisible(false)
+      let userData = await retrieveUserDetail()
       try {
         let params = {
           "documentId":selectedDocument,
           "categoryId": categoryInfo.categoryId,
-          "documentName": selectedName.endsWith('.pdf') ? selectedName : `${selectedName}.pdf`
+          "documentName": selectedName.endsWith('.pdf') ? selectedName : `${selectedName}.pdf`,
+          "updatedBy": userData.id,
+          "revokeAccess": [],
+          "provideAccess": [],
+          "familyId": [],
         }
         console.log('handleUpdate params-->',  params)
         const udpateResult = await NetworkManager.updateDocument(params)

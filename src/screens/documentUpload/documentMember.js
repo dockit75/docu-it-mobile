@@ -130,10 +130,10 @@ const DocumentMember = ({ navigation, props }) => {
         const params = {
             familyId: familyItem.id,
             documentId: document.documentId ?? Document.id,
-            // categoryId: categoryInfo.categoryId,
+            categoryId: categoryInfo.categoryId,
             revokeAccess: revokeMembers,
             provideAccess: uniqueAddMembers,
-            // documentName: document.documentName,
+            documentName: document.documentName,
             updatedBy: document.uploadedBy ?? Document.updatedBy
         }
         // console.log('params========>>>', params)

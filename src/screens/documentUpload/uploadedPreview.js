@@ -288,7 +288,7 @@ const UploadedPreview = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </View>
-      ) : <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight }}>
+      ) : <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: '100%' }}>
           <DrawerNavigator>
             <View style={styles.wrapper}>
               <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }} style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', paddingHorizontal: 15, paddingBottom: 10 }} onPress={() => navigation.goBack()}>

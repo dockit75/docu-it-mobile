@@ -92,11 +92,16 @@ const UploadConfirmation = ({ navigation, route }) => {
   const handleUpdate = async (document) => {
     console.log('edit called')
     try {
+      let userData = await retrieveUserDetail()
       setIsLoading(true)
       let params = {
         "documentId": documentInfo[0].documentId,
         "categoryId": categoryData.categoryId?.toString(),
         "documentName": documentName + '.pdf',
+        "updatedBy": userData.id,
+        "revokeAccess": [],
+        "provideAccess": [],
+        "familyId": [],
       }
       // console.log('handleUpdate params-->',  params)
       const udpateResult = await NetworkManager.updateDocument(params)
@@ -313,7 +318,7 @@ const UploadConfirmation = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   contentView: { paddingTop: 10, justifyContent: 'space-between', height: '92.5%' },
   buttonText: { fontSize: 22, fontWeight: '500', alignItems: 'center', color: COLORS.white },
-  imageBackground: { width: screenWidth, height: screenHeight, flex: 1, justifyContent: 'space-between' },
+  imageBackground: { width: screenWidth, height: '100%', flex: 1, justifyContent: 'space-between' },
   categoryTitle: { color: COLORS.white, marginHorizontal: 20, textTransform: 'uppercase', fontWeight: 'bold' },
   headerViewText: { fontSize: 14, fontWeight: '700', alignItems: 'center', paddingLeft: 10, color: COLORS.white },
   button: { width: 150, height: 50, backgroundColor: '#17826b', padding: 10, borderRadius: 10, alignItems: 'center' },

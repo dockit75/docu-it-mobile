@@ -91,11 +91,13 @@ const DocumentFamily = ({ navigation }) => {
       
     if(familyMembersList?.length) {
       const params = {
-        familyId: selectedFamily,
+        familyId: [selectedFamily],
         documentId: document.documentId ?? Document.id,
         revokeAccess: [],
         provideAccess: familyMembersResult?.data?.response?.MemberList?.filter(filterItem => (Document.uploadedBy !== filterItem.user.id && filterItem.inviteStatus === "Accepted"))?.map(item => item.id) ?? [],
-        updatedBy: document.uploadedBy ?? Document.updatedBy
+        updatedBy: document.uploadedBy ?? Document.updatedBy,
+        categoryId: categoryInfo.categoryId?.toString(),
+        documentName: document.documentName
       }
       // console.log('params========>>>', params, familyMembersResult?.data?.response?.MemberList)
       try {
