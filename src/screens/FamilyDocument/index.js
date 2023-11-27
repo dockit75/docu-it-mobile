@@ -77,12 +77,12 @@ const FamilyDocument = ({ navigation }) => {
         Keyboard.dismiss()
         setErrorMessage('')
         // setTimeout(() => alert(editFamilyRes.data.message), 1000)
-        Alert.alert(res.data.message)
+        Alert.alert(editFamilyRes.data.message)
       } else {
         Keyboard.dismiss()
         setErrorMessage('')
         // setTimeout(() => alert(response.data.message), 1000)
-        Alert.alert(res.data.message)
+        Alert.alert(editFamilyRes.data.message)
       }
 
       setCurrentItemId([]);
