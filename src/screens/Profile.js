@@ -241,7 +241,7 @@ const Profile = ({ navigation }) => {
     let buttonEnable = (!isLoading && isValueChange)
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight }}>
+            <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: '100%' }}>
                 <DrawerNavigator>
                 <View style={{ flex: 1 }}>
                 <View style={styles.editProfileHeader} >

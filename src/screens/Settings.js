@@ -13,7 +13,7 @@ import DrawerNavigator from '../components/common/DrawerNavigator';
 const Settings = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     return (
-                <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight }}>
+                <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: '100%' }}>
                     <DrawerNavigator>
                         <View style={{flex:1}}>
                     <View style={{ marginTop: 5 }}>
