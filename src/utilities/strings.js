@@ -14,7 +14,7 @@
   }
 
   export const LOGIN = {
-    termsAndCondtion: ['click to accept', ' terms and conditions', ' and', ' privacy policies'],
+    termsAndCondtion: ['I accept Docu.IT`s', ' Terms of Use', ' and', ' Privacy Policies'],
     alreadyHaveAccount: 'Already have an account?',
     signIn: ' SIGN IN',
     title: 'Registration',
@@ -63,6 +63,6 @@
   export const FAMILY_LIST_EMPTY = {
     familyEmpty: 'No families added.',
     memberEmpty: 'No family members added.',
-    contactEmpty: 'No Contacts...',
-    pendingEmpty: 'No recent Invites'
+    contactEmpty: 'No contacts...',
+    pendingEmpty: 'No recent invites'
   }

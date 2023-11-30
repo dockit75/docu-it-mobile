@@ -252,12 +252,16 @@ const RegistrationPage = ({ navigation }) => {
                                             value={checked}
                                             onValueChange={() => setChecked(!checked)}
                                         />
-                                        <Text style={{ color: 'black',fontSize: 12 }}>
-                                            <Text style={{ fontSize: 11, color: COLORS.avatarBackground }}>{LOGIN.termsAndCondtion[0]}</Text>
-                                            <Text style={{ fontSize: 12, fontWeight: 'bold', color: COLORS.brandBlue }}>{LOGIN.termsAndCondtion[1]}</Text>
-                                            <Text style={{ fontSize: 11, color: COLORS.avatarBackground }}>{LOGIN.termsAndCondtion[2]}</Text>
-                                            <Text style={{ fontSize: 12, fontWeight: 'bold', color: COLORS.brandBlue }}>{LOGIN.termsAndCondtion[3]}</Text>
-                                        </Text>
+                                        <View style={{flexDirection:'row',justifyContent:'flex-start',alignItems:'center'}}>
+                                            <Text style={{ fontSize: 13, color: COLORS.black }}>{LOGIN.termsAndCondtion[0]}</Text>
+                                            <TouchableOpacity>
+                                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: 'black',borderBottomColor:'black',borderBottomWidth:2}}>{LOGIN.termsAndCondtion[1]}</Text>
+                                            </TouchableOpacity>
+                                            <Text style={{ fontSize: 13, color: COLORS.black }}> &</Text>
+                                            <TouchableOpacity>
+                                            <Text  style={{ fontSize: 15, fontWeight: 'bold', color: 'black',borderBottomColor:'black',borderBottomWidth:2 }}>{LOGIN.termsAndCondtion[3]}</Text>
+                                            </TouchableOpacity>
+                                        </View>
                                 </View>
                                 <TouchableOpacity style={[styles.button, isOpen && { zIndex: -1 },{backgroundColor:checked ? '#0e9b81': 'gray',}]} onPress={() => checked ? handleSubmit(values, resetForm):null} disabled={isLoading}>
                                     {isLoading ? (
@@ -412,7 +416,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#3C3C43CC',
         marginTop: normalize(10),
         width: screenWidth - normalize(30),
-        position: 'absolute',
+        // position: 'absolute',
         top: 0
     },
     optionItem: {

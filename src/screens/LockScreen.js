@@ -458,10 +458,13 @@ const styles = StyleSheet.create({
   phoneInputContainer: {
     backgroundColor: 'transparent',
     right: 10,
+    alignItems:'center'
   },
   phoneInputTextContainer: {
     backgroundColor: 'transparent',
     right: 35,
+    alignItems:'center',
+    // justifyContent:'center'
     // paddingTop: normalize(12),
   },
   phoneInputTextStyle: {
@@ -472,7 +475,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     left: 45,
     color: 'black',
-    marginTop: 10
+    marginTop: 12,
+    // textAlign:'center'
   },
   phoneCountryFlag: {
     width: 'auto',
