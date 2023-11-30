@@ -27,6 +27,7 @@ import CommonInvite from '../screens/FamilyDocument/CommonInvite';
 // import Onboard from '../screens/onboard';
 import DocumentFamily from '../screens/documentUpload/documentFamily';
 import DocumentMember from '../screens/documentUpload/documentMember';
+import DocumentAccordian from '../screens/documentUpload/documentAccordian';
 import ChangePin from '../screens/ChangePin';
 
 import { PaperProvider } from 'react-native-paper';
@@ -141,6 +142,11 @@ const AppNavigator = ({ initialRouteName }) => {
      <Stack.Screen
       name="ChangePin"
       component={ChangePin}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="DocumentAccordian"
+      component={DocumentAccordian}
       options={{ headerShown: false }}
     />
     </Stack.Navigator>

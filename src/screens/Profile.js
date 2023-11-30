@@ -7,7 +7,7 @@ import { COLORS } from '../utilities/colors';
 import UserAvatar from 'react-native-user-avatar';
 import { retrieveUserDetail, storeUserDetail, storeUserSession } from '../storageManager';
 import { KeyboardAvoidingView } from 'react-native';
-import { PROFILE_SCREEN } from '../utilities/strings';
+import { APP_BUTTON_NAMES, LOGIN, PROFILE_SCREEN } from '../utilities/strings';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DocumentPicker from 'react-native-document-picker';
 import { PermissionsAndroid } from 'react-native';
@@ -16,6 +16,7 @@ import { Snackbar } from 'react-native-paper';
 import { Skeleton } from '@rneui/themed';
 import DrawerNavigator from '../components/common/DrawerNavigator';
 import { Dialog } from '@rneui/themed';
+import CustomSnackBar from '../components/common/SnackBar';
 
 
 const Profile = ({ navigation }) => {
@@ -34,7 +35,7 @@ const Profile = ({ navigation }) => {
     const [inputError, setInputError] = useState(false); 
     const [loader, setLoader] = useState(true);
 
-    const options = ['Male', 'Female', 'Other', 'Unspecified'];
+    const options = LOGIN.genderOptions;
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
           fetchProfile();
@@ -215,7 +216,8 @@ const Profile = ({ navigation }) => {
           :
           <React.Fragment key={item.id}>
             <Text style={[{ fontSize: normalize(14), textTransform: 'uppercase', color: COLORS.black, paddingRight: 20, fontWeight: '500' }, index && { marginTop: normalize(22) }]}>{`${item.id}   `}{(item.isEdit) && <Icon size={20} name='pencil' color={COLORS.warnLight} style={{ paddingLeft: 20 }} />}</Text>
-            <TextInput
+            {item.isEdit ? 
+              <TextInput
                 editable={item.isEdit}
                 placeholder={item.placeHolder}
                 placeholderTextColor={COLORS.warnLight}
@@ -224,12 +226,23 @@ const Profile = ({ navigation }) => {
                 // onChangeText={(value) => setProfileData(prev => prev = { ...prev, [item.id]: value })}
                 onChangeText={(value) => handleInputChange(value, item)}
                 maxLength={51}
-            />
+              /> 
+              :
+              <TextInput
+                editable={item.isEdit}
+                placeholder={item.placeHolder}
+                placeholderTextColor={COLORS.warnLight}
+                value={profileData?.[item.itemKeyName]}
+                style={[{ borderColor: item.isEdit ? COLORS.warnLight :COLORS.gray, borderWidth: normalize(1), borderRadius: normalize(8), marginTop: normalize(8), color: COLORS.black, height: normalize(48), paddingHorizontal: 10 }]}
+                // onChangeText={(value) => setProfileData(prev => prev = { ...prev, [item.id]: value })}
+                onChangeText={(value) => handleInputChange(value, item)}
+              />
+            }
           </React.Fragment>
         )
     }
 
-    const SnackBar = ({status, setStatus, message, styles}) => <Snackbar
+    const SnackBar = ({status, setStatus, message, styles}) => <CustomSnackBar
       elevation={5}
       style={styles}
       visible={status}
@@ -240,7 +253,7 @@ const Profile = ({ navigation }) => {
       duration={500}
     >
       <Text style={{ fontFamily: 'System', textAlign: 'center', color: COLORS.dodgerBlue, fontSize: normalize(12) }}> {message} </Text>
-    </Snackbar>
+    </CustomSnackBar>
 
 
     let buttonEnable = (!isLoading && isValueChange)
@@ -304,19 +317,20 @@ const Profile = ({ navigation }) => {
                       /> */}
                       {PROFILE_SCREEN.fields.map((item, index)=>mapInputs({item, index}))}
                       {inputError && <Text style={{ color: 'red' }}>Max length exceeded (50 characters)</Text>}
-                      <TouchableOpacity style={{ backgroundColor: (buttonEnable) ? '#17826b' : COLORS.gray, alignItems: 'center', alignSelf: 'center', width: 120, height: 40, alignContent: 'center', justifyContent: 'center', marginTop: 30, borderRadius: 20 }} disabled={isLoading || !isValueChange} onPress={() => handleUpdate()}>
-                            <Text style={[styles.done, { color: (buttonEnable) ? COLORS.warnLight : COLORS.backdrop }, !buttonEnable && { opacity: 0.5 }]}>
-                              {'Done'}
+                      <TouchableOpacity style={{ backgroundColor: (buttonEnable) ? '#17826b' : COLORS.gray, alignItems: 'center', alignSelf: 'center', width: 120, height: 40, alignContent: 'center', justifyContent: 'center', marginTop: 30, borderRadius: 20, flexDirection: 'row' }} disabled={isLoading || !isValueChange} onPress={() => handleUpdate()}>
+                            { isLoading && <ActivityIndicator size={'small'} color={COLORS.avatarBackground} />}
+                            <Text style={[styles.done, { color: (buttonEnable) ? COLORS.warnLight : COLORS.backdrop }, !buttonEnable && { opacity: 0.5, marginLeft: isLoading ? 10 : 0 }]}>
+                              {APP_BUTTON_NAMES.done}
                             </Text>
                           </TouchableOpacity>
                   </ScrollView>
-                  <SnackBar
+                  <CustomSnackBar
                     message={'Profile Updated Successfully!'}
                     status={isSnackbarVisible}
                     setStatus={setIsSnackbarVisible}
                     styles={styles.snackBar}
                   />
-                  <SnackBar
+                  <CustomSnackBar
                     message={'Profile Photo Updated Successfully!'}
                     status={isProfileUpdate}
                     setStatus={setIsProfileUpdate}
@@ -417,10 +431,11 @@ selectedOption: {
 snackBar: {
   width: normalize(200),
   alignSelf: 'center',
-  bottom: normalize(50),
+  bottom: normalize(55),
   opacity: 0.85,
   alignContent: 'center',
   backgroundColor: 'white',
+  zIndex: 1
 },
 })
 export default Profile

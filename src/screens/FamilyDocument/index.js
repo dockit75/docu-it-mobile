@@ -27,6 +27,7 @@ import { retrieveUserDetail } from '../../storageManager';
 import DrawerNavigator from '../../components/common/DrawerNavigator';
 import { Dialog } from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
+import CustomSnackBar from '../../components/common/SnackBar';
 
 const FamilyDocument = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -43,6 +44,7 @@ const FamilyDocument = ({ navigation }) => {
   const [isNameEdited, setIsNameEdited] = useState(false);
   const [previousCurrentItemId,SetPreviousCurrentItemId] = useState([])
   const [savePressed,setSavePressed] = useState(false)
+  const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
 
   const showModal = (item) => {
     setCurrentItemId(item);
@@ -61,9 +63,10 @@ const FamilyDocument = ({ navigation }) => {
     setNewFamilyName('')
     setTimeout(() => setIsModalVisible(false), 1000);
     setErrorMessage('')
+    setIsSnackbarVisible(false)
   };
   const editFamilyName = async () => {
-    console.log('editFamilyName==called')
+    // console.log('editFamilyName==called')
     try {
       let params = {
         name: newFamilyName,
@@ -76,13 +79,18 @@ const FamilyDocument = ({ navigation }) => {
       if (editFamilyRes.data.code === 200) {
         Keyboard.dismiss()
         setErrorMessage('')
+        setIsModalVisible(false)
         // setTimeout(() => alert(editFamilyRes.data.message), 1000)
-        Alert.alert(editFamilyRes.data.message)
+        // Alert.alert(editFamilyRes.data.message)
+        // console.log('editFamilyRes',editFamilyRes?.data)
+        setTimeout(() => setIsSnackbarVisible({ message: editFamilyRes.data.message, visible: true}), 1000)
       } else {
         Keyboard.dismiss()
         setErrorMessage('')
         // setTimeout(() => alert(response.data.message), 1000)
-        Alert.alert(editFamilyRes.data.message)
+        // Alert.alert(editFamilyRes.data.message)
+
+        setTimeout(() => setIsSnackbarVisible({ message: editFamilyRes.data.message, visible: true, isFailed: true }), 1000)
       }
 
       setCurrentItemId([]);
@@ -93,7 +101,8 @@ const FamilyDocument = ({ navigation }) => {
       setErrorMessage('')
       // console.error('Error fetching unique id:', error.response);
       // setTimeout(() => alert(error.response.data.message), 1000)
-      Alert.alert(error.response.data.message)
+      // Alert.alert(error.response.data.message)
+      setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 1000)
     }
     getFamilyList();
     setIsModalVisible(false);
@@ -136,24 +145,28 @@ const FamilyDocument = ({ navigation }) => {
       let res = await NetworkManager.addFamily(params);
       if (res.data.code === 200) {
         Keyboard.dismiss()
+        setIsModalVisible(false)
         setNewFamilyName('')
         setErrorMessage('')
+        setTimeout(() => setIsSnackbarVisible({ message: res.data.message, visible: true}), 1000)
         // setTimeout(() => alert(res.data.message), 1000)
-        Alert.alert(res.data.message)
+        // Alert.alert(res.data.message)
       } else {
         Keyboard.dismiss()
         setNewFamilyName('')
         setErrorMessage('')
         // setTimeout(() => alert(res.data.message), 1000)
-        Alert.alert(res.data.message)
+        // Alert.alert(res.data.message)
+        setTimeout(() => setIsSnackbarVisible({ message: res.data.message, visible: true, isFailed: true }), 1000)
       }
     } catch (error) {
       Keyboard.dismiss()
       // console.error('Error fetching unique id:', error.response);
       // setTimeout(() => alert(error.response.data.message), 1000)
-      Alert.alert(error.response.data.message)
+      // Alert.alert(error.response.data.message)
       setNewFamilyName('')
       setErrorMessage('')
+      setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 1000)
     }
     getFamilyList();
     setIsModalVisible(false);
@@ -180,14 +193,16 @@ const FamilyDocument = ({ navigation }) => {
             try {
               let response = await NetworkManager.deleteFamily(params);
               if (response.data.code === 200) {
-                Alert.alert(response.data.message)
+                // Alert.alert(response.data.message)
+                setTimeout(() => setIsSnackbarVisible({ message: response.data.message, visible: true }), 1000)
                 const updatedFamilyDetails = familyDetails.filter((family) => family.id !== item.id);
                 setFamilyDetail(updatedFamilyDetails);
                 // getFamilyList();
               }
             } catch (error) {
               // console.error('Error fetching unique id:', error.response);
-              Alert.alert(error.response.data.message)
+              // Alert.alert(error.response.data.message)
+              setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 1000)
             }
           }, style: 'destructive'
         }
@@ -342,11 +357,11 @@ const FamilyDocument = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               // onPress={isNameValid ? (editFamilyCall && currentItemId.name !==  currentItemId.name ? editFamilyName : handleSaveFamily) : null}
-              onPress = {handleFamily}
+              onPress = { isNameValid && ((!editFamilyCall && newFamilyName?.length) || (editFamilyCall && currentItemId.name !== previousCurrentItemId.name)) ? handleFamily : null}
               style={[
                 styles.saveButton,
                 {
-                  backgroundColor: isNameValid && (!editFamilyCall || (editFamilyCall && currentItemId.name !== previousCurrentItemId.name))
+                  backgroundColor: isNameValid && ((!editFamilyCall && newFamilyName?.length) || (editFamilyCall && currentItemId.name !== previousCurrentItemId.name))
                     ? '#0e9b81'  // Background color when conditions are true
                     : 'gray',    // Background color when conditions are false
                 }
@@ -405,6 +420,16 @@ const FamilyDocument = ({ navigation }) => {
             )}
           />
           )}
+
+          <CustomSnackBar
+            message={isSnackbarVisible?.message}
+            status={isSnackbarVisible?.visible}
+            setStatus={setIsSnackbarVisible}
+            styles={[styles.snackBar, {backgroundColor: isSnackbarVisible.isFailed ? COLORS.red : '#0e9b81'}]}
+            textStyle={{ color: COLORS.white, textAlign: 'left', fontSize: 13 }}
+            roundness={10}
+            duration={isSnackbarVisible.isFailed ? 3000 : 2000}
+          />
           </View>
       </DrawerNavigator>
     </ImageBackground>
@@ -557,5 +582,12 @@ const styles = StyleSheet.create({
     fontSize: 15, 
     marginVertical: 5, 
     marginBottom: 10 
-  }
+  },
+  snackBar: {
+    alignSelf: 'center',
+    bottom: normalize(50),
+    alignContent: 'center',
+    backgroundColor: 'white',
+    zIndex: 1
+},
 });

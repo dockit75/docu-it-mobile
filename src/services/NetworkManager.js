@@ -128,7 +128,8 @@ const path = {
     inviteUser : 'family/inviteUser',
     deleteFamily : 'family/deleteFamily',
     removeFamilyMembers : 'family/removeFamilyMembers',
-    userRanking: 'auth/getUserRanking?userId='
+    userRanking: 'auth/getUserRanking?userId=',
+    getFamilyWithMembers:'family/getFamilyWithMembers?adminId='
 }
 
 
@@ -250,7 +251,10 @@ const NetworkManager = {
     },
     getUserRanking: async (userId) => {
         return await requests.getTokenize(path.userRanking+userId, false)
-    }
+    },
+    getFamilyWithMembers: async (adminId) => {
+        return await requests.getTokenize(path.getFamilyWithMembers+adminId,false)
+    },
 
 };
 

@@ -18,13 +18,14 @@ import { Snackbar } from 'react-native-paper';
 import SplashScreen from 'react-native-splash-screen';
 import SmsRetriever from 'react-native-sms-retriever';
 import CheckBox from '@react-native-community/checkbox';
+import { APP_BUTTON_NAMES, LOGIN } from '../utilities/strings';
 const RegistrationPage = ({ navigation }) => {
     const [phoneNo, setPhoneNo] = useState('');
     const [isLogedIn, setIsLogedIn] = useState(true);
     const formikRef = useRef(null)
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(); // Initially value
-    const options = ['Male', 'Female', 'Others', 'Unspecified'];
+    const options = LOGIN.genderOptions;
     const [uniqueId, setUniqueId] = useState('')
     const insets = useSafeAreaInsets();
     const phoneInput = useRef(null);
@@ -143,7 +144,7 @@ const RegistrationPage = ({ navigation }) => {
             <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
                 <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, }}>
                     <Image source={Images.LOGO_DOCKIT} resizeMode='center' style={{ width: 100, height: 100, marginTop: normalize(60), alignSelf: 'center' }} />
-                    <Text style={styles.signup} >Registration</Text>
+                    <Text style={styles.signup} >{LOGIN.title}</Text>
                     <Formik innerRef={formikRef} validationSchema={loginValidationSchema} initialValues={initialValues} onSubmit={(values, resetForm) => { handleRegistration(values, resetForm) }}>
                         {({ values, handleChange, handleBlur, errors, handleSubmit, touched, resetForm, isSubmitting, setFieldValue }) => (
                             <View style={styles.container}>
@@ -240,10 +241,9 @@ const RegistrationPage = ({ navigation }) => {
                                         </View>
                                     )}
                                 </View>
-                                <View style={{  flexDirection: 'row', justifyContent: 'flex-start',  marginRight:49,marginTop:10}}>
-                                    <View >
+                                <View style={{  flexDirection: 'row', justifyContent: 'flex-start',  marginTop:10, width: screenWidth, paddingHorizontal: 20, alignItems: 'center' }}>
                                         <CheckBox
-                                            tintColors={{ true: 'red', false: 'black' }}
+                                            tintColors={{ true: COLORS.brandBlue, false: COLORS.lightGray }}
                                             onCheckColor="white"
                                             onTintColor="green"
                                             offFillColor="white"
@@ -252,28 +252,24 @@ const RegistrationPage = ({ navigation }) => {
                                             value={checked}
                                             onValueChange={() => setChecked(!checked)}
                                         />
-                                    </View>
-                                    <View>
-                                        <Text style={{ color: 'black',fontSize: 16}}>
-                                            <Text>Check to accept</Text>
-                                            <Text style={{ fontWeight: 'bold' }}> terms and conditions</Text>
-                                            <Text> and</Text>
-                                            <Text>{'\n'}</Text>
-                                            <Text style={{ fontWeight: 'bold' }}> privacy policies</Text>
+                                        <Text style={{ color: 'black',fontSize: 12 }}>
+                                            <Text style={{ fontSize: 11, color: COLORS.avatarBackground }}>{LOGIN.termsAndCondtion[0]}</Text>
+                                            <Text style={{ fontSize: 12, fontWeight: 'bold', color: COLORS.brandBlue }}>{LOGIN.termsAndCondtion[1]}</Text>
+                                            <Text style={{ fontSize: 11, color: COLORS.avatarBackground }}>{LOGIN.termsAndCondtion[2]}</Text>
+                                            <Text style={{ fontSize: 12, fontWeight: 'bold', color: COLORS.brandBlue }}>{LOGIN.termsAndCondtion[3]}</Text>
                                         </Text>
-                                    </View>
                                 </View>
                                 <TouchableOpacity style={[styles.button, isOpen && { zIndex: -1 },{backgroundColor:checked ? '#0e9b81': 'gray',}]} onPress={() => checked ? handleSubmit(values, resetForm):null} disabled={isLoading}>
                                     {isLoading ? (
                                         <ActivityIndicator color='white' /> // Show loader while loading
                                     ) : (
-                                        <Text style={styles.buttonText}>SUBMIT</Text>
+                                        <Text style={styles.buttonText}>{APP_BUTTON_NAMES.submit}</Text>
                                     )}
                                 </TouchableOpacity>
                                 <View style={{ flexDirection: 'row', marginBottom: normalize(20) }}>
-                                    <Text style={{ color: 'black' }}>Already have an account?</Text>
+                                    <Text style={{ color: 'black' }}>{LOGIN.alreadyHaveAccount}</Text>
                                     <TouchableOpacity onPress={() => handleLogin(resetForm)}>
-                                        <Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}> SIGN IN</Text>
+                                        <Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}>{LOGIN.signIn}</Text>
                                     </TouchableOpacity>
                                 </View>
                                 {(errors.userName && touched.userName) || (errors.phoneNo && touched.phoneNo) || (errors.emailId && touched.emailId) || (errors.gender && touched.gender) ? (<Text style={styles.errorText}>{errors.userName || errors.phoneNo || errors.emailId || errors.gender}</Text>) : null}

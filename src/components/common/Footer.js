@@ -26,6 +26,10 @@ const Footer = ({ props, route, screenName }) => {
     }
 
     useEffect(() => {
+        pendingUserInvite();
+    }, [])
+
+    useEffect(() => {
         setInterval(() => { pendingUserInvite()}, 10000);
     }, [navigation.isFocused()]);
 

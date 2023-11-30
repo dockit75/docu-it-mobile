@@ -48,6 +48,7 @@ import { Dialog, LinearProgress } from '@rneui/themed';
 import { setProfileCompletion } from '../../slices/UserSlices';
 import { useDispatch } from 'react-redux';
 import Popover from 'react-native-popover-view';
+import CustomSnackBar from '../../components/common/SnackBar';
 const DocumentScannerScreen = ({ navigation, route }) => {
 
   // navigation params
@@ -72,14 +73,15 @@ const DocumentScannerScreen = ({ navigation, route }) => {
   const [selectedName,setSelectedName] = useState('')
   const [selectedDocument,setSelectedDocument] =useState('')
   const [prevSelectedName,SetPrevSelectedName] = useState('')
+  const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
 
   const [userData, setUserData] = useState(null);
 
   const dispatch = useDispatch()
 
   useEffect(() => {
-    setIsLoader(true)
     const unsubscribe = navigation.addListener('focus', async () => {
+      setIsLoader(true)
       getUploadedDocumentsList()
   });
 
@@ -108,8 +110,9 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         setIsLoader(false)
       }
     } catch (error) {
-      setIsLoader(false)
       console.error(error); // You might send an exception to your error tracker
+    } finally {
+      setIsLoader(false)
     }
   }
 
@@ -189,9 +192,11 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         onPress: () => {}
       },
       { text: 'Ok', onPress: async () => {
+        try {
         let deleteResult = await NetworkManager.documentDelete(item.documentId ?? item?.documentId)
         if(deleteResult.data?.status === 'SUCCESS' && deleteResult.data?.code === 200){
-          Alert.alert(deleteResult.data?.message)
+          // Alert.alert(deleteResult.data?.message)
+          setIsSnackbarVisible({ message: deleteResult.data?.message, visible: true })
           if(docmentFilterList?.length === 0) {
             let profileStatusResult = await NetworkManager.getUserRanking(userData.id)
             if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
@@ -203,7 +208,12 @@ const DocumentScannerScreen = ({ navigation, route }) => {
           if (fullScreenImage && fullScreenImage.uri === item.documentUrl) {
             setFullScreenImage(null);
           }
+        } else {
+          setIsSnackbarVisible({ message: deleteResult.data?.message, visible: true, isFailed: true })
         }
+      } catch (error) {
+        setIsSnackbarVisible({ message: error?.response?.data.message, visible: true, isFailed: true })
+      }
         // console.log('deleteResult ****** -->', deleteResult)
       }, style: 'destructive' }
     ]
@@ -368,7 +378,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
   const handleShareDocument = async (document) => {
     // Alert.alert('','working under progress')
     handleShowOption(document, false)
-    setTimeout(() => (navigation.navigate('DocumentFamily', { document: document, categoryInfo: categoryInfo })), 150)
+    setTimeout(() => (navigation.navigate('DocumentAccordian', { document: document, categoryInfo: categoryInfo })), 150)
   }
 
   const handleViewDocument = async (document) => {
@@ -471,15 +481,17 @@ const DocumentScannerScreen = ({ navigation, route }) => {
           "provideAccess": [],
           "familyId": [],
         }
-        console.log('handleUpdate params-->',  params)
+        // console.log('handleUpdate params-->',  params)
         const udpateResult = await NetworkManager.updateDocument(params)
-        console.log('udpateResult------>>>>++++++++++++++++++++',udpateResult)
+        // console.log('udpateResult------>>>>++++++++++++++++++++',udpateResult)
         if(udpateResult.data.code === 200){
-          Alert.alert(udpateResult.data.message)
+          // Alert.alert(udpateResult.data.message)
+          setTimeout(() => setIsSnackbarVisible({ message: udpateResult.data?.message, visible: true }), 1000)
           setSelectedDocument(null)
           setSelectedName(null)
           getUploadedDocumentsList();
-         
+        } else {
+          setIsSnackbarVisible({ message: udpateResult.data?.message, visible: true, isFailed: true })
         }
         
       } catch(error) {
@@ -560,7 +572,8 @@ const DocumentScannerScreen = ({ navigation, route }) => {
   }, [listExtraData, userData, documentList])
 
   const keyExtractor = useCallback((item, index) => index?.toString() + item?.documentId?.toString(), [])
-  let documentList = isLoader ? Array(10).fill(1).map((n, i) => n = { "categoryId": 'category_loader'+i,  isLoading: true, "documentUrl": 'category_url_loader'+i }) : combinedDocuments
+  // let documentList = isLoader ? Array(10).fill(1).map((n, i) => n = { "categoryId": 'category_loader'+i,  isLoading: true, "documentUrl": 'category_url_loader'+i }) : combinedDocuments
+  let documentList = combinedDocuments
   // console.log('categpry ---->', fullScreenImage)
   return (
     <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight, flex: 1 }}>
@@ -635,7 +648,10 @@ const DocumentScannerScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
               </View>
             </View>
-          ) : <>
+          ) : isLoader ? (<Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
+            <ActivityIndicator size={'large'} color={'#0e9b81'} />
+            <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Loading...</Text>
+          </Dialog>) : (<>
               {/* <FlatList
                 data={documentList}
                 keyExtractor={keyExtractor}
@@ -686,7 +702,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
                 onStateChange={ state => setIsShowUpload(state.open)}
                 onPress={() => setIsShowUpload(prev => !prev)}
               />
-            </>
+            </>)
           }
           {/* <Popover
           isVisible={isModalVisible}
@@ -773,6 +789,16 @@ const DocumentScannerScreen = ({ navigation, route }) => {
             <LinearProgress style={{ marginVertical: 10 }} color={'#0e9b81'} />
             <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Uploading...</Text>
           </Dialog> 
+
+          <CustomSnackBar
+            message={isSnackbarVisible?.message}
+            status={isSnackbarVisible?.visible}
+            setStatus={setIsSnackbarVisible}
+            styles={[styles.snackBar, {backgroundColor: isSnackbarVisible.isFailed ? COLORS.red : '#0e9b81'}]}
+            textStyle={{ color: COLORS.white, textAlign: 'left', fontSize: 13 }}
+            roundness={10}
+            duration={isSnackbarVisible.isFailed ? 3000 : 2000}
+          />
         </SafeAreaView>
       </DrawerNavigator>
     </ImageBackground>
@@ -999,6 +1025,13 @@ buttonText:{
   fontSize: 16,
   color: 'white',
   fontWeight: '500',
+},
+snackBar: {
+  alignSelf: 'center',
+  bottom: normalize(50),
+  alignContent: 'center',
+  backgroundColor: 'white',
+  zIndex: 1
 },
 });
 

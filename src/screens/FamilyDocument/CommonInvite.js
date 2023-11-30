@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect, cloneElement } from 'react'
-import { ScrollView, StyleSheet, ImageBackground, Text, View, Image, TouchableOpacity, FlatList, TextInput, Alert, PermissionsAndroid, ActivityIndicator } from 'react-native'
+import React, { useRef, useState, useEffect, cloneElement, useMemo } from 'react'
+import { ScrollView, StyleSheet, ImageBackground, Text, View, Image, TouchableOpacity, FlatList, TextInput, Alert, PermissionsAndroid, ActivityIndicator, Platform } from 'react-native'
 import { Card, Title, Paragraph, Button } from 'react-native-paper'
 import { normalize, normalizeVertical, screenHeight, screenWidth } from '../../utilities/measurement';
 import { COLORS } from '../../utilities/colors'
@@ -11,7 +11,7 @@ import { useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DrawerNavigator from '../../components/common/DrawerNavigator'
-import { Dialog, Tab, TabView } from '@rneui/themed';
+import { Dialog, SearchBar, Tab, TabView } from '@rneui/themed';
 import { FONTALIGNMENT } from '../../utilities/Fonts';
 import PhoneInput from "react-native-phone-number-input";
 import { retrieveUserDetail } from '../../storageManager';
@@ -39,17 +39,36 @@ const CommonInvite = ({ navigation, props }) => {
     const [isLoader, setIsLoader] = useState(true);
     const [checked, setChecked] = useState(false);
     const [filteredContacts, setFilteredContacts] = useState([]);
+    const [search, setSearch] = useState('');
+    const [searchData, setSearchData] = useState([]);
     const insets = useSafeAreaInsets();
+
+    // ref
+    let inputRef = useRef()
 
     useEffect(() => {
         setIsLoader(true)
-        console.log('familyMember', familyMember)
-        console.log('contacts====>>>', myContacts)
-        console.log('newArray', arrayCombined)
+        // console.log('familyMember', familyMember)
+        // console.log('contacts====>>>', myContacts)
+        // console.log('newArray', arrayCombined)
         getUser();
         filterContacts();
         setTimeout(() => setIsLoader(false), 1000)
     }, []);
+
+    useEffect(() => {
+        if(!isLoader) {
+            if (search?.length) {
+                let searchTextReg = new RegExp(search.toLowerCase())
+                let updateFilterContacts = filteredContacts.filter(filterItem => searchTextReg.test(filterItem.name.toLowerCase()))
+                setSearchData(updateFilterContacts.slice().sort((a, b) => a.name.localeCompare(b.name)))
+                setSelectedItems(prev => prev = [ ...prev.filter(filterItem => !filterItem?.isFilterItem), ...filteredContacts.map(filterItem => filterItem = { ...filterItem, isFilterItem: true }) ])
+            } else {
+                filterContacts();
+                setSelectedItems(prev => prev = [ ...prev.filter(filterItem => !filterItem?.isFilterItem) ])
+            }
+        }
+    }, [search])
 
     const getUser = async () => {
         let UserId = await retrieveUserDetail();
@@ -76,7 +95,7 @@ const CommonInvite = ({ navigation, props }) => {
         } else {
             updatedSelectedItems.push(itemId); // Add the item if it's not in the array
         }
-        setSelectedItems(updatedSelectedItems);
+        setSelectedItems(updatedSelectedItems.filter(filterItem => !filterItem?.isFilterItem));
         if (updatedSelectedItems.length === 0) {
             setInviteEnable(false)
         } else {
@@ -138,6 +157,33 @@ const CommonInvite = ({ navigation, props }) => {
         // console.log('filterd-Contacts---', filtered?.length)
         setFilteredContacts(filtered);
     };
+
+
+    /**
+     * Render the header of the invite list
+     */
+    const renderChatsHeader = () => {
+
+        return (
+        <View>
+            <View style={styles.messageSearchBarContainer} onTouchStart={() => inputRef.current?.focus()}>
+                <SearchBar
+                    placeholder='Search'
+                    onChangeText={setSearch}
+                    clearIcon={search === '' ? false : undefined}
+                    value={search ?? ''}
+                    ref={(search) => { inputRef.current = search }}
+                    platform={Platform.OS === 'android' ? 'default' : 'ios'}
+                    containerStyle={styles.messageSearchBar}
+                    inputContainerStyle={{ padding: 0, backgroundColor: COLORS.coolLight, borderRadius: 10, height: 40, alignItems: 'center' }}
+                    cancelButtonProps={{ color: COLORS.brandBlue }}
+                />
+            </View>
+        </View>
+        )
+    }
+
+    const memoizedRenderChatsHeader = useMemo(renderChatsHeader, [search])
     // console.log('filteredContacts', isLoader)
     return (
         <ImageBackground
@@ -146,12 +192,12 @@ const CommonInvite = ({ navigation, props }) => {
             style={{ width: screenWidth, height: '100%' }}>
             <DrawerNavigator>
                 <View style={styles.container}>
-                    <View style={{ flexDirection: 'row' }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: screenWidth * 0.73 }}>
                     <TouchableOpacity onPress={() => navigation.navigate('FamilyMember', { familyItem: familyItem })} style={{ alignSelf: 'center' }}>
                         <MaterialCommunityIcons name='arrow-u-left-top' color={'white'} size={32} />
                     </TouchableOpacity>
                     <Text style={styles.TextSettings}>Invite User</Text>
-                    <View />
+                    <View style={{ width: 10, height: 10 }} />
                     </View>
 
                     {inviteEnable ? <View >
@@ -161,6 +207,7 @@ const CommonInvite = ({ navigation, props }) => {
                     </View> : <View />}
                 </View>
                 <View>
+                    {memoizedRenderChatsHeader}
                 </View>
 
                 <Dialog overlayStyle={{ width: 120, zIndex: 111 }} isVisible={isLoader} >
@@ -168,12 +215,13 @@ const CommonInvite = ({ navigation, props }) => {
                     <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
                 </Dialog>
                 <FlashList
-                    data={filteredContacts.slice().sort((a, b) => a.name.localeCompare(b.name))}
+                    data={search?.length ? searchData : filteredContacts.slice().sort((a, b) => a.name.localeCompare(b.name))}
                     extraData={selectedItems}
                     ListEmptyComponent={<View style={styles.listEmptyComponent}>
                         <Icon name='phone-slash' size={60} color={'white'}/>
                     <Text style={{ color: 'white', fontSize: 20 ,marginTop:10}}>{FAMILY_LIST_EMPTY.contactEmpty}</Text>
                   </View>}
+                    // ListHeaderComponent={memoizedRenderChatsHeader}
                     renderItem={({ item, index }) => (
                         <View style={styles.FlatListContainer}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -216,7 +264,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginVertical: 15,
         color: 'white',
-        marginLeft: normalize(15)
+        marginLeft: normalize(45),
+        textAlign: 'center'
     },
     text: {
         color: COLORS.white,
@@ -270,5 +319,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center', 
         height: 40, width: 40, 
         borderRadius: 25 
-    }
+    },
+    messageSearchBarContainer: {
+        // paddingLeft: normalize(16),
+        height: normalizeVertical(30),
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginVertical: normalize(12),
+        marginLeft: 12,
+        // width: screenWidth - 20
+    },
+    messageSearchBar: {
+      fontSize: 16,
+      fontWeight: '400',
+      fontFamily: 'System',
+      flex: 1,
+      backgroundColor: COLORS.transparent,
+      borderBottomColor: COLORS.transparent,
+      borderTopColor: COLORS.transparent,
+      borderRadius: 18
+    },
 })

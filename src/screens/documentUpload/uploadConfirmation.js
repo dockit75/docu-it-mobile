@@ -14,6 +14,7 @@ import {
 import moment from 'moment';
 import { useDispatch } from 'react-redux';
 import { COLORS } from '../../utilities/colors';
+import { RadioButton } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { Images } from '../../assets/images/images';
 import { createPdf } from 'react-native-images-to-pdf';
@@ -202,7 +203,7 @@ const UploadConfirmation = ({ navigation, route }) => {
   
         Alert.alert(
           'Confirmation',
-          'Document saved sucessfully,\nAre you sure you want to share document ?',
+          'Document saved sucessfully,\nDo you want to share with your family?',
           [
             {
               text: 'No',
@@ -228,7 +229,7 @@ const UploadConfirmation = ({ navigation, route }) => {
                   ...saveResult?.data.response,
                   ...saveResult?.data.response?.[0]
                 }
-                navigation.navigate('DocumentFamily', { document: documentObj, categoryInfo: categoryData, isSaveDocumentFlow: true })
+                navigation.navigate('DocumentAccordian', { document: documentObj, categoryInfo: categoryData, isSaveDocumentFlow: true })
                 refreshData && refreshData()
               },
             },
@@ -280,7 +281,7 @@ const UploadConfirmation = ({ navigation, route }) => {
                       <Text style={{color:'white',marginLeft:10}}>
                         {item.categoryName}
                       </Text>
-                      <CheckBox
+                      {/* <CheckBox
                         tintColors={{ true: 'red', false: 'white' }}
                         onCheckColor="white"
                         onTintColor="green"
@@ -289,6 +290,13 @@ const UploadConfirmation = ({ navigation, route }) => {
                         onAnimationType="fill"
                         value={item.categoryId === categoryData?.categoryId}
                         onValueChange={() => setCategoryData(item)}
+                      /> */}
+                      <RadioButton
+                        value={item.categoryName}
+                        status={ item.categoryId === categoryData?.categoryId ? 'checked' : 'unchecked' }
+                        onPress={() => setCategoryData(item)}
+                        uncheckedColor={COLORS.white}
+                        color={COLORS.red}
                       />
                        </View>
                     </View>

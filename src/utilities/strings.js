@@ -7,6 +7,20 @@
     familyMgmt: 'FAMILY MGMT'
   }
 
+  export const HEADER = {
+    profileStatusTitle: 'Profile Ranking Calculation',
+    profileStatusDescriptionText: 'Profile status calculation based on below information:',
+    profileStatusDescriptionList: ['Life Insurance - 20%', 'Health Insurance - 20%', 'Asset - 20%', 'Finance Accounts (Bank, Investment) - 20%', 'Referral/Invite - 20%']
+  }
+
+  export const LOGIN = {
+    termsAndCondtion: ['click to accept', ' terms and conditions', ' and', ' privacy policies'],
+    alreadyHaveAccount: 'Already have an account?',
+    signIn: ' SIGN IN',
+    title: 'Registration',
+    genderOptions: ['Male', 'Female', 'Other', 'Unspecified'] 
+  }
+
   export const UPLOAD_PREVIEW = {
     
   }
@@ -41,12 +55,14 @@
   export const APP_BUTTON_NAMES = {
     next: 'Next',
     save: 'Save',
-    update: 'Update'
+    update: 'Update',
+    submit: 'SUBMIT',
+    done: 'Done'
   }
 
   export const FAMILY_LIST_EMPTY = {
-    familyEmpty: 'No more families added.',
-    memberEmpty: 'No more family members added.',
+    familyEmpty: 'No families added.',
+    memberEmpty: 'No family members added.',
     contactEmpty: 'No Contacts...',
     pendingEmpty: 'No recent Invites'
   }

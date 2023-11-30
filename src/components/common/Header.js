@@ -1,6 +1,7 @@
+import { HEADER } from '../../utilities/strings';
 import React, {useState, useRef, Fragment, useEffect, useMemo} from 'react';
 import {Text, View, TouchableOpacity, Image, StyleSheet} from 'react-native';
-import {normalize} from '../../utilities/measurement';
+import {normalize, screenWidth} from '../../utilities/measurement';
 import {Images} from '../../assets/images/images';
 import Drawer from 'react-native-drawer';
 import DrawerContent from './DrawerContent';
@@ -11,7 +12,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import DocumentScanner from 'react-native-document-scanner-plugin';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { LinearProgress } from '@rneui/themed';
+import { Dialog, LinearProgress } from '@rneui/themed';
 import { COLORS } from '../../utilities/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProfileCompletion } from '../../slices/UserSlices';
@@ -21,6 +22,7 @@ const Header = props => {
   const [open, setOpen] = useState();
   const insets = useSafeAreaInsets()
   const [visible, setVisible] = useState(false);
+  const [isShowProfileStatusInfo, setIsShowProfileStatusInfo] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch()
   const profileCompletion = useSelector(State => State.user?.profileCompletion)
@@ -116,7 +118,7 @@ const uploadFileList = async (files) => {
     // console.log('open called');
     drawerRef.current.open();
   };
-  let progress = profileCompletion ?? 40
+  let progress = profileCompletion ?? 0
   // console.log('progress', progress)
   const memoizedRenderChatsHeader = useMemo(memoRenderProfileStatus, [progress])
   return (
@@ -140,8 +142,8 @@ const uploadFileList = async (files) => {
             resizeMode="center"
             style={styles.logoImage}
           />
-          <View style={{ position: 'absolute', right: 50, alignSelf: 'center', justifyContent: 'space-between', top: 5 }}>
-            <Text style={{ fontSize: normalize(12), color: COLORS.white, marginBottom: 3 }}>Profile Status</Text>
+          <View style={{ position: 'absolute', right: 50, alignSelf: 'center', justifyContent: 'space-between', top: 5 }} onTouchEnd={() => setIsShowProfileStatusInfo(true)}>
+            <Text style={{ fontSize: normalize(11), color: COLORS.white, marginBottom: 3 }}>{`Profile Status (${progress}%)`}</Text>
             {memoizedRenderChatsHeader}
             {/* <View style={{ width: `${100 * progress}%`, backgroundColor: progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green', height: 100 }} /> */}
             {/* <ProgressBar progress={progress} color={progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green'} /> */}
@@ -150,7 +152,20 @@ const uploadFileList = async (files) => {
               <MaterialCommunityIcons name="dots-vertical" size={22} color="white" />
             </TouchableOpacity>
       </View>
-      
+      <Dialog overlayStyle={{ width: screenWidth * 0.85 }} isVisible={isShowProfileStatusInfo} >
+        <View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
+            <Text style={{ fontSize: 16, fontWeight: '500', color: COLORS.brandBlue, justifyContent: 'space-between' }}>{HEADER.profileStatusTitle}</Text>
+            <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', marginTop: 5 }} onPress={() => setIsShowProfileStatusInfo(false)}>
+              <MaterialCommunityIcons name="close" size={25} color="black" />
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginTop: 5 }}>
+            {/* <Text style={{ fontSize: normalize(11), color: COLORS.lightBlack, marginBottom: 5 }}>{HEADER.profileStatusDescriptionText}</Text> */}
+            {HEADER.profileStatusDescriptionList.map(item => <Text>{item}</Text>)}
+          </View>
+        </View>
+      </Dialog>
       <View style={{ position: 'absolute', right: 5, bottom: 0 }}>
         <Menu
           style={{width: 60, height: 150}}
