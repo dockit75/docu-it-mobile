@@ -26,7 +26,7 @@ import { Snackbar } from 'react-native-paper';
 import { retrieveUserDetail } from '../../storageManager';
 import DrawerNavigator from '../../components/common/DrawerNavigator';
 import CheckBox from '@react-native-community/checkbox';
-import { Dialog } from '@rneui/themed';
+import { Dialog,LinearProgress } from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import { addContact } from 'react-native-contacts';
 
@@ -40,7 +40,7 @@ const DocumentAccordian = ({ navigation }) => {
     const [document, setDocument] = useState(Document)
     const [familyDetails, setFamilyDetail] = useState([]);
     // const [familyMember, setFamilyMember] = useState([]);
-    // const [userDetails, setUserDetails] = useState([]);
+    const [userDetails, setUserDetails] = useState([]);
     // const [selectedFamily, setSelectedFamily] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     // const [currentShareMembersList, setCurrentShareMembersList] = useState([]);
@@ -52,15 +52,20 @@ const DocumentAccordian = ({ navigation }) => {
     const [openedIndices, setOpenedIndices] = useState([]);
     let [revokeMembers, setRevokeMembers] = useState([]);
     const [memberData, setMembersData] = useState([]);
-
+    const [isProcessing,setIsProcessing] = useState(false);
 
     const isMounted = useRef(true);
 
     useEffect(() => {
+        getUserDetails()
         getFamilyWithMember();
         getDocumentDetails();
         // console.log('document',document,categoryInfo)
     }, []);
+    const getUserDetails = async() => {
+        let UserId = await retrieveUserDetail();
+        setUserDetails(UserId)
+    }
 
 
 
@@ -101,12 +106,16 @@ const DocumentAccordian = ({ navigation }) => {
 
 
  const handleShareDocument = async () => {
+    setIsProcessing(true)
+    const uniqueFamilyIds = [...new Set(selectedFamilyIds)];
+    const uniqueAddMembers = [...new Set(addMembers)]; 
+    const uniqueRevokembers = [...new Set(revokeMembers)]; 
     const params = {
-        familyId:selectedFamilyIds,
+        familyId:uniqueFamilyIds,
         documentId: document.documentId ?? Document.id,
         categoryId: categoryInfo.categoryId,
-        revokeAccess: revokeMembers,
-        provideAccess: addMembers,
+        revokeAccess: uniqueRevokembers,
+        provideAccess: uniqueAddMembers,
         documentName: document.documentName,
         updatedBy: document.uploadedBy ?? Document.updatedBy
     }
@@ -115,6 +124,7 @@ const DocumentAccordian = ({ navigation }) => {
         let response = await NetworkManager.updateDocument(params)
         // console.log('handleShareDocument--->>',response)
         if (response.data.code === 200) {
+            setIsProcessing(false)
             Alert.alert(
                 'Success',
                 'Document shared successfully',
@@ -135,7 +145,9 @@ const DocumentAccordian = ({ navigation }) => {
         }
     } catch (error) {
         console.error('Error in listFamilyMembers:', error);
+        setIsProcessing(false)
         Alert.alert(error.response.data.message)
+      
     }
 }
        
@@ -229,7 +241,7 @@ const DocumentAccordian = ({ navigation }) => {
                    
             {isOpen && (
                     <ScrollView style={{ marginVertical: 10 }}>
-                        {item.membersList.filter(filterItem => filterItem.user.id !== item.createdBy ).map((member) => (
+                        {item.membersList.filter(filterItem => filterItem.user.id !== userDetails.id ).map((member) => (
                             <View key={member.id} style={styles.scrollViewContainer}>
                                 <View style={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }}>
                                     <Icon name="account" size={25} color={COLORS.white} />
@@ -250,7 +262,7 @@ const DocumentAccordian = ({ navigation }) => {
                         ))}
                     </ScrollView>
                 )}
-
+ 
                 </View>
             </View>
         );
@@ -293,8 +305,14 @@ const DocumentAccordian = ({ navigation }) => {
                             <FamilyAccordionHeader item={item} index={index} openedIndices={openedIndices}/>
                         )}
                         keyExtractor={(item) => item.id}
-                    />)}
+                    />
+                    )} 
+                    
                 </View>
+                {isProcessing && <Dialog style={{ zIndex: 10, elevation: 10 }} isVisible={isProcessing} >
+          <LinearProgress style={{ marginVertical: 10 }} color={'#0e9b81'} />
+          <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Processing...</Text>
+        </Dialog>}
 
             </DrawerNavigator>
         </ImageBackground>
