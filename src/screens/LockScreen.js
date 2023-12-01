@@ -288,7 +288,13 @@ const LockScreen = ({ navigation, route }) => {
                 defaultValue={phone}
                 defaultCode="IN"
                 onChangeText={(text) => {
-                  setPhone(text);
+                  let expr = /(\+91)/g;
+                  if(expr.test(text)){
+                    setPhone(text?.substring(3)?.trim())
+                    phoneInput?.current?.setState({ number: text?.substring(3)?.trim() })
+                  } else {
+                    setPhone(text);
+                  }
                 }}
                 disableArrowIcon={true}
                 containerStyle={styles.phoneInputContainer}
