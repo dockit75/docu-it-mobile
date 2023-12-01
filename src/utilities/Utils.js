@@ -70,3 +70,32 @@ export const convertPdfUrlToBase64 = (pdfUrl) => {
       return base64String;
     });
 }
+
+ export const processAddressBookContacts = (contactsData, userDeviceInfo) => {
+  const contactsParam = []
+  if (contactsData.length > 0) {
+    contactsData.filter((contact, index) => {
+      if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
+        for (let index = 0; index < contact.phoneNumbers.length; index++) {
+          let phoneNumber = contact.phoneNumbers[index].number
+          const name = contact.givenName
+          const middleName = contact?.middleName
+          const lastName = contact?.familyName
+          if (phoneNumber) {
+            phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
+            contactsParam.push({
+              id: `${phoneNumber}_${index}`,
+              name: name ,
+              middleName: middleName,
+              firstName: name,
+              lastName: lastName,
+              originalPhoneNumber: contact.phoneNumbers[index].number,
+              phoneNumber: phoneNumber,
+            })
+          }
+        }
+      }
+    })
+  }
+  return contactsParam
+}

@@ -70,7 +70,7 @@ const PendingUser = ({ navigation }) => {
             }
         } catch (error) {
             // console.error('Error fetching unique id:', error.response);
-            alert('Something went Wroung ')
+            alert('Something went Wrong ')
         }
     }
 

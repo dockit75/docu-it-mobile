@@ -60,7 +60,10 @@ const CommonInvite = ({ navigation, props }) => {
         if(!isLoader) {
             if (search?.length) {
                 let searchTextReg = new RegExp(search.toLowerCase())
-                let updateFilterContacts = filteredContacts.filter(filterItem => searchTextReg.test(filterItem.name.toLowerCase()))
+                let updateFilterContacts = filteredContacts.filter(filterItem => {
+                    let contactName = filterItem.name + filterItem.middleName + filterItem.lastName
+                    return searchTextReg.test(contactName.toLowerCase()) || searchTextReg.test(filterItem.phoneNumber)
+                })
                 setSearchData(updateFilterContacts.slice().sort((a, b) => a.name.localeCompare(b.name)))
                 setSelectedItems(prev => prev = [ ...prev.filter(filterItem => !filterItem?.isFilterItem), ...filteredContacts.map(filterItem => filterItem = { ...filterItem, isFilterItem: true }) ])
             } else {
@@ -133,7 +136,7 @@ const CommonInvite = ({ navigation, props }) => {
             }
         } catch (error) {
             // console.error('Error fetching unique id:', error.response);
-            alert(error.response.data.message)
+            alert(error?.response?.data?.message ?? 'Something went Wrong' )
         }
         setSelectedItems([]);
 
@@ -229,7 +232,7 @@ const CommonInvite = ({ navigation, props }) => {
                                     <Text style={styles.iconText}>{item?.name[0] ?? ''}</Text>
                                 </View>
                                 <View style={{ marginLeft: 20 }}>
-                                    <Text style={styles.text}>{item?.name ?? ''}</Text>
+                                    <Text style={styles.text}>{item?.name ?? ''}{`${(item?.middleName?.length) ? ` ${item?.middleName} ` : ' '}`}{((item?.lastName?.length && (item?.middleName !== item?.lastName))) ? item?.lastName : ''}</Text>
                                     <Text style={{ color: 'white' }}>{item?.phoneNumber ?? ''}</Text>
                                 </View>
                             </View>

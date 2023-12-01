@@ -29,6 +29,7 @@ import { retrieveUserDetail } from '../../storageManager';
 import Contacts from 'react-native-contacts';
 import { Dialog } from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
+import { processAddressBookContacts } from '../../utilities/Utils';
 
 const FamilyMember = ({ navigation, props }) => {
   const route = useRoute();
@@ -117,19 +118,21 @@ const FamilyMember = ({ navigation, props }) => {
   const loadContacts = () => {
     Contacts.getAll()
       .then((contacts) => {
-        contacts.filter(filterItem => filterItem)
-        .sort(
-          (a, b) =>
-            a.givenName?.toLowerCase() > b.givenName?.toLowerCase(),)
-            let contactList = contacts.map(contact =>{
-                      if (contact.phoneNumbers.length > 0) {
-                            return {
-                              name : contact.givenName,
-                              phoneNumber : contact.phoneNumbers[0].number.replace(/\D/g, '')
-                            }
-                      }
-                    })
-        setMyContacts((prevContacts) => [...prevContacts, ...contactList]);
+        // contacts.filter(filterItem => filterItem)
+        // .sort(
+        //   (a, b) =>
+        //     a.givenName?.toLowerCase() > b.givenName?.toLowerCase(),)
+        //     let contactList = contacts.map(contact =>{
+        //               if (contact.phoneNumbers.length > 0) {
+        //                     return {
+        //                       name : contact.givenName,
+        //                       phoneNumber : contact.phoneNumbers[0].number.replace(/\D/g, '')
+        //                     }
+        //               }
+        //             })
+        
+        const processedContacts = processAddressBookContacts(contacts)
+        setMyContacts((prevContacts) => [...prevContacts, ...processedContacts]);
         setMyContactsUpdated(true);
       })
       .catch((e) => {
