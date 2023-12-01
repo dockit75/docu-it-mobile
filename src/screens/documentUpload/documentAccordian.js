@@ -29,6 +29,7 @@ import CheckBox from '@react-native-community/checkbox';
 import { Dialog,LinearProgress } from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import { addContact } from 'react-native-contacts';
+import CustomSnackBar from '../../components/common/SnackBar';
 
 const DocumentAccordian = ({ navigation }) => {
     const insets = useSafeAreaInsets();
@@ -54,6 +55,7 @@ const DocumentAccordian = ({ navigation }) => {
     const [memberData, setMembersData] = useState([]);
     const [isProcessing,setIsProcessing] = useState(false);
     const [familyData,setFamilyData] = useState([]);
+    const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
 
     const isMounted = useRef(true);
 
@@ -127,28 +129,17 @@ const DocumentAccordian = ({ navigation }) => {
         // console.log('handleShareDocument--->>',response)
         if (response.data.code === 200) {
             setIsProcessing(false)
-            Alert.alert(
-                'Success',
-                'Document shared successfully',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {
-                            if(isSaveDocumentFlow){
-                                navigation.pop(3)
-                              } else {
-                                navigation.goBack()
-                              }
-                        },
-                    },
-                ],
-                { cancelable: false }
-            );
+            setIsSnackbarVisible({ message: response.data.message, visible: true})
+            if (isSaveDocumentFlow) {
+                setTimeout(() => navigation.pop(3), 1500); // Adjust the delay (1000 milliseconds = 1 second)
+            } else {
+                setTimeout(() => navigation.goBack(), 1500); // Adjust the delay
+            }
         }
     } catch (error) {
         console.error('Error in listFamilyMembers:', error);
         setIsProcessing(false)
-        Alert.alert(error.response.data.message)
+        setIsSnackbarVisible({ message: error.response.data.message, visible: true})
       
     }
 }
@@ -333,7 +324,15 @@ const DocumentAccordian = ({ navigation }) => {
           <LinearProgress style={{ marginVertical: 10 }} color={'#0e9b81'} />
           <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Processing...</Text>
         </Dialog>}
-
+               <CustomSnackBar
+                    message={isSnackbarVisible?.message}
+                    status={isSnackbarVisible?.visible}
+                    setStatus={setIsSnackbarVisible}
+                    styles={[styles.snackBar, {backgroundColor: isSnackbarVisible.isFailed ? COLORS.red : '#0e9b81'}]}
+                    textStyle={{ color: COLORS.white, textAlign: 'left', fontSize: 13 }}
+                    roundness={10}
+                    duration={isSnackbarVisible.isFailed ? 3000 : 2000}
+                 />
             </DrawerNavigator>
         </ImageBackground>
     );
@@ -472,5 +471,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 10,
         alignSelf: 'center'
-    }
+    },
+    snackBar: {
+        alignSelf: 'center',
+        bottom: normalize(50),
+        alignContent: 'center',
+        backgroundColor: 'white',
+        zIndex: 1
+
+    },
 });

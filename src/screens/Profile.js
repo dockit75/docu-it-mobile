@@ -160,6 +160,7 @@ const Profile = ({ navigation }) => {
       setIsImageUpload(false)
     } else {
       alert(profileResult.data.message)
+      setIsSnackbarVisible({ message:profileResult.data.message, visible: true})
       setIsImageUpload(false)
       setIsProfileUpdate(true)
       setIsSnackbarVisible(true)

@@ -14,7 +14,7 @@
   }
 
   export const LOGIN = {
-    termsAndCondtion: ['I accept Docu.IT`s', ' Terms of Use', ' and', ' Privacy Policies'],
+    termsAndCondtion: ['I accept Dock.IT`s', ' Terms of Use', ' and', ' Privacy Policy'],
     alreadyHaveAccount: 'Already have an account?',
     signIn: ' SIGN IN',
     title: 'Registration',

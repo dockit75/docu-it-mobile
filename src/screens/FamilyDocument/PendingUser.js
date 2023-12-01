@@ -12,6 +12,7 @@ import { retrieveUserDetail } from '../../storageManager';
 import NetworkManager from '../../services/NetworkManager';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import { Dialog } from '@rneui/themed';
+import CustomSnackBar from '../../components/common/SnackBar';
 
 
 
@@ -24,6 +25,7 @@ const PendingUser = ({ navigation }) => {
     const [invitesPending, setInvitesPending] = useState(familyInvitedLists)
     const [userAcount, setUserAccount] = useState(userDetails)
     const [isLoading, setIsLoading] = useState(true);
+    const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
     
  
   useEffect(() => {
@@ -62,15 +64,15 @@ const PendingUser = ({ navigation }) => {
             let response = await NetworkManager.acceptInvite(params)
             // console.log("response",response)
             if (response.data.code === 200) {
-                alert(response.data.message)
+                setIsSnackbarVisible({ message: response.data.message, visible: true})
                 setInvitesPending(prevInvites => prevInvites.filter(invite => invite !== item));
                
             } else {
-                alert(response.data.message)
+                setIsSnackbarVisible({ message: response.data.message, visible: true})
             }
         } catch (error) {
             // console.error('Error fetching unique id:', error.response);
-            alert('Something went Wrong ')
+            setIsSnackbarVisible({ message: 'Something went Wrong ', visible: true})
         }
     }
 
@@ -117,6 +119,15 @@ const PendingUser = ({ navigation }) => {
                         </View>
                     )}
                 />)}
+                 <CustomSnackBar
+                    message={isSnackbarVisible?.message}
+                    status={isSnackbarVisible?.visible}
+                    setStatus={setIsSnackbarVisible}
+                    styles={[styles.snackBar, {backgroundColor: isSnackbarVisible.isFailed ? COLORS.red : '#0e9b81'}]}
+                    textStyle={{ color: COLORS.white, textAlign: 'left', fontSize: 13 }}
+                    roundness={10}
+                    duration={isSnackbarVisible.isFailed ? 3000 : 2000}
+                 />
               </View>
             </DrawerNavigator>
         </ImageBackground>
@@ -164,5 +175,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row', 
         justifyContent: 'space-between', 
         width: '25%' 
-    }
+    },
+    snackBar: {
+        alignSelf: 'center',
+        bottom: normalize(50),
+        alignContent: 'center',
+        backgroundColor: 'white',
+        zIndex: 1
+
+    },
 })

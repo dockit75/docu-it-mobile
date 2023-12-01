@@ -30,6 +30,7 @@ import Contacts from 'react-native-contacts';
 import { Dialog } from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import { processAddressBookContacts } from '../../utilities/Utils';
+import CustomSnackBar from '../../components/common/SnackBar';
 
 const FamilyMember = ({ navigation, props }) => {
   const route = useRoute();
@@ -44,7 +45,8 @@ const FamilyMember = ({ navigation, props }) => {
   const [iconEnabled, setIconEnabled] = useState(false)
   const [arrayCombined, setArrayCombined] = useState([])
   const [myContactsUpdated, setMyContactsUpdated] = useState(false);
-  const [newExterNalInvites,setNewExternalInvites] = useState([])
+  const [newExterNalInvites,setNewExternalInvites] = useState([]);
+  const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
 
 
   const checkContactPermission = async () => {
@@ -61,7 +63,7 @@ const FamilyMember = ({ navigation, props }) => {
         loadContacts();
       }else {
         // console.log('Contacts permission denied');
-        alert('Permission to access contacts was denied. You can update it in your device settings.');
+        setIsSnackbarVisible({ message:'Permission to access contacts was denied. You can update it in your device settings.', visible: true})
       }
     } catch (err) {
       console.warn(err);
@@ -107,7 +109,7 @@ const FamilyMember = ({ navigation, props }) => {
         console.log('arrayCombined ******', arrayCombined)
         isPressedAdd ?  navigation.navigate('CommonInvite', { familyItem: familyItem, familyMember: familyMember,arrayCombined : arrayCombined,myContacts:myContacts }) : loadContacts();
       }else {
-        Alert.alert('Permission to access contacts was denied. You can update it in your device settings.');
+        setIsSnackbarVisible({ message:'Permission to access contacts was denied. You can update it in your device settings.', visible: true})
       }
     } catch (err) {
       console.warn(err);
@@ -136,7 +138,7 @@ const FamilyMember = ({ navigation, props }) => {
         setMyContactsUpdated(true);
       })
       .catch((e) => {
-        alert('Permission to access contacts was denied');
+        setIsSnackbarVisible({ message:'Permission to access contacts was denied', visible: true})
         console.warn('Permission to access contacts was denied');
       });
   };
@@ -200,11 +202,13 @@ const FamilyMember = ({ navigation, props }) => {
     try {
       let response = await NetworkManager.inviteUser(params)
       if (response.data.code === 200) {
-        alert(response.data.message)
+        setIsSnackbarVisible({ message: response.data.message, visible: true})
+
         setIconEnabled(true)
       } 
     } catch (error) {
-      alert(error.response.data.message)
+      setIsSnackbarVisible({ message: error.response.data.message, visible: true})
+
     }
 
   }
@@ -226,7 +230,7 @@ const FamilyMember = ({ navigation, props }) => {
         try {
           let response = await NetworkManager.removeFamilyMembers(params)
           if (response.data.code === 200) {
-            Alert.alert(response.data.message)
+            setIsSnackbarVisible({ message: response.data.message, visible: true})
             const updatedCombinedArray = arrayCombined.filter(
               arrayItem => arrayItem !== item
             );     
@@ -234,7 +238,7 @@ const FamilyMember = ({ navigation, props }) => {
           } else {
           }
         } catch (error) {
-          Alert.alert(error.response.data.message)
+          setIsSnackbarVisible({ message:error.response.data.message, visible: true})
         }
       }, style: 'destructive' }
     ]
@@ -320,6 +324,15 @@ const FamilyMember = ({ navigation, props }) => {
           )}
         />
         )}
+                  <CustomSnackBar
+                    message={isSnackbarVisible?.message}
+                    status={isSnackbarVisible?.visible}
+                    setStatus={setIsSnackbarVisible}
+                    styles={[styles.snackBar, {backgroundColor: isSnackbarVisible.isFailed ? COLORS.red : '#0e9b81'}]}
+                    textStyle={{ color: COLORS.white, textAlign: 'left', fontSize: 13 }}
+                    roundness={10}
+                    duration={isSnackbarVisible.isFailed ? 3000 : 2000}
+                 />
         </View>
       </DrawerNavigator>
     </ImageBackground>
@@ -376,7 +389,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'white',
     fontWeight: 'bold',
-    textTransform: 'uppercase',
+    // textTransform: 'uppercase',
     marginLeft:30
   },
   memberText:{
@@ -411,7 +424,14 @@ const styles = StyleSheet.create({
     alignItems:'center',
     flexDirection:'row',
     justifyContent:'flex-start'
-  }
+  },
+  snackBar: {
+    alignSelf: 'center',
+    bottom: normalize(50),
+    alignContent: 'center',
+    backgroundColor: 'white',
+    zIndex: 1
+},
   
 });
 

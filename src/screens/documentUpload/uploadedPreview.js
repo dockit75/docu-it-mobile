@@ -35,6 +35,7 @@ import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { DocumentItemLoader } from './documentItemLoader';
 import DrawerNavigator from '../../components/common/DrawerNavigator';
+import CustomSnackBar from '../../components/common/SnackBar';
 
 const UploadedPreview = ({ navigation, route }) => {
 
@@ -52,6 +53,7 @@ const UploadedPreview = ({ navigation, route }) => {
   const [combinedDocuments, setCombinedDocuments] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
   const [documentPageList, setDocumentPageList] = useState([]);
+  const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
 
   // ref
   let pdfDocumentInfo = useRef()
@@ -127,12 +129,13 @@ const UploadedPreview = ({ navigation, route }) => {
       } else {
         // Handle the case where the user denied camera permissions
         // You can show a message to the user explaining why the camera is require
-        Alert.alert('', 'Permission to access camera was denied.');
+        setIsSnackbarVisible({ message:"Permission to access camera was denied.", visible: true})
 
       }
     } else {
       // Handle other permission statuses 
-      Alert.alert('', 'Permission to access camera was denied.');
+      setIsSnackbarVisible({ message:"Permission to access camera was denied.", visible: true})
+      
     }
   };
 
@@ -173,7 +176,8 @@ const UploadedPreview = ({ navigation, route }) => {
           }
         } catch (error) {
           // console.error('Error fetching unique id:', error.response);
-          Alert.alert(error)
+          setIsSnackbarVisible({ message:error, visible: true})
+
         }
       }, style: 'destructive' }
     ]
@@ -386,6 +390,15 @@ const UploadedPreview = ({ navigation, route }) => {
             </View>
           </View>
         </Popover> */}
+                <CustomSnackBar
+                    message={isSnackbarVisible?.message}
+                    status={isSnackbarVisible?.visible}
+                    setStatus={setIsSnackbarVisible}
+                    styles={[styles.snackBar, {backgroundColor: isSnackbarVisible.isFailed ? COLORS.red : '#0e9b81'}]}
+                    textStyle={{ color: COLORS.white, textAlign: 'left', fontSize: 13 }}
+                    roundness={10}
+                    duration={isSnackbarVisible.isFailed ? 3000 : 2000}
+                 />
         </DrawerNavigator>
         </ImageBackground>
 }
@@ -597,6 +610,13 @@ wrapper:{
   flex: 1,
   justifyContent:'center',
   paddingTop: 10
+},
+snackBar: {
+  alignSelf: 'center',
+  bottom: normalize(50),
+  alignContent: 'center',
+  backgroundColor: 'white',
+  zIndex: 1
 },
 });
 

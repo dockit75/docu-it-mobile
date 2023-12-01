@@ -20,6 +20,7 @@ import Contacts from 'react-native-contacts';
 import CheckBox from '@react-native-community/checkbox';
 import { FlashList } from '@shopify/flash-list'
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
+import CustomSnackBar from '../../components/common/SnackBar';
 
 
 const CommonInvite = ({ navigation, props }) => {
@@ -39,6 +40,7 @@ const CommonInvite = ({ navigation, props }) => {
     const [isLoader, setIsLoader] = useState(true);
     const [checked, setChecked] = useState(false);
     const [filteredContacts, setFilteredContacts] = useState([]);
+    const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
     const [search, setSearch] = useState('');
     const [searchData, setSearchData] = useState([]);
     const insets = useSafeAreaInsets();
@@ -115,32 +117,20 @@ const CommonInvite = ({ navigation, props }) => {
         // console.log('handleInviteUser ====== Params', params)
         try {
             let response = await NetworkManager.inviteUser(params)
-            // console.log('handleInviteUser==>response', response)
+            console.log('handleInviteUser==>response', response)
             if (response.data.code === 200) {
-                Alert.alert(
-                    'Success',
-                    response.data.message,
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => {
-                                setChecked(false)
-                                navigation.navigate('FamilyMember',{familyItem:familyItem})
-                            },
-                        },
-                    ],
-                    { cancelable: false }
-                );
-            } else {
-                // console.log('else called')
-            }
+                setIsSnackbarVisible({ message: response.data.message, visible: true})
+                setTimeout(() =>  navigation.navigate('FamilyMember',{familyItem:familyItem}),1000)
+            } 
         } catch (error) {
-            // console.error('Error fetching unique id:', error.response);
-            alert(error?.response?.data?.message ?? 'Something went Wrong' )
+            console.error('Error fetching unique id:', error.response);
+           setIsSnackbarVisible({ message: error?.response?.data?.message ?? 'Something went Wrong', visible: true })
+
         }
         setSelectedItems([]);
 
     }
+    console.log('setIsSnackbarVisible',isSnackbarVisible)
 
     const filterContacts = () => {
         // Extract all phone numbers from arrayCombined
@@ -253,6 +243,15 @@ const CommonInvite = ({ navigation, props }) => {
                     )}
                     estimatedItemSize={45}
                 />
+                 <CustomSnackBar
+                    message={isSnackbarVisible?.message}
+                    status={isSnackbarVisible?.visible}
+                    setStatus={setIsSnackbarVisible}
+                    styles={[styles.snackBar, {backgroundColor: isSnackbarVisible.isFailed ? COLORS.red : '#0e9b81'}]}
+                    textStyle={{ color: COLORS.white, textAlign: 'left', fontSize: 13 }}
+                    roundness={10}
+                    duration={isSnackbarVisible.isFailed ? 3000 : 2000}
+                 />
                
             </DrawerNavigator>
         </ImageBackground>
@@ -341,5 +340,12 @@ const styles = StyleSheet.create({
       borderBottomColor: COLORS.transparent,
       borderTopColor: COLORS.transparent,
       borderRadius: 18
+    },
+    snackBar: {
+        alignSelf: 'center',
+        bottom: normalize(50),
+        alignContent: 'center',
+        backgroundColor: 'white',
+        zIndex: 1
     },
 })

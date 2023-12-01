@@ -16,6 +16,7 @@ import NetworkManager from '../services/NetworkManager';
 import { retrieveUserDetail } from '../storageManager';
 import DrawerNavigator from '../components/common/DrawerNavigator';
 import { Snackbar } from 'react-native-paper';
+import CustomSnackBar from '../components/common/SnackBar';
 
 const CELL_COUNT = 4;
 
@@ -33,6 +34,7 @@ const ChangePin = ({ navigation }) => {
     const [clearedConfirmedPin, setClearedConfirmedPin] = useState('');
     const [snackbarVisible, setSnackbarVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
     const [props, getCellOnLayoutHandler] = useClearByFocusCell({
         value,
         setValue
@@ -154,7 +156,7 @@ const ChangePin = ({ navigation }) => {
             console.log('response==', response)
             if (response.data.code === 200) {
                 console.log('if called')
-                Alert.alert(response.data.message)
+                setIsSnackbarVisible({ message: response.data.message, visible: true})
                 // setPin('');
                 setTimeout(() => {
                     navigation.navigate('LockScreen')
@@ -163,7 +165,8 @@ const ChangePin = ({ navigation }) => {
 
             }
         } catch (error) {
-            Alert.alert(error.response.data.message)
+            
+            setIsSnackbarVisible({ message: error.response.data.message, visible: true})
         }
     };
     console.log('confirmedPin', pin, confirmedPin)
@@ -253,6 +256,15 @@ const ChangePin = ({ navigation }) => {
                         {snackbarMessage}
                     </Snackbar>
                 </View>
+                <CustomSnackBar
+                    message={isSnackbarVisible?.message}
+                    status={isSnackbarVisible?.visible}
+                    setStatus={setIsSnackbarVisible}
+                    styles={[styles.snackBar, {backgroundColor: isSnackbarVisible.isFailed ? COLORS.red : '#0e9b81'}]}
+                    textStyle={{ color: COLORS.white, textAlign: 'left', fontSize: 13 }}
+                    roundness={10}
+                    duration={isSnackbarVisible.isFailed ? 3000 : 2000}
+                 />
 
             </DrawerNavigator>
         </ImageBackground>
@@ -343,6 +355,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(195,0,0)',
         color: 'white',
         marginTop: 100
-    }
+    },
+    snackBar: {
+        alignSelf: 'center',
+        bottom: normalize(50),
+        alignContent: 'center',
+        backgroundColor: 'white',
+        zIndex: 1
+    },
 })
 export default ChangePin
