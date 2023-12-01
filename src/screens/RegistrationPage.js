@@ -241,7 +241,7 @@ const RegistrationPage = ({ navigation }) => {
                                         </View>
                                     )}
                                 </View>
-                                <View style={{  flexDirection: 'row', justifyContent: 'flex-start',  marginTop:10, width: screenWidth, paddingHorizontal: 20, alignItems: 'center' }}>
+                                <View style={{  flexDirection: 'row', justifyContent: 'flex-start',  marginTop:10, width: screenWidth, paddingHorizontal: 20, alignItems: 'center',zIndex:-1 }}>
                                         <CheckBox
                                             tintColors={{ true: COLORS.brandBlue, false: COLORS.lightGray }}
                                             onCheckColor="white"
@@ -270,7 +270,7 @@ const RegistrationPage = ({ navigation }) => {
                                         <Text style={styles.buttonText}>{APP_BUTTON_NAMES.submit}</Text>
                                     )}
                                 </TouchableOpacity>
-                                <View style={{ flexDirection: 'row', marginBottom: normalize(20) }}>
+                                <View style={{ flexDirection: 'row', marginBottom: normalize(20),zIndex: -1, }}>
                                     <Text style={{ color: 'black' }}>{LOGIN.alreadyHaveAccount}</Text>
                                     <TouchableOpacity onPress={() => handleLogin(resetForm)}>
                                         <Text style={{ color: 'black', fontWeight: 'bold', borderBottomWidth: 0 }}>{LOGIN.signIn}</Text>
@@ -317,10 +317,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: normalizeVertical(20),
         marginVertical: normalizeVertical(4),
         fontWeight: '600',
-        fontSize: 15
+        fontSize: 15,
+        color:'black'
     },
     button: {
-        
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 5,
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#3C3C43CC',
         marginTop: normalize(10),
         width: screenWidth - normalize(30),
-        // position: 'absolute',
+        position: 'absolute',
         top: 0
     },
     optionItem: {
