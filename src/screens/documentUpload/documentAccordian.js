@@ -53,6 +53,7 @@ const DocumentAccordian = ({ navigation }) => {
     let [revokeMembers, setRevokeMembers] = useState([]);
     const [memberData, setMembersData] = useState([]);
     const [isProcessing,setIsProcessing] = useState(false);
+    const [familyData,setFamilyData] = useState([]);
 
     const isMounted = useRef(true);
 
@@ -95,6 +96,7 @@ const DocumentAccordian = ({ navigation }) => {
             let memberIdArray = response.data.response.memberIds
             setAddMembers(memberIdArray)
             setMembersData(memberIdArray)
+            setFamilyData([...new Set(response.data.response.sharedDetails.map(item => item.member.family.id))])
             setSelectedFamilyIds([...new Set(response.data.response.sharedDetails.map(item => item.member.family.id))])
             setIsLoading(false)
         }
@@ -172,13 +174,26 @@ const DocumentAccordian = ({ navigation }) => {
            if(selectedFamilyIds.includes(familyId) && isCheckWholeFamily){
                let updatedFamilyIds = selectedFamilyIds.filter(familyItem => familyItem != familyId )
                let updatedMemberIds = addMembers.filter(memberItem => !memberIds.includes(memberItem) )
-               setSelectedFamilyIds(updatedFamilyIds)
+            //   
                setAddMembers(updatedMemberIds)
+               let value = familyData.filter((itm) => itm.id != `${familyId}`);
+               if (value.includes(`${familyId}`)) {
+                setSelectedFamilyIds(selectedFamilyIds)
+               setRevokeMembers((prevRevokeMembers) => [...prevRevokeMembers, ...memberIds])
+            //    setSelectedFamilyIds(familyId)
+               }
+
            }else{
             let updatedFamilyIds = [...selectedFamilyIds,familyId]
             let updatedMemberIds = [...addMembers,...memberIds]
             setSelectedFamilyIds(updatedFamilyIds)
             setAddMembers(updatedMemberIds)
+            setRevokeMembers((prevRevokeMembers) => prevRevokeMembers.filter(memberItem => !memberIds.includes(memberItem)))
+            // let updatedFamilyIds = isCheckWholeFamily ? [familyId] : [...selectedFamilyIds, familyId];
+            // let updatedMemberIds = isCheckWholeFamily ? memberIds : [...addMembers, ...memberIds];
+            // setSelectedFamilyIds(updatedFamilyIds);
+            // setAddMembers(updatedMemberIds);
+            // setRevokeMembers((prevRevokeMembers) => prevRevokeMembers.filter(memberItem => !memberIds.includes(memberItem)));
            }
        }else{
         if (addMembers.includes(`${memberId}`)) {
@@ -189,6 +204,8 @@ const DocumentAccordian = ({ navigation }) => {
             }
             if (value.length === 0 && selectedFamilyIds.includes(familyId)) {
                 setSelectedFamilyIds(prev => prev.filter(selectedFamilyId => selectedFamilyId !== familyId));
+                // setRevokeMembers(prev => prev.filter(filterItem => filterItem != memberId))
+
             }
         } else {
             addMembers = [...addMembers, `${memberId}`]
@@ -196,6 +213,7 @@ const DocumentAccordian = ({ navigation }) => {
             setRevokeMembers(prev => prev.filter(filterItem => filterItem != memberId))
             if (!selectedFamilyIds.includes(familyId)) {
                 setSelectedFamilyIds(prev => [...prev, familyId]);
+                setRevokeMembers(prev => prev.filter(filterItem => filterItem != memberId))
             }
         }
        }
@@ -203,8 +221,10 @@ const DocumentAccordian = ({ navigation }) => {
     console.log('setSelectedFamilyIds',selectedFamilyIds)
 
     const FamilyAccordionHeader = ({ item, index,openedIndices }) => {
-        let membersList = item.membersList.filter(filterItem => filterItem.user.id !== item.createdBy )
+      
+        let membersList = item.membersList.filter(filterItem => filterItem.user.id !== userDetails.id )
         let membersCount = membersList?.length 
+        // console.log('membersList',membersList,addMembers,item.name)
         let isCheckWholeFamily =membersList.length && membersList.every(memberItem => addMembers.includes(memberItem.id))
         const isOpen = openedIndices.includes(index);
         let uncheckBoxColor = membersCount ? COLORS.white : COLORS.lightNeutral
