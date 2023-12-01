@@ -252,14 +252,14 @@ const RegistrationPage = ({ navigation }) => {
                                             value={checked}
                                             onValueChange={() => setChecked(!checked)}
                                         />
-                                        <View style={{flexDirection:'row',justifyContent:'flex-start',alignItems:'center'}}>
-                                            <Text style={{ fontSize: 13, color: COLORS.black }}>{LOGIN.termsAndCondtion[0]}</Text>
+                                        <View style={{flexDirection:'row',alignItems:'center',}} >
+                                            <Text style={{ fontSize: 12, color: COLORS.black }}>{LOGIN.termsAndCondtion[0]}</Text>
                                             <TouchableOpacity>
-                                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: 'black',borderBottomColor:'black',borderBottomWidth:2}}>{LOGIN.termsAndCondtion[1]}</Text>
+                                            <Text style={{ fontSize: 13, fontWeight: 'bold', color: 'black',borderBottomColor:'black',borderBottomWidth:2}}>{LOGIN.termsAndCondtion[1]}</Text>
                                             </TouchableOpacity>
-                                            <Text style={{ fontSize: 13, color: COLORS.black }}> &</Text>
+                                            <Text style={{ fontSize: 12, color: COLORS.black }}> &</Text>
                                             <TouchableOpacity>
-                                            <Text  style={{ fontSize: 15, fontWeight: 'bold', color: 'black',borderBottomColor:'black',borderBottomWidth:2 }}>{LOGIN.termsAndCondtion[3]}</Text>
+                                            <Text  style={{ fontSize: 13, fontWeight: 'bold', color: 'black',borderBottomColor:'black',borderBottomWidth:2 }}>{LOGIN.termsAndCondtion[3]}</Text>
                                             </TouchableOpacity>
                                         </View>
                                 </View>
