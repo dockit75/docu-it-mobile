@@ -104,8 +104,7 @@ const PendingUser = ({ navigation }) => {
                                 <Text style={{ fontSize: 14, color: "white", marginLeft: 10, }}>
                                     <Text style={{ fontSize: 17, fontWeight: 'bold' }}>{item.invitedBy.name}</Text>
                                     {" "}inviting you to  {'\n'} join 
-                                    <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'yellow' }}>{" "}{item.family.name}</Text> famiy
-                                    </Text>
+                                    <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'yellow' }}>{" "}{item.family.name}</Text>{" family"}</Text>
                             </View>
                             <View style={styles.buttons}>
                                 <TouchableOpacity onPress={() => handleInvite(item, 'Accepted')} style={styles.iconTouchable}>

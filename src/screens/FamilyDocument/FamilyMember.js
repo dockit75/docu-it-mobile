@@ -86,14 +86,18 @@ const FamilyMember = ({ navigation, props }) => {
 
   useEffect(() => {
     // Add a check to ensure myContacts is not empty and myContactsUpdated is set to true
-    if (myContacts.length > 0 && myContactsUpdated) {
-      const updatedExternalInvite = mapPhoneNumbersToDisplayNames(myContacts);
-      let updatedCombinedArray = [...familyMember, ...updatedExternalInvite];
-      setArrayCombined(updatedCombinedArray);
-    }
+    getUpdateMemberList();
   }, [myContacts, familyMember, myContactsUpdated]);
 
-
+   const getUpdateMemberList = async () =>{
+    let userData = await retrieveUserDetail()
+         
+    if (myContacts.length > 0 && myContactsUpdated) {
+      const updatedExternalInvite = mapPhoneNumbersToDisplayNames(myContacts);
+      let updatedCombinedArray = userData.id === familyItem.createdBy ? [...familyMember, ...updatedExternalInvite] : familyMember.filter(filterItem => filterItem.inviteStatus ===  "Accepted") ;
+      setArrayCombined(updatedCombinedArray);
+    }
+   }
   
 
   const requestContactPermissionAgain = async (isPressedAdd) => {
@@ -180,8 +184,9 @@ const FamilyMember = ({ navigation, props }) => {
           let externalInvite = response.data.response.ExternalInvites
           setNewExternalInvites(externalInvite)
           const updatedExternalInvite = mapPhoneNumbersToDisplayNames(externalInvite);
-          let updatedCombinedArray = [...memberList, ...updatedExternalInvite];
-          setArrayCombined(updatedCombinedArray)
+          let updatedCombinedArray = userData.id === familyItem.createdBy ? [...memberList, ...updatedExternalInvite] :  memberList.filter(filterItem => filterItem.inviteStatus ===  "Accepted") ;
+          // console.log('memberList',updatedCombinedArray,memberList,familyItem.id,userData.id)
+          setArrayCombined( updatedCombinedArray)
           setFamilyMember(memberList)
           setIsLoader(false)
         } else {
