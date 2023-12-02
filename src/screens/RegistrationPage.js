@@ -89,7 +89,7 @@ const RegistrationPage = ({ navigation }) => {
     }
 
     const loginValidationSchema = yup.object().shape({
-        userName: yup.string().required(' Please enter your username'),
+        userName: yup.string().required(' Please enter your name'),
         phoneNo: yup.string().required('Please enter your phonenumber').min(10, 'Phone number must be 10 digits'),
         emailId: yup.string().email('Invalid email address').required('Please enter your email'),
         gender: yup.string().required('Please choose your gender'),

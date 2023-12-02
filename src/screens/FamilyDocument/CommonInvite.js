@@ -184,6 +184,7 @@ const CommonInvite = ({ navigation, props }) => {
             resizeMode="cover"
             style={{ width: screenWidth, height: '100%' }}>
             <DrawerNavigator>
+                <View style={{flex:1}}>
                 <View style={styles.container}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: screenWidth * 0.73 }}>
                     <TouchableOpacity onPress={() => navigation.navigate('FamilyMember', { familyItem: familyItem })} style={{ alignSelf: 'center' }}>
@@ -252,6 +253,7 @@ const CommonInvite = ({ navigation, props }) => {
                     roundness={10}
                     duration={isSnackbarVisible.isFailed ? 3000 : 2000}
                  />
+                 </View>
                
             </DrawerNavigator>
         </ImageBackground>
