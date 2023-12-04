@@ -55,7 +55,7 @@ const CommonInvite = ({ navigation, props }) => {
         // console.log('newArray', arrayCombined)
         getUser();
         filterContacts();
-        setTimeout(() => setIsLoader(false), 1000)
+        setTimeout(() => setIsLoader(false), 2000)
     }, []);
 
     useEffect(() => {

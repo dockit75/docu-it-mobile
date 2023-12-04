@@ -25,7 +25,7 @@ import NetworkManager from '../../services/NetworkManager';
 import { Snackbar } from 'react-native-paper';
 import { retrieveUserDetail } from '../../storageManager';
 import DrawerNavigator from '../../components/common/DrawerNavigator';
-import { Dialog } from '@rneui/themed';
+import { Dialog ,LinearProgress} from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import CustomSnackBar from '../../components/common/SnackBar';
 
@@ -45,6 +45,7 @@ const FamilyDocument = ({ navigation }) => {
   const [previousCurrentItemId,SetPreviousCurrentItemId] = useState([])
   const [savePressed,setSavePressed] = useState(false)
   const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const showModal = (item) => {
     setCurrentItemId(item);
@@ -67,6 +68,7 @@ const FamilyDocument = ({ navigation }) => {
   };
   const editFamilyName = async () => {
     // console.log('editFamilyName==called')
+    setIsLoading(true)
     try {
       let params = {
         name: newFamilyName,
@@ -77,6 +79,7 @@ const FamilyDocument = ({ navigation }) => {
       let editFamilyRes = await NetworkManager.editFamily(params);
       // console.log('editFamilyRes',editFamilyRes)
       if (editFamilyRes.data.code === 200) {
+        setIsLoading(false)
         Keyboard.dismiss()
         setErrorMessage('')
         setIsModalVisible(false)
@@ -95,7 +98,7 @@ const FamilyDocument = ({ navigation }) => {
 
       setCurrentItemId([]);
     } catch (error) {
-
+      setIsLoading(false)
       setCurrentItemId([]);
       Keyboard.dismiss()
       setErrorMessage('')
@@ -135,6 +138,7 @@ const FamilyDocument = ({ navigation }) => {
 
   const handleSaveFamily = async () => {
     // console.log('saveFamily--called')
+    setIsLoading(true)
     setEditFamilyCall(false);
     let params = {
       name: newFamilyName,
@@ -144,8 +148,9 @@ const FamilyDocument = ({ navigation }) => {
     try {
       let res = await NetworkManager.addFamily(params);
       if (res.data.code === 200) {
-        Keyboard.dismiss()
         setIsModalVisible(false)
+        setIsLoading(false)
+        Keyboard.dismiss()
         setNewFamilyName('')
         setErrorMessage('')
         setTimeout(() => setIsSnackbarVisible({ message: res.data.message, visible: true}), 1000)
@@ -161,6 +166,7 @@ const FamilyDocument = ({ navigation }) => {
       }
     } catch (error) {
       Keyboard.dismiss()
+      setIsLoading(false)
       // console.error('Error fetching unique id:', error.response);
       // setTimeout(() => alert(error.response.data.message), 1000)
       // Alert.alert(error.response.data.message)
@@ -430,6 +436,10 @@ const FamilyDocument = ({ navigation }) => {
             roundness={10}
             duration={isSnackbarVisible.isFailed ? 3000 : 2000}
           />
+           <Dialog style={{ zIndex: 10, elevation: 10 }} isVisible={isLoading} >
+          <LinearProgress style={{ marginVertical: 10 }} color={'#0e9b81'} />
+          <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Processing...</Text>
+        </Dialog>
           </View>
       </DrawerNavigator>
     </ImageBackground>

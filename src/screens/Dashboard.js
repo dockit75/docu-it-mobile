@@ -205,7 +205,7 @@ const renderItems = ({item}) => (
         contentContainerStyle={!activityData.length ? { justifyContent: 'center', alignItems: 'center', height: '100%' } : {}}
         ListEmptyComponent={() => (
             <View style={{alignItems:'center',justifyContent:'center'}}>
-              <Text style={{color:'black',fontSize:20}}>No more recent activity.</Text>  
+              <Text style={{color:'black',fontSize:20}}>No Recent Activity.</Text>  
             </View>)
         }
         ListHeaderComponent={() => (activityData?.length ? <View style={{ marginBottom: 10, justifyContent: 'center' }}>

@@ -218,6 +218,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
       }, style: 'destructive' }
     ]
     )
+    getUploadedDocumentsList();
   }
 
   const rotateLeft = (imageUri) => {
@@ -666,7 +667,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
                 data={documentList}
                 extraData={documentList.filter(item => item.showOptions === true)?.[0] ?? documentList}
                 ListEmptyComponent={<View style={{ alignItems: 'center', justifyContent: 'center', height: screenHeight * 0.75 }}>
-                  <Text style={{ color: 'white', fontSize: 20 }}>No more documents uploaded.</Text>
+                  <Text style={{ color: 'white', fontSize: 20 }}>No Documents Uploaded.</Text>
                 </View>}
                 keyExtractor={keyExtractor}
                 renderItem={renderItems}
