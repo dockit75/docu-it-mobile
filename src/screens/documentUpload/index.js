@@ -197,6 +197,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         if(deleteResult.data?.status === 'SUCCESS' && deleteResult.data?.code === 200){
           // Alert.alert(deleteResult.data?.message)
           setIsSnackbarVisible({ message: deleteResult.data?.message, visible: true })
+          getUploadedDocumentsList();
           if(docmentFilterList?.length === 0) {
             let profileStatusResult = await NetworkManager.getUserRanking(userData.id)
             if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
@@ -218,7 +219,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
       }, style: 'destructive' }
     ]
     )
-    getUploadedDocumentsList();
+   
   }
 
   const rotateLeft = (imageUri) => {

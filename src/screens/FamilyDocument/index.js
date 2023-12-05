@@ -68,6 +68,7 @@ const FamilyDocument = ({ navigation }) => {
   };
   const editFamilyName = async () => {
     // console.log('editFamilyName==called')
+    setIsModalVisible(false)
     setIsLoading(true)
     try {
       let params = {
@@ -82,11 +83,11 @@ const FamilyDocument = ({ navigation }) => {
         setIsLoading(false)
         Keyboard.dismiss()
         setErrorMessage('')
-        setIsModalVisible(false)
+       
         // setTimeout(() => alert(editFamilyRes.data.message), 1000)
         // Alert.alert(editFamilyRes.data.message)
         // console.log('editFamilyRes',editFamilyRes?.data)
-        setTimeout(() => setIsSnackbarVisible({ message: editFamilyRes.data.message, visible: true}), 1000)
+        setTimeout(() => setIsSnackbarVisible({ message: editFamilyRes.data.message, visible: true}), 500)
       } else {
         Keyboard.dismiss()
         setErrorMessage('')
@@ -105,7 +106,7 @@ const FamilyDocument = ({ navigation }) => {
       // console.error('Error fetching unique id:', error.response);
       // setTimeout(() => alert(error.response.data.message), 1000)
       // Alert.alert(error.response.data.message)
-      setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 1000)
+      setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 500)
     }
     getFamilyList();
     setIsModalVisible(false);
@@ -138,6 +139,7 @@ const FamilyDocument = ({ navigation }) => {
 
   const handleSaveFamily = async () => {
     // console.log('saveFamily--called')
+    setIsModalVisible(false)
     setIsLoading(true)
     setEditFamilyCall(false);
     let params = {
@@ -148,12 +150,11 @@ const FamilyDocument = ({ navigation }) => {
     try {
       let res = await NetworkManager.addFamily(params);
       if (res.data.code === 200) {
-        setIsModalVisible(false)
         setIsLoading(false)
         Keyboard.dismiss()
         setNewFamilyName('')
         setErrorMessage('')
-        setTimeout(() => setIsSnackbarVisible({ message: res.data.message, visible: true}), 1000)
+        setTimeout(() => setIsSnackbarVisible({ message: res.data.message, visible: true}), 500)
         // setTimeout(() => alert(res.data.message), 1000)
         // Alert.alert(res.data.message)
       } else {
@@ -172,7 +173,7 @@ const FamilyDocument = ({ navigation }) => {
       // Alert.alert(error.response.data.message)
       setNewFamilyName('')
       setErrorMessage('')
-      setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 1000)
+      setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 500)
     }
     getFamilyList();
     setIsModalVisible(false);
