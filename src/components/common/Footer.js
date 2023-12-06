@@ -67,12 +67,16 @@ const Footer = ({ props, route, screenName }) => {
       const checkTourStatus = async () => {
         try {
           const notificationStatus = await AsyncStorage.getItem('stepFourReached');
-          const tourStatus = await AsyncStorage.getItem('allowTour');
+          const tourStatus = await AsyncStorage.getItem('stepFiveReached');
+          console.log('notificationStatus',notificationStatus,tourStatus)
           if (tourStatus === null &&  notificationStatus === 'true') {
             setNotificationColor(true);
+          
           } else {
-  
+             
             setNotificationColor(false);
+            await AsyncStorage.setItem('stepFourReached', ''); // or null, depending on your preference
+            await AsyncStorage.setItem('stepFiveReached', '');
           }
         } catch (error) {
           console.error('Error reading tour guide status:', error.message);
@@ -115,16 +119,7 @@ const Footer = ({ props, route, screenName }) => {
             </View>
               
             <View style={{position:'relative'}}>
-            <TourGuideZone  zone={4} text={'Click here to view notifications'} shape={'circle_and_keep'} tourKey={tourKey} backdropColor={'blue'}
-                style={{     
-                    zIndex: 100, // Adjust the z-index as needed
-                    elevation: 20,
-                    // borderWidth:1, 
-                    // borderColor:'white', // Adjust the elevation as needed
-                  }}
-                  maskOffset={10}
-                >
-                    
+            <TourGuideZone  zone={4} text={'Click here to view notifications'} shape={'circle'} tourKey={tourKey}  borderRadius={4}   >
                     <TouchableOpacity style={{ alignItems: 'center', flexDirection: 'row', }} onPress={handlePending}>
                         <Icon name="notifications" size={40} color={notificationColor?'black':'gray'} />
                         {notificationCount ? (<Badge style={{ position: 'absolute', backgroundColor: 'red', top: 0, right: -2 }}>{notificationCount ?? 0}</Badge>) : null}

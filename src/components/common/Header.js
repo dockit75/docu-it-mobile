@@ -1,12 +1,12 @@
 import { HEADER } from '../../utilities/strings';
-import React, {useState, useRef, Fragment, useEffect, useMemo} from 'react';
-import {Text, View, TouchableOpacity, Image, StyleSheet} from 'react-native';
-import {normalize, screenWidth} from '../../utilities/measurement';
-import {Images} from '../../assets/images/images';
+import React, { useState, useRef, Fragment, useEffect, useMemo } from 'react';
+import { Text, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { normalize, screenWidth } from '../../utilities/measurement';
+import { Images } from '../../assets/images/images';
 import Drawer from 'react-native-drawer';
 import DrawerContent from './DrawerContent';
-import {Menu, MenuItem, MenuDivider} from 'react-native-material-menu';
-import {useNavigation} from '@react-navigation/native';
+import { Menu, MenuItem, MenuDivider } from 'react-native-material-menu';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -17,8 +17,17 @@ import { COLORS } from '../../utilities/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProfileCompletion } from '../../slices/UserSlices';
 import { ProgressBar } from 'react-native-paper';
+import { TourGuideZone, useTourGuideController } from 'rn-tourguide';
+
 
 const Header = props => {
+  const {
+    canStart,
+    start,
+    stop,
+    eventEmitter,
+    tourKey
+  } = useTourGuideController();
   const [open, setOpen] = useState();
   const insets = useSafeAreaInsets()
   const [visible, setVisible] = useState(false);
@@ -28,7 +37,7 @@ const Header = props => {
   const profileCompletion = useSelector(State => State.user?.profileCompletion)
 
   // useEffect(() => {
-    // console.log('profileCompletion ******', profileCompletion)
+  // console.log('profileCompletion ******', profileCompletion)
   //   if(!profileCompletion){
   //     dispatch(setProfileCompletion({percentage: 0.8}))
   //   }
@@ -44,71 +53,71 @@ const Header = props => {
     // navigation.navigate('CategoryScreen')
     handleScanner()
     hideMenu()
-};
+  };
 
 
-const formatScannedImages = (images) => {
-  return images.map((uri) => ({
-    documentUrl: uri,
-    fileType: 'image/jpg', // You can change the type as needed
-    fileName: uri.split('/').pop()
-  }));
-};
+  const formatScannedImages = (images) => {
+    return images.map((uri) => ({
+      documentUrl: uri,
+      fileType: 'image/jpg', // You can change the type as needed
+      fileName: uri.split('/').pop()
+    }));
+  };
 
-const handleScanner = async () => {
-  // Check if camera permission is granted
-  const status = await check(PERMISSIONS.ANDROID.CAMERA);
-  if (status === RESULTS.GRANTED) {
-    // Camera permission is already granted, start the document scanner
-    const { scannedImages: newScannedImages } = await DocumentScanner.scanDocument({
-      croppedImageQuality: 50
-    });
-    if (newScannedImages.length > 0) {
-      const formattedScannedImages = formatScannedImages(newScannedImages);
-      uploadFileList(formattedScannedImages)
-    }
-  } else if (status === RESULTS.DENIED) {
-    // Camera permission is denied, request it from the user
-    const requestResult = await request(PERMISSIONS.ANDROID.CAMERA);
-    if (requestResult === RESULTS.GRANTED) {
-      // Camera permission has been granted, start the document scanner
+  const handleScanner = async () => {
+    // Check if camera permission is granted
+    const status = await check(PERMISSIONS.ANDROID.CAMERA);
+    if (status === RESULTS.GRANTED) {
+      // Camera permission is already granted, start the document scanner
       const { scannedImages: newScannedImages } = await DocumentScanner.scanDocument({
         croppedImageQuality: 50
       });
       if (newScannedImages.length > 0) {
         const formattedScannedImages = formatScannedImages(newScannedImages);
         uploadFileList(formattedScannedImages)
+      }
+    } else if (status === RESULTS.DENIED) {
+      // Camera permission is denied, request it from the user
+      const requestResult = await request(PERMISSIONS.ANDROID.CAMERA);
+      if (requestResult === RESULTS.GRANTED) {
+        // Camera permission has been granted, start the document scanner
+        const { scannedImages: newScannedImages } = await DocumentScanner.scanDocument({
+          croppedImageQuality: 50
+        });
+        if (newScannedImages.length > 0) {
+          const formattedScannedImages = formatScannedImages(newScannedImages);
+          uploadFileList(formattedScannedImages)
+
+        }
+      } else {
+        // Handle the case where the user denied camera permissions
+        // You can show a message to the user explaining why the camera is require
+        alert('Permission to access camera was denied.');
+        setSnackbarMessage('Camera permission required to scan Documents');
+        setSnackbarVisible(true);
 
       }
     } else {
-      // Handle the case where the user denied camera permissions
-      // You can show a message to the user explaining why the camera is require
+      // Handle other permission statuses 
       alert('Permission to access camera was denied.');
       setSnackbarMessage('Camera permission required to scan Documents');
       setSnackbarVisible(true);
-
     }
-  } else {
-    // Handle other permission statuses 
-    alert('Permission to access camera was denied.');
-    setSnackbarMessage('Camera permission required to scan Documents');
-    setSnackbarVisible(true);
-  }
-};
+  };
 
-const memoRenderProfileStatus = () =>  {
-  return (
-    <LinearProgress
-      style={{ width: 100, backgroundColor: COLORS.lightGray, borderWidth: 0.4, borderColor: COLORS.avatarBackground, height: 5, borderRadius: 5 }}
-      value={progress / 100}
-      color={progress > 70 ? '#7CFC00' : (progress > 30 && progress < 70) ? 'yellow' : 'red'}
-      animation={false}
-    />
-  )
-}
-const uploadFileList = async (files) => {
-    navigation.navigate('uploadPreview', {uploadFiles: files, categoryInfo: null, refreshData: false})
-}
+  const memoRenderProfileStatus = () => {
+    return (
+      <LinearProgress
+        style={{ width: 100, backgroundColor: COLORS.lightGray, borderWidth: 0.4, borderColor: COLORS.avatarBackground, height: 5, borderRadius: 5 }}
+        value={progress / 100}
+        color={progress > 70 ? '#7CFC00' : (progress > 30 && progress < 70) ? 'yellow' : 'red'}
+        animation={false}
+      />
+    )
+  }
+  const uploadFileList = async (files) => {
+    navigation.navigate('uploadPreview', { uploadFiles: files, categoryInfo: null, refreshData: false })
+  }
 
   const hideMenu = () => setVisible(false);
 
@@ -134,23 +143,31 @@ const uploadFileList = async (files) => {
           paddingBottom: 10
           //   backgroundColor: 'green',
         }}>
-        <TouchableOpacity onPress={props.leftAction}>
-          <MaterialCommunityIcons name="menu" size={30} color="white" />
-        </TouchableOpacity>
-        <Image
-            source={require('../../assets/images/logo_dockit.png')}
-            resizeMode="center"
-            style={styles.logoImage}
-          />
-          <View style={{ position: 'absolute', right: 50, alignSelf: 'center', justifyContent: 'space-between', top: 5 }} onTouchEnd={() => setIsShowProfileStatusInfo(true)}>
-            <Text style={{ fontSize: normalize(11), color: COLORS.white, marginBottom: 3 }}>{`Profile Status (${progress}%)`}</Text>
-            {memoizedRenderChatsHeader}
-            {/* <View style={{ width: `${100 * progress}%`, backgroundColor: progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green', height: 100 }} /> */}
-            {/* <ProgressBar progress={progress} color={progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green'} /> */}
+          <View>
+          <TouchableOpacity onPress={props.leftAction}>
+        <TourGuideZone zone={5} text={'Click here to move Settings'} shape={'circle'} tourKey={tourKey}  
+         borderRadius={4} // Set a borderRadius that fits the shape of your icon
+        //  textTopOffset={20}
+
+        >
+            <MaterialCommunityIcons name="menu" size={30} color="white" />
+        </TourGuideZone>
+          </TouchableOpacity>
           </View>
-            <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', marginTop: 5 }} onPress={showMenu}>
-              <MaterialCommunityIcons name="dots-vertical" size={22} color="white" />
-            </TouchableOpacity>
+        <Image
+          source={require('../../assets/images/logo_dockit.png')}
+          resizeMode="center"
+          style={styles.logoImage}
+        />
+        <View style={{ position: 'absolute', right: 50, alignSelf: 'center', justifyContent: 'space-between', top: 5 }} onTouchEnd={() => setIsShowProfileStatusInfo(true)}>
+          <Text style={{ fontSize: normalize(11), color: COLORS.white, marginBottom: 3 }}>{`Profile Status (${progress}%)`}</Text>
+          {memoizedRenderChatsHeader}
+          {/* <View style={{ width: `${100 * progress}%`, backgroundColor: progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green', height: 100 }} /> */}
+          {/* <ProgressBar progress={progress} color={progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green'} /> */}
+        </View>
+        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', marginTop: 5 }} onPress={showMenu}>
+          <MaterialCommunityIcons name="dots-vertical" size={22} color="white" />
+        </TouchableOpacity>
       </View>
       <Dialog overlayStyle={{ width: screenWidth * 0.85 }} isVisible={isShowProfileStatusInfo} >
         <View>
@@ -168,7 +185,7 @@ const uploadFileList = async (files) => {
       </Dialog>
       <View style={{ position: 'absolute', right: 5, bottom: 0 }}>
         <Menu
-          style={{width: 60, height: 150}}
+          style={{ width: 60, height: 150 }}
           visible={visible}
           onRequestClose={hideMenu}>
           <MenuItem
@@ -186,7 +203,7 @@ const uploadFileList = async (files) => {
             <Text style={{ margin: 5 }}>Home</Text> */}
             <Icon name="home" size={30} color="black" />
           </MenuItem>
-          <MenuItem textStyle={{color: 'black'}} onPress={handleUploadDocuments}>
+          <MenuItem textStyle={{ color: 'black' }} onPress={handleUploadDocuments}>
             {/* <Image
               source={require('../../assets/images/blackCameraIcon.png')}
               resizeMode="center"
@@ -196,7 +213,7 @@ const uploadFileList = async (files) => {
             <Icon name="camera" size={25} color="black" />
           </MenuItem>
           <MenuItem
-            textStyle={{fontSize: 17, color: 'black'}}
+            textStyle={{ fontSize: 17, color: 'black' }}
             onPress={handleHelp}>
             {/* <Image
               source={require('../../assets/images/blackCameraIcon.png')}

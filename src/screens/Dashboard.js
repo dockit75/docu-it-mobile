@@ -101,7 +101,7 @@ const Dashboard = ({ }) => {
       } catch (error) {
         console.error('Error reading tour guide status:', error.message);
       }
-    
+
     };
 
     checkTourStatus();
@@ -111,9 +111,9 @@ const Dashboard = ({ }) => {
 
   useEffect(() => {
     // Delay the execution of this block by 5000 milliseconds (5 seconds)
-      if (canStart && allowTour ) {
-        start();
-      }
+    if (canStart && allowTour) {
+      start();
+    }
 
     // Clear the timeout when the component is unmounted or the dependency values change
   }, [canStart, allowTour]);
@@ -141,29 +141,37 @@ const Dashboard = ({ }) => {
 
 
 
-  
-    const handleOnStepChange = () => {
-      // Increment stepCount
-      stepCount++;
-  
-      // Check if stepCount is 4, then update local storage
-      console.log('stepCount',stepCount)
-      if (stepCount === 4) {
-        try {
-          console.log('try called', stepCount);
-          // Store true in local storage
-          AsyncStorage.setItem('stepFourReached', 'true');
-        } catch (error) {
-          console.error('Error storing step four status:', error.message);
-        }
+
+  const handleOnStepChange = () => {
+    // Increment stepCount
+    stepCount++;
+
+    // Check if stepCount is 4, then update local storage
+    console.log('stepCount', stepCount)
+    if (stepCount === 4) {
+      try {
+        console.log('try called', stepCount);
+        // Store true in local storage
+        AsyncStorage.setItem('stepFourReached', 'true');
+      } catch (error) {
+        console.error('Error storing step four status:', error.message);
+      }
+    } else if (stepCount === 5) {
+      try {
+        console.log('try called five called', stepCount);
+        // Store true in local storage
+        AsyncStorage.setItem('stepFiveReached', 'true');
+      } catch (error) {
+        console.error('Error storing step four status:', error.message);
       }
     }
+  }
 
-    console.log('step count=====>>',stepCount)
+  console.log('step count=====>>', stepCount)
 
 
   useEffect(() => {
-    console.log('handle start called',allowTour)
+    console.log('handle start called', allowTour)
     eventEmitter.on('start', handleOnStart);
     eventEmitter.on('stop', handleOnStop);
     eventEmitter.on('stepChange', handleOnStepChange);
@@ -289,43 +297,65 @@ const Dashboard = ({ }) => {
     </View>
   )
 
-  const renderTile = (item, index) => {
-    const zoneNumber = index + 1; // Add 1 to make sure zones are different for each tile
-    const text = index === 0 ? 'Click to add, view and share My Documents' : 'Click to add and view My Family';
+  // const renderTile = (item, index) => {
+  //   const zoneNumber = index + 1; // Add 1 to make sure zones are different for each tile
+  //   const text = index === 0 ? 'Click to add, view and share My Documents' : 'Click to add and view My Family';
 
-    return <TourGuideZone
-      key={index}
-      zone={zoneNumber}
-      text={text}
-      borderRadius={16}
-      // bottom={30}
-      // shape={'circle'}
-      verticalOffset={0.5}
-      wrapperStyle={{ backgroundColor: 'red' }}
-      tooltipStyle={{ backgroundColor: 'red' }}
-      backdropColor={'red'}
-      tourKey={tourKey}
-    >
-      <TouchableOpacity onPress={() => handlePress(item.path)}>
-        <Card style={styles.cardContainer}>
-          <Image source={Images[item.icon]} style={styles.Images} resizeMode="center" />
-          <Card.Content>
-            <Paragraph style={styles.imageText}>{item.title}</Paragraph>
-          </Card.Content>
-        </Card>
-      </TouchableOpacity>
-    </TourGuideZone>
-  }
+  //   return <TourGuideZone
+  //     key={index}
+  //     zone={zoneNumber}
+  //     text={text}
+  //     borderRadius={16}
+  //     // bottom={30}
+  //     // shape={'circle'}
+  //     verticalOffset={0.5}
+  //     wrapperStyle={{ backgroundColor: 'red' }}
+  //     tooltipStyle={{ backgroundColor: 'red' }}
+  //     backdropColor={'red'}
+  //     tourKey={tourKey}
+  //   >
+  //     <TouchableOpacity onPress={() => handlePress(item.path)}>
+  //       <Card style={styles.cardContainer}>
+  //         <Image source={Images[item.icon]} style={styles.Images} resizeMode="center" />
+  //         <Card.Content>
+  //           <Paragraph style={styles.imageText}>{item.title}</Paragraph>
+  //         </Card.Content>
+  //       </Card>
+  //     </TouchableOpacity>
+  //   </TourGuideZone>
+  // }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flexDirection: 'column', alignItems: 'center', height: screenHeight * 0.4, alignSelf: 'center', justifyContent: 'space-evenly' }}>
         <View style={styles.cardView}>
-          {tileList.map(renderTile)}
+          {/* {tileList.map(renderTile)} */}
+          <TourGuideZone zone={3} text={'Click to add, view and share My Documents'} borderRadius={16} tourKey={tourKey} keepTooltipPosition={false}>
+            <TouchableOpacity onPress={() => handlePress(() => navigation.navigate('CategoryScreen'))}>
+              <Card style={styles.cardContainer}>
+                <Image source={require('../assets/images/icon_personal_docs.png')} style={styles.Images} resizeMode="center" />
+                <Card.Content>
+                  <Paragraph style={styles.imageText}>My Documents</Paragraph>
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
+            </TourGuideZone>
+         
+
+          <TourGuideZone zone={2} text={'Click to add and view My Family'} borderRadius={16} tourKey={tourKey} >
+          <TouchableOpacity onPress={() => handlePress(() => navigation.navigate('FamilyDocument'))}>
+            <Card style={styles.cardContainer}>
+              <Image source={require('../assets/images/icon_family_mgmt.png')} style={styles.Images} resizeMode="center" />
+              <Card.Content>
+                <Paragraph style={styles.imageText}>My Family</Paragraph>
+              </Card.Content>
+            </Card>
+          </TouchableOpacity>
+          </TourGuideZone>
         </View>
         <View >
           <TourGuideZone
-            zone={3}
+            zone={1}
             text={'click to scan and upload PDF'}
             // borderRadius={16}
             shape={'circle'}
@@ -337,16 +367,6 @@ const Dashboard = ({ }) => {
               <MaterialIcon name="camera-alt" size={40} color="white" style={{ padding: 2 }} />
             </TouchableOpacity>
           </TourGuideZone>
-          {/* <TourGuideZoneByPosition
-          zone={7}
-          shape={'circle'}
-          isTourGuide
-          bottom={30}
-          left={35}
-          width={300}
-          height={300}
-        /> */}
-
         </View>
       </View>
       <FlatList
