@@ -331,7 +331,7 @@ const Dashboard = ({ }) => {
         <View style={styles.cardView}>
           {/* {tileList.map(renderTile)} */}
           <TourGuideZone zone={3} text={'Click to add, view and share My Documents'} borderRadius={16} tourKey={tourKey} keepTooltipPosition={false}>
-            <TouchableOpacity onPress={() => handlePress(() => navigation.navigate('CategoryScreen'))}>
+            <TouchableOpacity onPress={() => navigation.navigate('CategoryScreen')}>
               <Card style={styles.cardContainer}>
                 <Image source={require('../assets/images/icon_personal_docs.png')} style={styles.Images} resizeMode="center" />
                 <Card.Content>
@@ -343,7 +343,7 @@ const Dashboard = ({ }) => {
          
 
           <TourGuideZone zone={2} text={'Click to add and view My Family'} borderRadius={16} tourKey={tourKey} >
-          <TouchableOpacity onPress={() => handlePress(() => navigation.navigate('FamilyDocument'))}>
+          <TouchableOpacity onPress={() => navigation.navigate('FamilyDocument')}>
             <Card style={styles.cardContainer}>
               <Image source={require('../assets/images/icon_family_mgmt.png')} style={styles.Images} resizeMode="center" />
               <Card.Content>
