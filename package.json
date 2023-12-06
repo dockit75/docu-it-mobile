@@ -56,10 +56,12 @@
     "react-native-sms-retriever": "^1.1.1",
     "react-native-snackbar": "^2.6.2",
     "react-native-splash-screen": "^3.3.0",
+    "react-native-svg": "^14.1.0",
     "react-native-table-component": "^1.2.2",
     "react-native-user-avatar": "^1.0.8",
     "react-native-vector-icons": "^10.0.0",
     "react-redux": "^8.1.2",
+    "rn-tourguide": "^3.3.0",
     "yup": "^1.2.0"
   },
   "devDependencies": {

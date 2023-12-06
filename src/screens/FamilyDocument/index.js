@@ -437,8 +437,8 @@ const FamilyDocument = ({ navigation }) => {
             roundness={10}
             duration={isSnackbarVisible.isFailed ? 3000 : 2000}
           />
-           <Dialog style={{ zIndex: 10, elevation: 10 }} isVisible={isLoading} >
-          <LinearProgress style={{ marginVertical: 10 }} color={'#0e9b81'} />
+           <Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
+           <ActivityIndicator size={'large'} color={'#0e9b81'} />
           <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Processing...</Text>
         </Dialog>
           </View>
