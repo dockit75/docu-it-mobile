@@ -297,40 +297,42 @@ const Dashboard = ({ }) => {
     </View>
   )
 
-  // const renderTile = (item, index) => {
-  //   const zoneNumber = index + 1; // Add 1 to make sure zones are different for each tile
-  //   const text = index === 0 ? 'Click to add, view and share My Documents' : 'Click to add and view My Family';
-
-  //   return <TourGuideZone
-  //     key={index}
-  //     zone={zoneNumber}
-  //     text={text}
-  //     borderRadius={16}
-  //     // bottom={30}
-  //     // shape={'circle'}
-  //     verticalOffset={0.5}
-  //     wrapperStyle={{ backgroundColor: 'red' }}
-  //     tooltipStyle={{ backgroundColor: 'red' }}
-  //     backdropColor={'red'}
-  //     tourKey={tourKey}
-  //   >
-  //     <TouchableOpacity onPress={() => handlePress(item.path)}>
-  //       <Card style={styles.cardContainer}>
-  //         <Image source={Images[item.icon]} style={styles.Images} resizeMode="center" />
-  //         <Card.Content>
-  //           <Paragraph style={styles.imageText}>{item.title}</Paragraph>
-  //         </Card.Content>
-  //       </Card>
-  //     </TouchableOpacity>
-  //   </TourGuideZone>
-  // }
+  const renderTile = (item, index) => {
+    
+    const zoneNumber = index === 0 ? 3 : 2;
+    const text = index === 0 ? 'Click to add, view and share My Documents' : 'Click to add and view My Family';
+    return <TourGuideZone
+      key={index}
+      zone={zoneNumber}
+      text={text}
+      borderRadius={16}
+      // bottom={30}
+      // shape={'circle'}
+      verticalOffset={0.5}
+      wrapperStyle={{ backgroundColor: 'red' }}
+      tooltipStyle={{ backgroundColor: 'red' }}
+      backdropColor={'red'}
+      tourKey={tourKey}
+    >
+      <TouchableOpacity onPress={() => handlePress(item.path)}>
+        <Card style={styles.cardContainer}>
+          <Image source={Images[item.icon]} style={styles.Images} resizeMode="center" />
+          <Card.Content>
+            <Paragraph style={styles.imageText}>{item.title}</Paragraph>
+          </Card.Content>
+        </Card>
+      </TouchableOpacity>
+    </TourGuideZone>
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flexDirection: 'column', alignItems: 'center', height: screenHeight * 0.4, alignSelf: 'center', justifyContent: 'space-evenly' }}>
         <View style={styles.cardView}>
-          {/* {tileList.map(renderTile)} */}
-          <TourGuideZone zone={3} text={'Click to add, view and share My Documents'} borderRadius={16} tourKey={tourKey} keepTooltipPosition={false}>
+          {tileList.map(renderTile)}
+          {/* {[...tileList].reverse().map(renderTile)} */}
+
+          {/* <TourGuideZone zone={3} text={'Click to add, view and share My Documents'} borderRadius={16} tourKey={tourKey} keepTooltipPosition={false}>
             <TouchableOpacity onPress={() => navigation.navigate('CategoryScreen')}>
               <Card style={styles.cardContainer}>
                 <Image source={require('../assets/images/icon_personal_docs.png')} style={styles.Images} resizeMode="center" />
@@ -351,7 +353,7 @@ const Dashboard = ({ }) => {
               </Card.Content>
             </Card>
           </TouchableOpacity>
-          </TourGuideZone>
+          </TourGuideZone> */}
         </View>
         <View >
           <TourGuideZone
