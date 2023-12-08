@@ -1,4 +1,4 @@
-import { HEADER } from '../../utilities/strings';
+import { HEADER, TOUR_GUIDE } from '../../utilities/strings';
 import React, { useState, useRef, Fragment, useEffect, useMemo } from 'react';
 import { Text, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { normalize, screenWidth } from '../../utilities/measurement';
@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setProfileCompletion } from '../../slices/UserSlices';
 import { ProgressBar } from 'react-native-paper';
 import { TourGuideZone, useTourGuideController } from 'rn-tourguide';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Header = props => {
@@ -32,6 +33,7 @@ const Header = props => {
   const insets = useSafeAreaInsets()
   const [visible, setVisible] = useState(false);
   const [isShowProfileStatusInfo, setIsShowProfileStatusInfo] = useState(false);
+  const [allowTour, setAllowTour] = useState()
   const navigation = useNavigation();
   const dispatch = useDispatch()
   const profileCompletion = useSelector(State => State.user?.profileCompletion)
@@ -55,6 +57,34 @@ const Header = props => {
     hideMenu()
   };
 
+  useEffect(() => {
+    console.log('useEffect one called')
+   
+    setInterval(() => { checkTourStatus() }, 1000);
+  }, []);
+
+  const checkTourStatus = async () => {
+    try {
+      const tourStatus = await AsyncStorage.getItem('allowTour');
+      const tourSkipped = await AsyncStorage.getItem('tourSkipped');
+      // console.log('tourSkipped', tourSkipped, tourStatus)
+      if (tourStatus === 'false') {
+        // Tour has been skipped, set allowTour to false
+        // console.log('ifCalled===>>>>>')
+        setAllowTour(false);
+      } else {
+
+        // console.log('else called')
+        // Tour has not been skipped, use the status from AsyncStorage
+        setAllowTour(true);
+      }
+    } catch (error) {
+      console.error('Error reading tour guide status:', error.message);
+    }
+
+  };
+
+  // console.log('setALlowtoure====>>>>>',allowTour)
 
   const formatScannedImages = (images) => {
     return images.map((uri) => ({
@@ -144,8 +174,8 @@ const Header = props => {
           //   backgroundColor: 'green',
         }}>
           <View>
-          <TouchableOpacity onPress={props.leftAction}>
-        <TourGuideZone zone={5} text={'Click here to move Settings'} shape={'circle'} tourKey={tourKey}  
+          <TouchableOpacity onPress={allowTour === false ? props.leftAction : null}>
+        <TourGuideZone zone={5} text={TOUR_GUIDE.menuTour} shape={'circle'} tourKey={tourKey}  
          borderRadius={4} // Set a borderRadius that fits the shape of your icon
         //  textTopOffset={20}
 
@@ -165,7 +195,7 @@ const Header = props => {
           {/* <View style={{ width: `${100 * progress}%`, backgroundColor: progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green', height: 100 }} /> */}
           {/* <ProgressBar progress={progress} color={progress <= 0.3 ? 'red' : (progress < 0.5 && progress < 0.7) ? 'orange' : 'green'} /> */}
         </View>
-        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', marginTop: 5 }} onPress={showMenu}>
+        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', marginTop: 5 }} onPress={allowTour === false ? showMenu : null}>
           <MaterialCommunityIcons name="dots-vertical" size={22} color="white" />
         </TouchableOpacity>
       </View>

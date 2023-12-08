@@ -129,7 +129,7 @@ const DocumentAccordian = ({ navigation }) => {
         // console.log('handleShareDocument--->>',response)
         if (response.data.code === 200) {
             setIsProcessing(false)
-            setIsSnackbarVisible({ message: response.data.message, visible: true})
+            setIsSnackbarVisible({ message: 'Document shared successfully', visible: true})
             if (isSaveDocumentFlow) {
                 setTimeout(() => navigation.pop(3), 1500); // Adjust the delay (1000 milliseconds = 1 second)
             } else {

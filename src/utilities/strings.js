@@ -66,3 +66,11 @@
     contactEmpty: 'No contacts...',
     pendingEmpty: 'No recent invites'
   }
+
+  export const TOUR_GUIDE = {
+    cameraTour: 'click to scan and upload PDF',
+    familyTour: 'Click to add and view My Family',
+    documentTour: 'Click to add, view and share My Documents',
+    notificationTour: 'Click here to view notifications',
+    menuTour:'Click here to move Settings'
+  }

@@ -27,6 +27,7 @@ import { Dialog } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BackHandler } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { TOUR_GUIDE } from '../utilities/strings';
 import { setProfileCompletion } from '../slices/UserSlices';
 import {
   TourGuideProvider, // Main provider
@@ -82,7 +83,7 @@ const Dashboard = ({ }) => {
   }
 
   useEffect(() => {
-    console.log('useEffect one called')
+    // console.log('useEffect one called')
     const checkTourStatus = async () => {
       try {
         const tourStatus = await AsyncStorage.getItem('allowTour');
@@ -90,11 +91,11 @@ const Dashboard = ({ }) => {
         console.log('tourSkipped', tourSkipped, tourStatus)
         if (tourStatus === 'false') {
           // Tour has been skipped, set allowTour to false
-          console.log('ifCalled===>>>>>')
+          // console.log('ifCalled===>>>>>')
           setAllowTour(false);
         } else {
 
-          console.log('else called')
+          // console.log('else called')
           // Tour has not been skipped, use the status from AsyncStorage
           setAllowTour(true);
         }
@@ -260,7 +261,7 @@ const Dashboard = ({ }) => {
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
   }
-
+console.log('setALlowtoure',allowTour)
   const renderItems = ({ item }) => (
     <View
       style={styles.recentActivity}>
@@ -300,7 +301,7 @@ const Dashboard = ({ }) => {
   const renderTile = (item, index) => {
     
     const zoneNumber = index === 0 ? 3 : 2;
-    const text = index === 0 ? 'Click to add, view and share My Documents' : 'Click to add and view My Family';
+    const text = index === 0 ? TOUR_GUIDE.documentTour : TOUR_GUIDE.familyTour;
     return <TourGuideZone
       key={index}
       zone={zoneNumber}
@@ -314,7 +315,7 @@ const Dashboard = ({ }) => {
       backdropColor={'red'}
       tourKey={tourKey}
     >
-      <TouchableOpacity onPress={() => handlePress(item.path)}>
+      <TouchableOpacity onPress={() =>allowTour === false ? handlePress(item.path):null}>
         <Card style={styles.cardContainer}>
           <Image source={Images[item.icon]} style={styles.Images} resizeMode="center" />
           <Card.Content>
@@ -358,7 +359,7 @@ const Dashboard = ({ }) => {
         <View >
           <TourGuideZone
             zone={1}
-            text={'click to scan and upload PDF'}
+            text={TOUR_GUIDE.cameraTour}
             // borderRadius={16}
             shape={'circle'}
             tourKey={tourKey}

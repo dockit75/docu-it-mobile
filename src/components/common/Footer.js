@@ -13,6 +13,8 @@ import { State } from 'react-native-gesture-handler';
 import { TourGuideZone, useTourGuideController } from 'rn-tourguide';
 import { COLORS } from '../../utilities/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TOUR_GUIDE } from '../../utilities/strings';
+import { checkNotifications } from 'react-native-permissions';
 
 const Footer = ({ props, route, screenName }) => {
     const {
@@ -31,6 +33,7 @@ const Footer = ({ props, route, screenName }) => {
     const [familyInvitedList, setFamilyInvitedList] = useState([]);
     const [notificationColor, setNotificationColor] = useState(false);
     const [isInZone, setIsInZone] = useState(false);
+    const [allowTour,setAllowTour] = useState(false);
     const handleHome = () => {
         navigation.navigate('Dashboard')
     };
@@ -57,10 +60,7 @@ const Footer = ({ props, route, screenName }) => {
     //   };
 
     useEffect(() => {
-        console.log('useEffect one called')
-        
         setInterval(() => { checkTourStatus() }, 1000);
-        
       }, []);
 
 
@@ -68,12 +68,16 @@ const Footer = ({ props, route, screenName }) => {
         try {
           const notificationStatus = await AsyncStorage.getItem('stepFourReached');
           const tourStatus = await AsyncStorage.getItem('stepFiveReached');
-          console.log('notificationStatus',notificationStatus,tourStatus)
+          const status = await AsyncStorage.getItem('allowTour');
+
           if (tourStatus === null &&  notificationStatus === 'true') {
             setNotificationColor(true);
           
-          } else {
-             
+          } else if(status === "false") {
+            // console.log('else if called======================>>>>')
+            setAllowTour(true)
+
+          }else   {
             setNotificationColor(false);
             await AsyncStorage.setItem('stepFourReached', ''); // or null, depending on your preference
             await AsyncStorage.setItem('stepFiveReached', '');
@@ -82,9 +86,7 @@ const Footer = ({ props, route, screenName }) => {
           console.error('Error reading tour guide status:', error.message);
         }
       };
-
-
-// console.log('setnotification',notificationColor,isInZone)
+// console.log('setAllow',allowTour)
 
     const pendingUserInvite = async () => {
         let UserId = await retrieveUserDetail();
@@ -119,8 +121,8 @@ const Footer = ({ props, route, screenName }) => {
             </View>
               
             <View style={{position:'relative'}}>
-            <TourGuideZone  zone={4} text={'Click here to view notifications'} shape={'circle'} tourKey={tourKey}  borderRadius={4}   >
-                    <TouchableOpacity style={{ alignItems: 'center', flexDirection: 'row', }} onPress={handlePending}>
+            <TourGuideZone  zone={4} text={TOUR_GUIDE.notificationTour} shape={'circle'} tourKey={tourKey}  borderRadius={4}   >
+                    <TouchableOpacity style={{ alignItems: 'center', flexDirection: 'row', }} onPress={allowTour ? handlePending : null}>
                         <Icon name="notifications" size={40} color={notificationColor?'black':'gray'} />
                         {notificationCount ? (<Badge style={{ position: 'absolute', backgroundColor: 'red', top: 0, right: -2 }}>{notificationCount ?? 0}</Badge>) : null}
                     </TouchableOpacity>

@@ -26,7 +26,7 @@ export default function DrawerNavigator(props) {
 
  
   return (
-    <TourGuideProvider preventOutsideInteraction={true} verticalOffset={23}  animationDuration={800}  wrapperStyle={{zIndex:1,}} labels={{
+    <TourGuideProvider preventOutsideInteraction={true} verticalOffset={30}  animationDuration={800}  wrapperStyle={{zIndex:1,}} labels={{
    // Set to an empty string to effectively "remove" the label
       previous: ' ',
       next: 'Next',
