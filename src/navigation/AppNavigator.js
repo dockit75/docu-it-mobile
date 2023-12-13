@@ -11,7 +11,7 @@ import RegistrationPage from '../screens/RegistrationPage';
 import { AppState, StatusBar, TouchableOpacity } from 'react-native'
 import { COLORS } from '../utilities/colors';
 import HamburgerMenu from '../screens/home/index';
-import User from '../screens/User';
+// import User from '../screens/User';
 import Profile from '../screens/Profile';
 import PinGenerationScreen from '../screens/PinGenerationScreen';
 import DocumentScannerScreen from '../screens/documentUpload/index';
@@ -64,11 +64,11 @@ const AppNavigator = ({ initialRouteName }) => {
         component={PinGenerationScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="DocumentScannerScreen"
         component={DocumentScannerScreen}
         options={{ headerShown: false, title: 'Upload Document' }}
-      />
+      /> */}
       <Stack.Screen
         name="uploadPreview"
         component={UploadedPreview}
@@ -89,11 +89,11 @@ const AppNavigator = ({ initialRouteName }) => {
         component={HamburgerMenu}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="User"
         component={User}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
         name="Profile"
         component={Profile}
