@@ -13,7 +13,7 @@ import NetworkManager from '../../services/NetworkManager';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import { Dialog } from '@rneui/themed';
 import CustomSnackBar from '../../components/common/SnackBar';
-
+import Loader from '../../components/common/Loader';
 
 
 const PendingUser = ({ navigation }) => {
@@ -86,10 +86,8 @@ const PendingUser = ({ navigation }) => {
                     </TouchableOpacity>
                     <Text style={styles.pendingText}> Pending Invites</Text>
                 </View>
-                {isLoading === true ?  (<Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
-                    <ActivityIndicator size={'large'} color={'#0e9b81'} />
-                    <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-                   </Dialog> ): (
+                
+                {isLoading === true ? <Loader isLoading={isLoading} text={'loading'}/>  : (
                 <FlatList
                     data={invitesPending.slice().reverse()}
                     style={{ flex: 1 }}

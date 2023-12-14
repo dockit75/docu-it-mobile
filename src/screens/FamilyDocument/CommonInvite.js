@@ -21,6 +21,7 @@ import CheckBox from '@react-native-community/checkbox';
 import { FlashList } from '@shopify/flash-list'
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import CustomSnackBar from '../../components/common/SnackBar';
+import Loader from '../../components/common/Loader';
 
 
 const CommonInvite = ({ navigation, props }) => {
@@ -49,7 +50,7 @@ const CommonInvite = ({ navigation, props }) => {
     let inputRef = useRef()
 
     useEffect(() => {
-        setIsLoader(true)
+        // setIsLoader(true)
         // console.log('familyMember', familyMember)
         // console.log('contacts====>>>', myContacts)
         // console.log('newArray', arrayCombined)
@@ -57,7 +58,7 @@ const CommonInvite = ({ navigation, props }) => {
         filterContacts();
         setTimeout(() => setIsLoader(false), 2000)
     }, []);
-
+  console.log('setIs loader false',isLoader)
     useEffect(() => {
         if(!isLoader) {
             if (search?.length) {
@@ -203,11 +204,7 @@ const CommonInvite = ({ navigation, props }) => {
                 <View>
                     {memoizedRenderChatsHeader}
                 </View>
-
-                <Dialog overlayStyle={{ width: 120, zIndex: 111 }} isVisible={isLoader} >
-                    <ActivityIndicator size={'large'} color={'#0e9b81'} />
-                    <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-                </Dialog>
+              {isLoader === true ? <Loader isLoading={isLoader} text={'loading'}/> : null} 
                 <FlashList
                     data={search?.length ? searchData : filteredContacts.slice().sort((a, b) => a.name.localeCompare(b.name))}
                     extraData={selectedItems}

@@ -31,6 +31,7 @@ import { Dialog } from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import { processAddressBookContacts } from '../../utilities/Utils';
 import CustomSnackBar from '../../components/common/SnackBar';
+import Loader from '../../components/common/Loader';
 
 const FamilyMember = ({ navigation, props }) => {
   const route = useRoute();
@@ -286,10 +287,7 @@ const FamilyMember = ({ navigation, props }) => {
           </View>
         </View>
 
-        {isLoader === true ?(<Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
-          <ActivityIndicator size={'large'} color={'#0e9b81'} />
-          <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-        </Dialog> ) : (
+       { isLoader === true ? <Loader isLoading={isLoader} text={'loading'}/>   : (
         <FlatList
           data={arrayCombined}
           style={{ flex: 1 }}
