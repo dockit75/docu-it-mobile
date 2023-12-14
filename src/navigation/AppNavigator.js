@@ -30,6 +30,7 @@ import DocumentMember from '../screens/documentUpload/documentMember';
 import DocumentAccordian from '../screens/documentUpload/documentAccordian';
 import ChangePin from '../screens/ChangePin';
 
+
 import { PaperProvider } from 'react-native-paper';
 
 const Stack = createStackNavigator();
@@ -64,11 +65,11 @@ const AppNavigator = ({ initialRouteName }) => {
         component={PinGenerationScreen}
         options={{ headerShown: false }}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name="DocumentScannerScreen"
         component={DocumentScannerScreen}
         options={{ headerShown: false, title: 'Upload Document' }}
-      /> */}
+      />
       <Stack.Screen
         name="uploadPreview"
         component={UploadedPreview}
