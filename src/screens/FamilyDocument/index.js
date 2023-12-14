@@ -28,6 +28,8 @@ import DrawerNavigator from '../../components/common/DrawerNavigator';
 import { Dialog ,LinearProgress} from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import CustomSnackBar from '../../components/common/SnackBar';
+import FamilyModal from './components/FamilyModal';
+import Loader from '../../components/common/Loader';
 
 const FamilyDocument = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -52,64 +54,15 @@ const FamilyDocument = ({ navigation }) => {
     SetPreviousCurrentItemId(item)
     setEditFamilyCall(true);
     setIsModalVisible(true);
+    console.log('show modal modal called')
   };
   const showModalAdd = () => {
+    console.log('show add modal called')
+
     setNewFamilyName('')
     setEditFamilyCall(false);
     setIsModalVisible(true);
-  };
-  const cancelModal = () => {
-    Keyboard.dismiss()
-    setCurrentItemId([]);
-    setNewFamilyName('')
-    setTimeout(() => setIsModalVisible(false), 1000);
-    setErrorMessage('')
-    setIsSnackbarVisible(false)
-  };
-  const editFamilyName = async () => {
-    // console.log('editFamilyName==called')
-    setIsModalVisible(false)
-    setIsLoading(true)
-    try {
-      let params = {
-        name: newFamilyName,
-        familyId: currentItemId.id,
-        adminId: userDetails.id,
-      };
-      // console.log('params',params)
-      let editFamilyRes = await NetworkManager.editFamily(params);
-      // console.log('editFamilyRes',editFamilyRes)
-      if (editFamilyRes.data.code === 200) {
-        setIsLoading(false)
-        Keyboard.dismiss()
-        setErrorMessage('')
-       
-        // setTimeout(() => alert(editFamilyRes.data.message), 1000)
-        // Alert.alert(editFamilyRes.data.message)
-        // console.log('editFamilyRes',editFamilyRes?.data)
-        setTimeout(() => setIsSnackbarVisible({ message: editFamilyRes.data.message, visible: true}), 500)
-      } else {
-        Keyboard.dismiss()
-        setErrorMessage('')
-        // setTimeout(() => alert(response.data.message), 1000)
-        // Alert.alert(editFamilyRes.data.message)
-
-        setTimeout(() => setIsSnackbarVisible({ message: editFamilyRes.data.message, visible: true, isFailed: true }), 1000)
-      }
-
-      setCurrentItemId([]);
-    } catch (error) {
-      setIsLoading(false)
-      setCurrentItemId([]);
-      Keyboard.dismiss()
-      setErrorMessage('')
-      // console.error('Error fetching unique id:', error.response);
-      // setTimeout(() => alert(error.response.data.message), 1000)
-      // Alert.alert(error.response.data.message)
-      setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 500)
-    }
-    getFamilyList();
-    setIsModalVisible(false);
+    console.log('ismodalVisible===>addd',isModalVisible)
   };
 
   useEffect(() => {
@@ -122,7 +75,6 @@ const FamilyDocument = ({ navigation }) => {
     setUserDetails(UserId);
     try {
       let response = await NetworkManager.listFamily(UserId.id);
-      // console.log('response',response)
       let FamilyList = response.data.response.familyList;
       if (response.data.code === 200) {
         setFamilyDetail(FamilyList);
@@ -132,53 +84,8 @@ const FamilyDocument = ({ navigation }) => {
       setIsLoader(false)
     } catch (error) {
       setIsLoader(false)
-      // console.error('Error fetching unique id:', error.response);
-
     }
   };
-
-  const handleSaveFamily = async () => {
-    // console.log('saveFamily--called')
-    setIsModalVisible(false)
-    setIsLoading(true)
-    setEditFamilyCall(false);
-    let params = {
-      name: newFamilyName,
-      adminId: userDetails.id,
-    };
-    // console.log('params family', params);
-    try {
-      let res = await NetworkManager.addFamily(params);
-      if (res.data.code === 200) {
-        setIsLoading(false)
-        Keyboard.dismiss()
-        setNewFamilyName('')
-        setErrorMessage('')
-        setTimeout(() => setIsSnackbarVisible({ message: res.data.message, visible: true}), 500)
-        // setTimeout(() => alert(res.data.message), 1000)
-        // Alert.alert(res.data.message)
-      } else {
-        Keyboard.dismiss()
-        setNewFamilyName('')
-        setErrorMessage('')
-        // setTimeout(() => alert(res.data.message), 1000)
-        // Alert.alert(res.data.message)
-        setTimeout(() => setIsSnackbarVisible({ message: res.data.message, visible: true, isFailed: true }), 1000)
-      }
-    } catch (error) {
-      Keyboard.dismiss()
-      setIsLoading(false)
-      // console.error('Error fetching unique id:', error.response);
-      // setTimeout(() => alert(error.response.data.message), 1000)
-      // Alert.alert(error.response.data.message)
-      setNewFamilyName('')
-      setErrorMessage('')
-      setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 500)
-    }
-    getFamilyList();
-    setIsModalVisible(false);
-  };
-
 
   const handleFamilyDelete = async (item) => {
     const params = {
@@ -204,11 +111,8 @@ const FamilyDocument = ({ navigation }) => {
                 setTimeout(() => setIsSnackbarVisible({ message: response.data.message, visible: true }), 1000)
                 const updatedFamilyDetails = familyDetails.filter((family) => family.id !== item.id);
                 setFamilyDetail(updatedFamilyDetails);
-                // getFamilyList();
               }
             } catch (error) {
-              // console.error('Error fetching unique id:', error.response);
-              // Alert.alert(error.response.data.message)
               setTimeout(() => setIsSnackbarVisible({ message: error.response.data.message, visible: true, isFailed: true }), 1000)
             }
           }, style: 'destructive'
@@ -229,8 +133,6 @@ const FamilyDocument = ({ navigation }) => {
     }
   }
 
-
-
   return (
     <ImageBackground
       source={Images.REGISTRATION}
@@ -247,138 +149,8 @@ const FamilyDocument = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* <Popover
-          isVisible={isModalVisible}
-          onRequestClose={() => {
-            Keyboard.dismiss()
-            setTimeout(() => setIsModalVisible(false), 1000)
-            setNewFamilyName('');
-            setCurrentItemId([])
-          }}
-          popoverStyle={styles.popover}>
-          <View style={styles.modalContent}>
-            {editFamilyCall ? (
-              <Text style={styles.textInputHeader}> Change Family Name </Text>
-            ) : (
-              <Text style={styles.textInputHeader}> Enter Family Name </Text>
-            )}
-            <TextInput
-              value={editFamilyCall ? currentItemId.name : newFamilyName}
-              onChangeText={text => {
-                const alphabetRegex = /^[A-Za-z]+$/;
-                if (setEditFamilyCall) {
-                  // Handle edit mode (update currentItemId.name)
-                  setCurrentItemId(prevState => ({ ...prevState, name: text }));
-                  setNewFamilyName(text);
-                } else {
-                  // Handle non-edit mode (update newFamilyName)
-                  setNewFamilyName(text);
-                }
-                const isValid = alphabetRegex.test(text);
-                setIsNameValid(isValid);
+       {isModalVisible === true && <FamilyModal isModalVisible={isModalVisible} editFamilyCall={editFamilyCall} userDetails={userDetails} getFamilyList={getFamilyList} currentItemId={currentItemId}/>}
 
-                // Set the error message if the input is not valid
-                if (!isValid) {
-                  setErrorMessage('Name must contain only alphabets.');
-                } else {
-                  setErrorMessage('');
-                }
-
-              }}
-
-              style={styles.input}
-            />
-            {errorMessage !== '' && (
-              <Text style={styles.errorMessage}> {errorMessage} </Text>
-            )}
-            <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity
-                onPress={cancelModal}
-                style={styles.cancelButton}>
-                <Text style={styles.buttonText}> Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={isNameValid ? (editFamilyCall ? editFamilyName : handleSaveFamily) : null}
-                style={[styles.saveButton, { backgroundColor: isNameValid ? '#0e9b81' : 'gray', }]}>
-                <Text style={styles.buttonText}> Save </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Popover> */}
-        <Modal
-          animationType={'fade'}
-          transparent={true}
-          visible={isModalVisible}
-          onRequestClose={() => {
-            Keyboard.dismiss()
-            setTimeout(() => setIsModalVisible(false), 1000)
-            setNewFamilyName('');
-            setCurrentItemId([])
-          }}>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <View style={styles.modalContent}>
-          {editFamilyCall ? (
-            <Text style={styles.textInputHeader}> Change Family Name </Text>
-          ) : (
-            <Text style={styles.textInputHeader}> Enter Family Name </Text>
-          )}
-          <TextInput
-            value={editFamilyCall ? currentItemId.name : newFamilyName}
-            onChangeText={text => {
-              if(text?.trim().length > 0) {
-              const alphabetRegex = /^[A-Za-z_ ]+$/;
-              if (setEditFamilyCall) {
-                // Handle edit mode (update currentItemId.name)
-                setCurrentItemId(prevState => ({ ...prevState, name: text }));
-                setNewFamilyName(text);
-              } else {
-                // Handle non-edit mode (update newFamilyName)
-                  setNewFamilyName(text);
-              }
-              const isValid = alphabetRegex.test(text);
-              setIsNameValid(isValid);
-
-              // Set the error message if the input is not valid
-              if (!isValid) {
-                setErrorMessage('Name must contain only alphabets.');
-              } else {
-                setErrorMessage('');
-              }
-
-            } else {
-              editFamilyCall && setCurrentItemId([]);
-              setNewFamilyName('');
-            }
-            }}
-
-            style={styles.input}
-          />
-          {errorMessage !== '' && (
-            <Text style={styles.errorMessage}> {errorMessage} </Text>
-          )}
-          <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity
-              onPress={cancelModal}
-              style={styles.cancelButton}>
-              <Text style={styles.buttonText}> Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              // onPress={isNameValid ? (editFamilyCall && currentItemId.name !==  currentItemId.name ? editFamilyName : handleSaveFamily) : null}
-              onPress = { isNameValid && ((!editFamilyCall && newFamilyName?.length) || (editFamilyCall && currentItemId.name !== previousCurrentItemId.name)) ? handleFamily : null}
-              style={[
-                styles.saveButton,
-                {
-                  backgroundColor: isNameValid && ((!editFamilyCall && newFamilyName?.length) || (editFamilyCall && currentItemId.name !== previousCurrentItemId.name))
-                    ? '#0e9b81'  // Background color when conditions are true
-                    : 'gray',    // Background color when conditions are false
-                }
-              ]}>
-              <Text style={styles.buttonText}> Save </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        </View>
-        </Modal>
         <View style={styles.header}>
           <View>
             <Text style={styles.familyName}> Family Name </Text>
@@ -387,10 +159,7 @@ const FamilyDocument = ({ navigation }) => {
             <Text style={styles.actionText}>Action</Text>
           </View>
         </View>
-        {isLoader === true ? (<Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
-          <ActivityIndicator size={'large'} color={'#0e9b81'} />
-          <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Loading...</Text>
-        </Dialog>) : (
+        {isLoader === true ? <Loader isLoading={isLoader} text={'loading'}/> : (
           <FlatList
             data={familyDetails}
             style={{ flex: 1 }}
@@ -427,7 +196,6 @@ const FamilyDocument = ({ navigation }) => {
             )}
           />
           )}
-
           <CustomSnackBar
             message={isSnackbarVisible?.message}
             status={isSnackbarVisible?.visible}
@@ -437,10 +205,6 @@ const FamilyDocument = ({ navigation }) => {
             roundness={10}
             duration={isSnackbarVisible.isFailed ? 3000 : 2000}
           />
-           <Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
-           <ActivityIndicator size={'large'} color={'#0e9b81'} />
-          <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Processing...</Text>
-        </Dialog>
           </View>
       </DrawerNavigator>
     </ImageBackground>
