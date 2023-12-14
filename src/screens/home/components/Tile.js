@@ -61,19 +61,15 @@ const Tile = ({ }) => {
     let [stepCount, setStepCount] = useState(0);
     const [zoneIndex, setZoneIndex] = useState(null);
     useEffect(() => {
-        // console.log('useEffect one called')
         const checkTourStatus = async () => {
             try {
                 const tourStatus = await AsyncStorage.getItem('allowTour');
                 const tourSkipped = await AsyncStorage.getItem('tourSkipped');
-                console.log('tourSkipped', tourSkipped, tourStatus)
                 if (tourStatus === 'false') {
                     // Tour has been skipped, set allowTour to false
-                    // console.log('ifCalled===>>>>>')
                     setAllowTour(false);
                 } else {
 
-                    // console.log('else called')
                     // Tour has not been skipped, use the status from AsyncStorage
                     setAllowTour(true);
                 }
@@ -86,7 +82,6 @@ const Tile = ({ }) => {
         checkTourStatus();
     }, []);
 
-    // console.log('setAllowTour======>>>>>', allowTour)
 
     useEffect(() => {
         // Delay the execution of this block by 5000 milliseconds (5 seconds)
@@ -126,10 +121,8 @@ const Tile = ({ }) => {
         stepCount++;
 
         // Check if stepCount is 4, then update local storage
-        console.log('stepCount', stepCount)
         if (stepCount === 4) {
             try {
-                console.log('try called', stepCount);
                 // Store true in local storage
                 AsyncStorage.setItem('stepFourReached', 'true');
             } catch (error) {
@@ -137,7 +130,6 @@ const Tile = ({ }) => {
             }
         } else if (stepCount === 5) {
             try {
-                console.log('try called five called', stepCount);
                 // Store true in local storage
                 AsyncStorage.setItem('stepFiveReached', 'true');
             } catch (error) {
@@ -146,11 +138,10 @@ const Tile = ({ }) => {
         }
     }
 
-    console.log('step count=====>>', stepCount)
+    
 
 
     useEffect(() => {
-        console.log('handle start called', allowTour)
         eventEmitter.on('start', handleOnStart);
         eventEmitter.on('stop', handleOnStop);
         eventEmitter.on('stepChange', handleOnStepChange);
@@ -192,7 +183,6 @@ const Tile = ({ }) => {
 
     const handleScanner = async () => {
         // Check if camera permission is granted
-        console.log('called')
         const status = await check(PERMISSIONS.ANDROID.CAMERA);
         if (status === RESULTS.GRANTED) {
             // Camera permission is already granted, start the document scanner
