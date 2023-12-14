@@ -17,6 +17,7 @@ import { Skeleton } from '@rneui/themed';
 import DrawerNavigator from '../components/common/DrawerNavigator';
 import { Dialog } from '@rneui/themed';
 import CustomSnackBar from '../components/common/SnackBar';
+import Loader from '../components/common/Loader';
 
 
 const Profile = ({ navigation }) => {
@@ -263,10 +264,7 @@ const Profile = ({ navigation }) => {
             <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: '100%' }}>
                 <DrawerNavigator>
                 <View style={{ flex: 1 }}>
-                {loader === true ?  (<Dialog overlayStyle={{ width: 120 }} isVisible={loader} >
-                    <ActivityIndicator size={'large'} color={'#0e9b81'} />
-                    <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-                   </Dialog> ): (
+                {loader === true ?  <Loader isLoading={loader} text={'loading'}/> : (
                     <View  style={{ flex: 1}}  >
                 <View style={styles.editProfileHeader} >
                     <TouchableOpacity onPress={() => navigation.navigate('Dashboard')} style={{ alignSelf: 'center' }}>

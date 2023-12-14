@@ -30,6 +30,7 @@ import { Dialog,LinearProgress } from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import { addContact } from 'react-native-contacts';
 import CustomSnackBar from '../../components/common/SnackBar';
+import Loader from '../../components/common/Loader';
 
 const DocumentAccordian = ({ navigation }) => {
     const insets = useSafeAreaInsets();
@@ -306,10 +307,7 @@ const DocumentAccordian = ({ navigation }) => {
                                 <Text style={styles.addText}>  Share</Text>
                             </TouchableOpacity>
                         </View>}
-                        {isLoading === true ? (<Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
-                        <ActivityIndicator size={'large'} color={'#0e9b81'} />
-                        <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Loading...</Text>
-                    </Dialog>) : (
+                        {isLoading ? <Loader isLoading={isLoading} text={'Processing'}/> : (
                     <FlatList
                         data={familyDetails}
                         renderItem={({ item, index }) => (

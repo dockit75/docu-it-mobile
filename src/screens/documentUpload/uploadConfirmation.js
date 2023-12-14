@@ -31,6 +31,7 @@ import { APP_BUTTON_NAMES, UPLOAD_DOCUMENT } from '../../utilities/strings';
 import { validatePathConfig } from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox';
 import DrawerNavigator from '../../components/common/DrawerNavigator';
+import Loader from '../../components/common/Loader';
 
 const UploadConfirmation = ({ navigation, route }) => {
 
@@ -313,10 +314,7 @@ const UploadConfirmation = ({ navigation, route }) => {
           </View>
         </View>
 
-        <Dialog style={{ zIndex: 10, elevation: 10 }} isVisible={isLoading} >
-          <LinearProgress style={{ marginVertical: 10 }} color={'#0e9b81'} />
-          <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Processing...</Text>
-        </Dialog>
+        {isLoading && <Loader isLoading={isLoading} text={'Processing'}/>}
         </DrawerNavigator>
       </ImageBackground>
     </SafeAreaView>

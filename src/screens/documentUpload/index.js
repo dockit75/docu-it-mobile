@@ -49,6 +49,7 @@ import { setProfileCompletion } from '../../slices/UserSlices';
 import { useDispatch } from 'react-redux';
 import Popover from 'react-native-popover-view';
 import CustomSnackBar from '../../components/common/SnackBar';
+import Loader from '../../components/common/Loader';
 const DocumentScannerScreen = ({ navigation, route }) => {
 
   // navigation params
@@ -650,10 +651,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
               </View>
             </View>
-          ) : isLoader ? (<Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
-            <ActivityIndicator size={'large'} color={'#0e9b81'} />
-            <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Loading...</Text>
-          </Dialog>) : (<>
+          ) : isLoader ?  <Loader isLoading={isLoader} text={'Processing'}/> : (<>
               {/* <FlatList
                 data={documentList}
                 keyExtractor={keyExtractor}
