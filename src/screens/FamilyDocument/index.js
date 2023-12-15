@@ -422,7 +422,15 @@ const FamilyDocument = ({ navigation }) => {
                       style={{ marginRight: 20 }}>
                       <Icon name="delete" size={20} color="white" />
                     </TouchableOpacity>
-                  </View> : null}
+                  </View> : 
+                  <View style={styles.iconView}>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('FamilyMember', { familyItem: item })}
+                      style={{ marginRight: 20 }}
+                    >
+                      <Icon name="eye" size={20} color="white" />
+                    </TouchableOpacity>
+                  </View>}
               </View>
             )}
           />
@@ -537,7 +545,7 @@ const styles = StyleSheet.create({
     padding: 10,
     flexDirection: 'row',
     // width:'75%',
-    marginLeft: 14,
+    marginLeft: 12,
     justifyContent: 'space-between',
     width: screenWidth - 25,
   },
@@ -545,13 +553,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '500',
     color: 'black',
-    marginLeft: 20,
+    marginLeft: 0,
   },
   actionText:{
     fontSize: 20,
     fontWeight: '500',
     color: 'black',
-    marginRight: 30,
+    marginRight: 15,
   },
   listEmptyComponent:{ 
     alignItems: 'center', 

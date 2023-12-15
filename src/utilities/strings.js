@@ -8,9 +8,9 @@
   }
 
   export const HEADER = {
-    profileStatusTitle: 'Profile Ranking Calculation',
+    profileStatusTitle: 'Profile Ranking',
     profileStatusDescriptionText: 'Profile status calculation based on below information:',
-    profileStatusDescriptionList: ['Life Insurance - 20%', 'Health Insurance - 20%', 'Asset - 20%', 'Finance Accounts (Bank, Investment) - 20%', 'Referral/Invite - 20%']
+    profileStatusDescriptionList: ['Life Insurance - 20%', 'Health Insurance - 20%', 'Asset - 20%', 'Finance Accounts - 20%', 'Referral/Invite - 20%']
   }
 
   export const LOGIN = {

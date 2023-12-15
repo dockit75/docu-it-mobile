@@ -110,7 +110,7 @@ const FamilyMember = ({ navigation, props }) => {
         }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('arrayCombined ******', arrayCombined)
+        // console.log('arrayCombined ******', arrayCombined)
         isPressedAdd ?  navigation.navigate('CommonInvite', { familyItem: familyItem, familyMember: familyMember,arrayCombined : arrayCombined,myContacts:myContacts }) : loadContacts();
       }else {
         setIsSnackbarVisible({ message:'Permission to access contacts was denied. You can update it in your device settings.', visible: true})
@@ -281,9 +281,9 @@ const FamilyMember = ({ navigation, props }) => {
           <View>
             <Text  style={styles.memberText}> Member Name </Text>
           </View>
-          <View>
+          {userDetails.id === familyItem.createdBy ? <View>
             <Text style={styles.actionText}> Action </Text>
-          </View>
+          </View> : null}
         </View>
 
         {isLoader === true ?(<Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     padding: 10,
     flexDirection: 'row',
     // width:'75%',
-    marginLeft: 14,
+    marginLeft: 12,
     justifyContent: 'space-between',
     alignItems: 'center',
     width: screenWidth - 25,
@@ -401,13 +401,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '500',
     color: 'black',
-    marginLeft: 20,
+    marginLeft: 10,
   },
   actionText:{
     fontSize: 20,
     fontWeight: '500',
     color: 'black',
-    marginRight: 30,
+    // marginRight: 30,
   },
   listEmptyComponent:{ 
     alignItems: 'center', 

@@ -307,7 +307,7 @@ const LockScreen = ({ navigation, route }) => {
                   autoComplete: 'tel'
                 }}
                 flagButtonStyle={{ right: 0.5, paddingBottom: 0 }}
-                codeTextStyle={{ height: normalize(18), marginBottom: 3 }}
+                // codeTextStyle={{ height: normalize(18), marginBottom: 3 }}
                 keyboardType="phone-pad"
               />
             </TouchableOpacity>
@@ -481,8 +481,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     left: 45,
     color: 'black',
-    marginTop: 12,
-    // textAlign:'center'
   },
   phoneCountryFlag: {
     width: 'auto',
@@ -492,7 +490,7 @@ const styles = StyleSheet.create({
   mobileInputView: {
     paddingLeft: normalize(10),
     width: screenWidth - normalize(30),
-    height: normalizeVertical(50),
+    // height: normalizeVertical(50),
     borderRadius: normalize(5),
     backgroundColor: '#e3e3e3cc',
     borderColor: COLORS.gray,

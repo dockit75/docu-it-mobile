@@ -218,12 +218,12 @@ const CommonInvite = ({ navigation, props }) => {
                     // ListHeaderComponent={memoizedRenderChatsHeader}
                     renderItem={({ item, index }) => (
                         <View style={styles.FlatListContainer}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View style={{ flexDirection: 'row',  flex: 0.9 }}>
                                 <View style={styles.letterContainer}>
                                     <Text style={styles.iconText}>{item?.name[0] ?? ''}</Text>
                                 </View>
                                 <View style={{ marginLeft: 20 }}>
-                                    <Text style={styles.text}>{item?.name ?? ''}{`${(item?.middleName?.length) ? ` ${item?.middleName} ` : ' '}`}{((item?.lastName?.length && (item?.middleName !== item?.lastName))) ? item?.lastName : ''}</Text>
+                                    <Text numberOfLines={1} style={styles.text}>{item?.name ?? ''}{`${(item?.middleName?.length) ? ` ${item?.middleName} ` : ' '}`}{((item?.lastName?.length && (item?.middleName !== item?.lastName))) ? item?.lastName : ''}</Text>
                                     <Text style={{ color: 'white' }}>{item?.phoneNumber ?? ''}</Text>
                                 </View>
                             </View>
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: COLORS.white,
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
     },
     iconText: {
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 8,
         flexDirection: 'row',
-        marginLeft: 14,
+        marginLeft: 12,
         width: screenWidth - 25,
         justifyContent: 'space-between'
     },
@@ -330,14 +330,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         marginVertical: normalize(12),
-        marginLeft: 12,
+        marginLeft: 6,
         // width: screenWidth - 20
     },
     messageSearchBar: {
       fontSize: 16,
       fontWeight: '400',
       fontFamily: 'System',
-      flex: 1,
+      flex: 0.99,
       backgroundColor: COLORS.transparent,
       borderBottomColor: COLORS.transparent,
       borderTopColor: COLORS.transparent,
