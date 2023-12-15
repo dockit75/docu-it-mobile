@@ -41,7 +41,7 @@ const FamilyModal = (isVisible) => {
   const [userDetails, setUserDetails] = useState(isVisible.userDetails);
   const [currentItemId, setCurrentItemId] = useState(isVisible.currentItemId);
   const [editFamilyCall, setEditFamilyCall] = useState(isVisible.editFamilyCall);
-  const [getFamilyList, setGetFamilyList] = useState(isVisible.getFamilyList);
+  const [getFamilyList, setGetFamilyList] = useState();
   const [isNameValid, setIsNameValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoader, setIsLoader] = useState(true);
@@ -60,7 +60,6 @@ const FamilyModal = (isVisible) => {
   }, []);
 
 
-  console.log('isModalVisible---->>>>', isModalVisible)
 
 
   const cancelModal = () => {
@@ -88,10 +87,7 @@ const FamilyModal = (isVisible) => {
         setIsLoading(false);
         Keyboard.dismiss();
         setErrorMessage('');
-
-        // setTimeout(() => alert(editFamilyRes.data.message), 1000)
-        // Alert.alert(editFamilyRes.data.message)
-        // console.log('editFamilyRes',editFamilyRes?.data)
+        isVisible.getFamilyList()
         setTimeout(
           () =>
             setIsSnackbarVisible({
@@ -100,12 +96,10 @@ const FamilyModal = (isVisible) => {
             }),
           500,
         );
+        
       } else {
         Keyboard.dismiss();
         setErrorMessage('');
-        // setTimeout(() => alert(response.data.message), 1000)
-        // Alert.alert(editFamilyRes.data.message)
-
         setTimeout(
           () =>
             setIsSnackbarVisible({
@@ -123,9 +117,6 @@ const FamilyModal = (isVisible) => {
       setCurrentItemId([]);
       Keyboard.dismiss();
       setErrorMessage('');
-      // console.error('Error fetching unique id:', error.response);
-      // setTimeout(() => alert(error.response.data.message), 1000)
-      // Alert.alert(error.response.data.message)
       setTimeout(
         () =>
           setIsSnackbarVisible({
@@ -136,7 +127,6 @@ const FamilyModal = (isVisible) => {
         500,
       );
     }
-    getFamilyList
     setIsModalVisible(false);
   };
   const handleSaveFamily = async () => {
@@ -148,7 +138,6 @@ const FamilyModal = (isVisible) => {
       name: newFamilyName,
       adminId: userDetails.id,
     };
-    // console.log('params family', params);
     try {
       let res = await NetworkManager.addFamily(params);
       if (res.data.code === 200) {
@@ -156,19 +145,16 @@ const FamilyModal = (isVisible) => {
         Keyboard.dismiss();
         setNewFamilyName('');
         setErrorMessage('');
+        isVisible.getFamilyList()
         setTimeout(
           () =>
             setIsSnackbarVisible({ message: res.data.message, visible: true }),
           500,
         );
-        // setTimeout(() => alert(res.data.message), 1000)
-        // Alert.alert(res.data.message)
       } else {
         Keyboard.dismiss();
         setNewFamilyName('');
         setErrorMessage('');
-        // setTimeout(() => alert(res.data.message), 1000)
-        // Alert.alert(res.data.message)
         setTimeout(
           () =>
             setIsSnackbarVisible({
@@ -182,9 +168,6 @@ const FamilyModal = (isVisible) => {
     } catch (error) {
       Keyboard.dismiss();
       setIsLoading(false);
-      // console.error('Error fetching unique id:', error.response);
-      // setTimeout(() => alert(error.response.data.message), 1000)
-      // Alert.alert(error.response.data.message)
       setNewFamilyName('');
       setErrorMessage('');
       setTimeout(
@@ -197,10 +180,9 @@ const FamilyModal = (isVisible) => {
         500,
       );
     }
-    getFamilyList
+   
     setIsModalVisible(false);
   };
-
   const handleFamily = () => {
     if (isNameValid) {
       if (editFamilyCall && currentItemId.name != previousCurrentItemId.name) {

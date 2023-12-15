@@ -13,23 +13,24 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { normalize, screenHeight, screenWidth } from '../../utilities/measurement';
-import { Images } from '../../assets/images/images';
+import { normalize, screenHeight, screenWidth } from '../../../utilities/measurement';
+import { Images } from '../../../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Popover from 'react-native-popover-view';
-import { COLORS } from '../../utilities/colors';
-import NetworkManager from '../../services/NetworkManager';
+import { COLORS } from '../../../utilities/colors';
+import NetworkManager from '../../../services/NetworkManager';
 import { Snackbar } from 'react-native-paper';
-import { retrieveUserDetail } from '../../storageManager';
-import DrawerNavigator from '../../components/common/DrawerNavigator';
+import { retrieveUserDetail } from '../../../storageManager';
+import DrawerNavigator from '../../../components/common/DrawerNavigator';
 import { Dialog ,LinearProgress} from '@rneui/themed';
-import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
-import CustomSnackBar from '../../components/common/SnackBar';
-import FamilyModal from './components/FamilyModal';
-import Loader from '../../components/common/Loader';
+import { FAMILY_LIST_EMPTY } from '../../../utilities/strings';
+import CustomSnackBar from '../../../components/common/SnackBar';
+import FamilyModal from '../components/FamilyModal';
+import Loader from '../../../components/common/Loader';
+import FamilyFlatlist from './FamilyFLatlist';
 
 const FamilyDocument = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -149,7 +150,7 @@ const FamilyDocument = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-       {isModalVisible === true && <FamilyModal isModalVisible={isModalVisible} editFamilyCall={editFamilyCall} userDetails={userDetails} getFamilyList={getFamilyList} currentItemId={currentItemId}/>}
+       {isModalVisible === true && <FamilyModal isModalVisible={isModalVisible} editFamilyCall={editFamilyCall} userDetails={userDetails}  currentItemId={currentItemId} getFamilyList={getFamilyList}/>}
 
         <View style={styles.header}>
           <View>
@@ -160,41 +161,7 @@ const FamilyDocument = ({ navigation }) => {
           </View>
         </View>
         {isLoader === true ? <Loader isLoading={isLoader} text={'loading'}/> : (
-          <FlatList
-            data={familyDetails}
-            style={{ flex: 1 }}
-            ListEmptyComponent={<View style={styles.listEmptyComponent}>
-              <Icon name='account-group' size={80} color={'white'}/>
-              <Text style={{ color: 'white', fontSize: 20 }}>{FAMILY_LIST_EMPTY.familyEmpty}</Text>
-            </View>}
-            renderItem={({ item }) => (
-              <View style={styles.FlatListContainer}>
-                <View style={styles.innerContainer}>
-                  <View style={styles.iconContainer}>
-                    <Icon name="account-group" size={25} color="white" />
-                  </View>
-                  <View>
-                    <TouchableOpacity onPress={() => navigation.navigate('FamilyMember', { familyItem: item })}>
-                      <Text style={styles.text}>{item.name}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                {item.createdBy === userDetails.id ?
-                  <View style={styles.iconView}>
-                    <TouchableOpacity
-                      onPress={() => showModal(item)}
-                      style={{ marginRight: 20 }}>
-                      <Icon name="square-edit-outline" size={20} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleFamilyDelete(item)}
-                      style={{ marginRight: 20 }}>
-                      <Icon name="delete" size={20} color="white" />
-                    </TouchableOpacity>
-                  </View> : null}
-              </View>
-            )}
-          />
+          <FamilyFlatlist  familyDetails={familyDetails} userDetails={userDetails}  getFamilyList={getFamilyList}/>
           )}
           <CustomSnackBar
             message={isSnackbarVisible?.message}
