@@ -229,15 +229,16 @@ const DocumentAccordian = ({ navigation }) => {
                             </View>
                           <View style={{alignItems:'center',justifyContent:'space-between',flexDirection:'row'}}>
                             <CheckBox
+                                style={{ marginRight:5,width:20,height:20 }}
                                 tintColors={{ true: COLORS.red, false: uncheckBoxColor }}
                                 onCheckColor={COLORS.white}
                                 onTintColor="green"
                                 offFillColor={COLORS.white}
                                 offTintColor={COLORS.white}
                                 onAnimationType="fill"
-                                style={{marginRight:5}}
                                 value={isCheckWholeFamily}
                                 disabled={membersCount === 0}
+                                boxType='square'
                                 onValueChange={() =>membersCount ? handleShareCheckBox(null,item.id,item,true,isCheckWholeFamily):null}
                             />
                             <TouchableOpacity onPress={() =>membersCount? handleSelectFamily(item, index):null}>
@@ -258,17 +259,20 @@ const DocumentAccordian = ({ navigation }) => {
                                     <Icon name="account" size={25} color={COLORS.white} />
                                     <Text style={{ fontSize: 16, color: COLORS.white, marginLeft: 10 }}>{member.user.name}</Text>
                                 </View>
+                                <View>
                                 <CheckBox
+                                    boxType='square'
                                     tintColors={{ true: COLORS.red, false: COLORS.white }}
                                     onCheckColor={COLORS.white}
                                     onTintColor="green"
                                     offFillColor={COLORS.white}
                                     offTintColor={COLORS.white}
                                     onAnimationType="fill"
-                                    style={{ marginRight: 20 }}
+                                    style={{ marginRight: 20,width:20,height:20 }}
                                     value={addMembers.includes(member.id)}
                                     onValueChange={() => handleShareCheckBox(member.id,item.id,item,false)}
                                 />
+                                </View>
                             </View>
                         ))}
                     </ScrollView>
@@ -477,7 +481,8 @@ const styles = StyleSheet.create({
         bottom: normalize(50),
         alignContent: 'center',
         backgroundColor: 'white',
-        zIndex: 1
+        zIndex: 1,
+        width:'90%'
 
     },
 });

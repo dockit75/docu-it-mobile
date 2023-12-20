@@ -10,7 +10,8 @@ import {
   FlatList,
   PermissionsAndroid,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform
 } from 'react-native';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
 import { normalize, screenWidth, screenHeight } from '../../utilities/measurement';
@@ -31,6 +32,8 @@ import { Dialog } from '@rneui/themed';
 import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
 import { processAddressBookContacts } from '../../utilities/Utils';
 import CustomSnackBar from '../../components/common/SnackBar';
+import {check, PERMISSIONS, RESULTS,request} from 'react-native-permissions';
+
 
 const FamilyMember = ({ navigation, props }) => {
   const route = useRoute();
@@ -50,6 +53,25 @@ const FamilyMember = ({ navigation, props }) => {
 
 
   const checkContactPermission = async () => {
+    if(Platform.OS === 'ios'){
+      let status = await check(PERMISSIONS.IOS.CONTACTS);
+      console.log('status,',status)
+      if(status === RESULTS.GRANTED){
+       loadContacts();
+      }else if(status === RESULTS.DENIED){
+        let reqContacts = await request(PERMISSIONS.IOS.CONTACTS);
+        if(reqContacts === RESULTS.GRANTED){
+          loadContacts();
+        }else{
+          setIsSnackbarVisible({ message:'Permission to access contacts was denied. You can update it in your device settings.', visible: true})
+        }
+      }else if(status === RESULTS.UNAVAILABLE){
+        setIsSnackbarVisible({ message:'This feature is not available (on this device / in this context)', visible: true})
+
+      }else{
+        setIsSnackbarVisible({ message:'Permission to access contacts was denied. You can update it in your device settings.', visible: true})
+      }
+  } else {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
@@ -68,6 +90,7 @@ const FamilyMember = ({ navigation, props }) => {
     } catch (err) {
       console.warn(err);
     }
+  }
   };
 
   useEffect(() => {
@@ -101,6 +124,25 @@ const FamilyMember = ({ navigation, props }) => {
   
 
   const requestContactPermissionAgain = async (isPressedAdd) => {
+    if(Platform.OS === 'ios'){
+      let status = await check(PERMISSIONS.IOS.CONTACTS);
+      console.log('status,',status)
+      if(status === RESULTS.GRANTED){
+        isPressedAdd ?  navigation.navigate('CommonInvite', { familyItem: familyItem, familyMember: familyMember,arrayCombined : arrayCombined,myContacts:myContacts }) : loadContacts();
+      }else if(status === RESULTS.DENIED){
+        let reqContacts = await request(PERMISSIONS.IOS.CONTACTS);
+        if(reqContacts === RESULTS.GRANTED){
+          loadContacts();
+        }else{
+          setIsSnackbarVisible({ message:'Permission to access contacts was denied. You can update it in your device settings.', visible: true})
+        }
+      }else if(status === RESULTS.UNAVAILABLE){
+        setIsSnackbarVisible({ message:'This feature is not available (on this device / in this context)', visible: true})
+
+      }else{
+        setIsSnackbarVisible({ message:'Permission to access contacts was denied. You can update it in your device settings.', visible: true})
+      }
+    }else{
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
@@ -118,6 +160,7 @@ const FamilyMember = ({ navigation, props }) => {
     } catch (err) {
       console.warn(err);
     }
+  }
   };
 
 
@@ -435,7 +478,8 @@ const styles = StyleSheet.create({
     bottom: normalize(50),
     alignContent: 'center',
     backgroundColor: 'white',
-    zIndex: 1
+    zIndex: 1,
+    width:'90%'
 },
   
 });

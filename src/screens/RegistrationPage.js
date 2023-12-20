@@ -242,17 +242,20 @@ const RegistrationPage = ({ navigation }) => {
                                     )}
                                 </View>
                                 <View style={{  flexDirection: 'row', justifyContent: 'flex-start',  marginTop:10, width: screenWidth, paddingHorizontal: 20, alignItems: 'center',zIndex:-1 }}>
-                                        <CheckBox
+                                    <View>
+                                        <CheckBox 
+                                            boxType='square'
                                             tintColors={{ true: COLORS.brandBlue, false: COLORS.lightGray }}
-                                            onCheckColor="white"
+                                            onCheckColor="green"
                                             onTintColor="green"
-                                            offFillColor="white"
-                                            offTintColor="white"
                                             onAnimationType="fill"
                                             value={checked}
                                             onValueChange={() => setChecked(!checked)}
+                                            size={10}
+                                            style={{width:20,height:20}}
                                         />
-                                        <View style={{flexDirection:'row',alignItems:'center',}} >
+                                        </View>
+                                        <View style={{flexDirection:'row',alignItems:'center', marginLeft:5}} >
                                             <Text style={{ fontSize: 12, color: COLORS.black }}>{LOGIN.termsAndCondtion[0]}</Text>
                                             <TouchableOpacity>
                                             <Text style={{ fontSize: 13, fontWeight: 'bold', color: 'black',borderBottomColor:'black',borderBottomWidth:2}}>{LOGIN.termsAndCondtion[1]}</Text>
@@ -376,7 +379,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         left: 50,
         color: 'black',
-        top: 0.1,
+        top: 12
     },
     phoneCountryFlag: {
         width: 'auto',

@@ -114,7 +114,7 @@ const CommonInvite = ({ navigation, props }) => {
             familyId: familyItem.id,
             invitedBy: userDetails.id
         }
-        // console.log('handleInviteUser ====== Params', params)
+        console.log('handleInviteUser ====== Params', params)
         try {
             let response = await NetworkManager.inviteUser(params)
             console.log('handleInviteUser==>response', response)
@@ -178,6 +178,7 @@ const CommonInvite = ({ navigation, props }) => {
 
     const memoizedRenderChatsHeader = useMemo(renderChatsHeader, [search])
     // console.log('filteredContacts', isLoader)
+    
     return (
         <ImageBackground
             source={Images.REGISTRATION}
@@ -228,19 +229,20 @@ const CommonInvite = ({ navigation, props }) => {
                                 </View>
                             </View>
                             <View>
-                                <CheckBox
-                                    tintColors={{ true: 'red', false: 'white' }}
-                                    onCheckColor="white"
-                                    onTintColor="green"
-                                    offFillColor="white"
-                                    offTintColor="white"
-                                    onAnimationType="fill"
-                                    value={selectedItems.includes(item?.phoneNumber?.length > 10 ? item.phoneNumber.substr(item.phoneNumber.length - 10, item.phoneNumber.length) : item?.phoneNumber ?? '')}
-                                    onValueChange={() => handleCheckboxChange(item?.phoneNumber?.length > 10 ? item.phoneNumber.substr(item.phoneNumber.length - 10, item.phoneNumber.length) : item?.phoneNumber ?? '')}
+                              <CheckBox 
+                                 boxType='square'
+                                 style={{ marginRight:5,width:20,height:20 }}
+                                 tintColors={{ true: COLORS.red, false: COLORS.gray }}
+                                 onCheckColor={COLORS.white}
+                                 onTintColor="green"
+                                 offFillColor={COLORS.white}
+                                 offTintColor={COLORS.white}
+                                 onAnimationType="fill"
+                                value={selectedItems.includes(item?.phoneNumber?.length > 10 ? item.phoneNumber.substr(item.phoneNumber.length - 10, item.phoneNumber.length) : item?.phoneNumber ?? '')}
+                                onValueChange={() => handleCheckboxChange(item?.phoneNumber?.length > 10 ? item.phoneNumber.substr(item.phoneNumber.length - 10, item.phoneNumber.length) : item?.phoneNumber ?? '')}
                                 />
-
+                                </View>
                             </View>
-                        </View>
                     )}
                     estimatedItemSize={45}
                 />
@@ -348,6 +350,7 @@ const styles = StyleSheet.create({
         bottom: normalize(50),
         alignContent: 'center',
         backgroundColor: 'white',
-        zIndex: 1
+        zIndex: 1,
+        width:'90%'
     },
 })

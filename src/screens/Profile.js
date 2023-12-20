@@ -436,7 +436,8 @@ snackBar: {
   opacity: 0.85,
   alignContent: 'center',
   backgroundColor: 'white',
-  zIndex: 1
+  zIndex: 1,
+  width:'90%'
 },
 })
 export default Profile

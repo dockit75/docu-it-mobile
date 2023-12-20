@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { Card, Title, Paragraph, Button, ActivityIndicator } from 'react-native-paper';
 import { normalize, normalizeVertical, screenHeight, screenWidth } from '../utilities/measurement';
@@ -214,6 +215,43 @@ const Dashboard = ({ }) => {
   };
 
   const handleScanner = async () => {
+    if(Platform.OS === 'ios'){
+      const value = await check(PERMISSIONS.IOS.CAMERA);
+      console.log('value',value)
+      if (value === RESULTS.GRANTED) {
+        // Camera permission is already granted, start the document scanner
+        const { scannedImages: newScannedImages } = await DocumentScanner.scanDocument({
+          croppedImageQuality: 50
+        });
+        if (newScannedImages.length > 0) {
+          const formattedScannedImages = formatScannedImages(newScannedImages);
+          uploadFileList(formattedScannedImages)
+        }
+      } else if (value === RESULTS.DENIED) {
+        console.log('else called')
+        // Camera permission is denied, request it from the user
+        const requestResult = await request(PERMISSIONS.IOS.CAMERA);
+        if (requestResult === RESULTS.GRANTED) {
+          // Camera permission has been granted, start the document scanner
+          const { scannedImages: newScannedImages } = await DocumentScanner.scanDocument({
+            croppedImageQuality: 50
+          });
+          if (newScannedImages.length > 0) {
+            const formattedScannedImages = formatScannedImages(newScannedImages);
+            uploadFileList(formattedScannedImages)
+  
+          }
+        } else {
+          // Handle the case where the user denied camera permissions
+          // You can show a message to the user explaining why the camera is require
+          alert('Permission to access camera was denied.');
+  
+        }
+      } else {
+        // Handle other permission statuses 
+        alert('Permission to access camera was denied.');
+      }
+    }else{
     // Check if camera permission is granted
     const status = await check(PERMISSIONS.ANDROID.CAMERA);
     if (status === RESULTS.GRANTED) {
@@ -248,6 +286,7 @@ const Dashboard = ({ }) => {
       // Handle other permission statuses 
       alert('Permission to access camera was denied.');
     }
+  }
   };
 
 

@@ -81,7 +81,8 @@ const DocumentScannerScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
-      setIsLoader(true)
+    
+      setTimeout(()=>setIsLoader(true), 1000)
       getUploadedDocumentsList()
   });
 
@@ -101,18 +102,18 @@ const DocumentScannerScreen = ({ navigation, route }) => {
         setCombinedDocuments(categoryResult.data.response.documentDetailsList.map(item => item = {...item, showOptions: false}))
 
         setIsUploading(false)
-        setIsLoader(false)
+        setTimeout(()=>setIsLoader(false), 1000)
         if(isOpenLatest){
           // let item = categoryResult.data.response.documentDetailsList?.sort((a, b) => b.updatedDate - a.updatedDate)[0]
           // setTimeout(() => navigation.navigate('uploadPreview', {uploadFiles: [{ ...item, fileType: 'application/pdf'}], categoryInfo, refreshData, isEditDocument: true}), 600)
         }
       } else {
-        setIsLoader(false)
+        setTimeout(()=>setIsLoader(false), 1000)
       }
     } catch (error) {
       console.error(error); // You might send an exception to your error tracker
     } finally {
-      setIsLoader(false)
+      setTimeout(()=>setIsLoader(false), 1000)
     }
   }
 
@@ -127,6 +128,48 @@ const DocumentScannerScreen = ({ navigation, route }) => {
   const handleScanner = async () => {
 
     setIsShowUpload(false)
+    if(Platform.OS === 'ios'){
+      const status = await check(PERMISSIONS.IOS.CAMERA);
+      setCameraPermissionStatus(status);
+  
+      if (status === RESULTS.GRANTED) {
+        // Camera permission is already granted, start the document scanner
+        const { scannedImages: newScannedImages } = await DocumentScanner.scanDocument({
+          croppedImageQuality: 50
+        });
+        if (newScannedImages.length > 0) {
+          const formattedScannedImages = formatScannedImages(newScannedImages);
+          uploadFileList(formattedScannedImages)
+        }
+      } else if (status === RESULTS.DENIED) {
+        // Camera permission is denied, request it from the user
+        const requestResult = await request(PERMISSIONS.IOS.CAMERA);
+  
+        if (requestResult === RESULTS.GRANTED) {
+          // Camera permission has been granted, start the document scanner
+          const { scannedImages: newScannedImages } = await DocumentScanner.scanDocument({
+            croppedImageQuality: 50
+          });
+          if (newScannedImages.length > 0) {
+            const formattedScannedImages = formatScannedImages(newScannedImages);
+            uploadFileList(formattedScannedImages)
+          }
+        } else {
+          // Handle the case where the user denied camera permissions
+          // You can show a message to the user explaining why the camera is require
+          alert('Permission to access camera was denied.');
+          setSnackbarMessage('Camera permission required to scan Documents');
+          setSnackbarVisible(true);
+  
+        }
+      } else {
+        // Handle other permission statuses 
+        alert('Permission to access camera was denied.');
+        setSnackbarMessage('Camera permission required to scan Documents');
+        setSnackbarVisible(true);
+      }
+
+    }else{
     // Check if camera permission is granted
     const status = await check(PERMISSIONS.ANDROID.CAMERA);
     setCameraPermissionStatus(status);
@@ -167,6 +210,7 @@ const DocumentScannerScreen = ({ navigation, route }) => {
       setSnackbarMessage('Camera permission required to scan Documents');
       setSnackbarVisible(true);
     }
+  }
   };
 
   const toggleFullScreen = async (item) => {
@@ -787,10 +831,10 @@ const DocumentScannerScreen = ({ navigation, route }) => {
           >
             <Text style={{ fontFamily: 'System', textAlign: 'center', color: COLORS.dodgerBlue, fontSize: normalize(12) }}> {`File Download Successfully!`} </Text>
           </Snackbar>
-          <Dialog style={{ zIndex: 10, elevation: 10 }} isVisible={isUploading} >
+          {isUploading === true ?<Dialog style={{ zIndex: 10, elevation: 10 }} isVisible={isUploading} >
             <LinearProgress style={{ marginVertical: 10 }} color={'#0e9b81'} />
             <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Uploading...</Text>
-          </Dialog> 
+          </Dialog> : null }
 
           <CustomSnackBar
             message={isSnackbarVisible?.message}

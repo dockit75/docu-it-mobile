@@ -180,7 +180,8 @@ const styles = StyleSheet.create({
         bottom: normalize(50),
         alignContent: 'center',
         backgroundColor: 'white',
-        zIndex: 1
+        zIndex: 1,
+        width:'90%'
 
     },
 })

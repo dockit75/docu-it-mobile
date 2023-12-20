@@ -80,7 +80,7 @@ const FamilyDocument = ({ navigation }) => {
       let editFamilyRes = await NetworkManager.editFamily(params);
       // console.log('editFamilyRes',editFamilyRes)
       if (editFamilyRes.data.code === 200) {
-        setIsLoading(false)
+        setTimeout(()=>setIsLoading(false), 1000)
         Keyboard.dismiss()
         setErrorMessage('')
        
@@ -150,7 +150,7 @@ const FamilyDocument = ({ navigation }) => {
     try {
       let res = await NetworkManager.addFamily(params);
       if (res.data.code === 200) {
-        setIsLoading(false)
+         setTimeout(()=>setIsLoading(false), 1000)
         Keyboard.dismiss()
         setNewFamilyName('')
         setErrorMessage('')
@@ -445,10 +445,10 @@ const FamilyDocument = ({ navigation }) => {
             roundness={10}
             duration={isSnackbarVisible.isFailed ? 3000 : 2000}
           />
-           <Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
+     {isLoading === true ?  <Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
            <ActivityIndicator size={'large'} color={'#0e9b81'} />
           <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Processing...</Text>
-        </Dialog>
+        </Dialog>: null}
           </View>
       </DrawerNavigator>
     </ImageBackground>
@@ -607,6 +607,7 @@ const styles = StyleSheet.create({
     bottom: normalize(50),
     alignContent: 'center',
     backgroundColor: 'white',
-    zIndex: 1
+    zIndex: 1,
+    width:'90%'
 },
 });
