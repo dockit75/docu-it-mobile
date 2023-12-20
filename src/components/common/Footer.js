@@ -15,6 +15,7 @@ import { COLORS } from '../../utilities/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TOUR_GUIDE } from '../../utilities/strings';
 import { checkNotifications } from 'react-native-permissions';
+import { Platform } from 'react-native';
 
 const Footer = ({ props, route, screenName }) => {
     const {
@@ -113,7 +114,7 @@ const Footer = ({ props, route, screenName }) => {
     }
 
     return (
-        <View style={{ marginBottom: (!screenName) ? 0 : 20, alignItems: 'center', justifyContent: 'space-between', backgroundColor:notificationColor?'transparent':'black', padding: 5, flexDirection: 'row', zIndex:-1}}>
+        <View style={{ marginBottom: (!screenName) ? 0 : 20, alignItems: 'center', justifyContent: 'space-between', backgroundColor:notificationColor?'transparent':'black', padding:Platform.OS === 'ios'?15 : 5, flexDirection: 'row', zIndex:-1}}>
             <View style={{ marginLeft: 20 }}>
                 <TouchableOpacity style={{ alignItems: 'center' }} onPress={handleHome}>
                     <Icon name="home" size={40} color="gray" />

@@ -61,7 +61,7 @@ const CategoryScreen = ({navigation, route}) => {
 
     return (
         <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, flex: 1 }}>
-					<SafeAreaView style={{ flex: 1 }}>
+					{/* <SafeAreaView style={{ flex: 1 }}> */}
 						<DrawerNavigator navigation={navigation}>
 							<FlatList
 								nestedScrollEnabled
@@ -92,7 +92,7 @@ const CategoryScreen = ({navigation, route}) => {
                     <ActivityIndicator size={'large'} color={'#0e9b81'} />
                     <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
                 </Dialog>
-            </SafeAreaView>
+            {/* </SafeAreaView> */}
         </ImageBackground>
     );
   }

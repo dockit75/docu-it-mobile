@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         left: 50,
         color: 'black',
-        top: 12
+        top: Platform.OS === 'ios' ? 12: 0.1,
     },
     phoneCountryFlag: {
         width: 'auto',
