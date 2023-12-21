@@ -166,7 +166,7 @@ const CommonInvite = ({ navigation, props }) => {
                     clearIcon={search === '' ? false : undefined}
                     value={search ?? ''}
                     ref={(search) => { inputRef.current = search }}
-                    platform={Platform.OS === 'android' ? 'default' : 'ios'}
+                    platform={Platform.OS === 'android' ? 'default' : 'default'}
                     containerStyle={styles.messageSearchBar}
                     inputContainerStyle={{ padding: 0, backgroundColor: COLORS.coolLight, borderRadius: 10, height: 40, alignItems: 'center' }}
                     cancelButtonProps={{ color: COLORS.brandBlue }}
