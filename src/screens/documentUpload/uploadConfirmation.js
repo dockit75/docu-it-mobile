@@ -245,7 +245,6 @@ const UploadConfirmation = ({ navigation, route }) => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={[styles.imageBackground]}>
         <DrawerNavigator>
         <View style={{ flex: 1 }}>
@@ -295,7 +294,7 @@ const UploadConfirmation = ({ navigation, route }) => {
                         value={item.categoryName}
                         status={ item.categoryId === categoryData?.categoryId ? 'checked' : 'unchecked' }
                         onPress={() => setCategoryData(item)}
-                        uncheckedColor={COLORS.white}
+                        uncheckedColor={COLORS.red}
                         color={COLORS.red}
                       />
                        </View>
@@ -319,7 +318,6 @@ const UploadConfirmation = ({ navigation, route }) => {
         </Dialog>
         </DrawerNavigator>
       </ImageBackground>
-    </SafeAreaView>
   );
 };
 

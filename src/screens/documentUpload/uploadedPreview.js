@@ -245,7 +245,7 @@ const UploadedPreview = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View >
         {fullScreenImage ? (
         <View style={{ borderWidth: 0.3, position: 'absolute', alignSelf: 'center', height: screenHeight * 0.93, paddingTop: insets.top }}>
           <View style={styles.fullScreenContainer}>
@@ -402,7 +402,7 @@ const UploadedPreview = ({ navigation, route }) => {
         </DrawerNavigator>
         </ImageBackground>
 }
-    </SafeAreaView>
+    </View>
   );
 };
 

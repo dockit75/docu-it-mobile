@@ -28,7 +28,6 @@ import { Dialog } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BackHandler } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { TOUR_GUIDE } from '../utilities/strings';
 import { setProfileCompletion } from '../slices/UserSlices';
 import {
   TourGuideProvider, // Main provider
@@ -37,6 +36,7 @@ import {
   useTourGuideController, // hook to start, etc.
 } from 'rn-tourguide'
 import { all } from 'axios';
+import { APP_BUTTON_NAMES, APP_NAME, TOUR_GUIDE } from '../utilities/strings';
 
 const tileList = [{
   icon: 'ICON_PERSONAL_DOCS',
@@ -67,6 +67,7 @@ const Dashboard = ({ }) => {
   const [allowTour, setAllowTour] = useState()
   let [stepCount, setStepCount] = useState(0);
   const [zoneIndex, setZoneIndex] = useState(null);
+  const [isStartTour, setIsStartTour] = useState(false)
 
 
   const handlePress = (path, isCameraIconPress) => isCameraIconPress ? handleScanner() : navigation.navigate(path)
@@ -114,7 +115,9 @@ const Dashboard = ({ }) => {
   useEffect(() => {
     // Delay the execution of this block by 5000 milliseconds (5 seconds)
     if (canStart && allowTour) {
-      start();
+      // start();
+      setIsStartTour(true)
+
     }
 
     // Clear the timeout when the component is unmounted or the dependency values change
@@ -370,30 +373,6 @@ console.log('setALlowtoure',allowTour)
       <View style={{ flexDirection: 'column', alignItems: 'center', height: screenHeight * 0.4, alignSelf: 'center', justifyContent: 'space-evenly' }}>
         <View style={styles.cardView}>
           {tileList.map(renderTile)}
-          {/* {[...tileList].reverse().map(renderTile)} */}
-
-          {/* <TourGuideZone zone={3} text={'Click to add, view and share My Documents'} borderRadius={16} tourKey={tourKey} keepTooltipPosition={false}>
-            <TouchableOpacity onPress={() => navigation.navigate('CategoryScreen')}>
-              <Card style={styles.cardContainer}>
-                <Image source={require('../assets/images/icon_personal_docs.png')} style={styles.Images} resizeMode="center" />
-                <Card.Content>
-                  <Paragraph style={styles.imageText}>My Documents</Paragraph>
-                </Card.Content>
-              </Card>
-            </TouchableOpacity>
-            </TourGuideZone>
-         
-
-          <TourGuideZone zone={2} text={'Click to add and view My Family'} borderRadius={16} tourKey={tourKey} >
-          <TouchableOpacity onPress={() => navigation.navigate('FamilyDocument')}>
-            <Card style={styles.cardContainer}>
-              <Image source={require('../assets/images/icon_family_mgmt.png')} style={styles.Images} resizeMode="center" />
-              <Card.Content>
-                <Paragraph style={styles.imageText}>My Family</Paragraph>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
-          </TourGuideZone> */}
         </View>
         <View >
           <TourGuideZone
@@ -411,6 +390,26 @@ console.log('setALlowtoure',allowTour)
           </TourGuideZone>
         </View>
       </View>
+      <Dialog isVisible={isStartTour} >
+        <View style={styles.modalContent}>
+          <Text style={{ fontSize: 22 }} >{TOUR_GUIDE.tourModalTitle}<Text style={{ fontWeight: 'bold' }}>{APP_NAME}</Text></Text>
+          <View style={{ width: 80, height: 80 }}>
+            <Image resizeMode="center" source={Images.LOGO_DOCKIT} style={{ width: '100%', height: '100%' }} />
+          </View>
+          <View>
+          <Text style={{ fontSize: 15, textAlign: 'left' }}>{TOUR_GUIDE.tourModal[0]}</Text>
+          {/* <Text style={{ fontSize: 14, textAlign: 'left' }}>{TOUR_GUIDE.tourModal[1]}</Text> */}
+          {/* <Text style={{ fontSize: 14, textAlign: 'left' }}>{TOUR_GUIDE.tourModal[3]}<Text style={{ fontWeight: 'bold' }}>{APP_NAME}</Text>{TOUR_GUIDE.tourModal[4]}</Text> */}
+          </View>
+          <View style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+            <TouchableOpacity
+              onPress={() => {setIsStartTour(false), setTimeout(() => start(), 300);}}
+              style={{backgroundColor:  '#17826b', padding: 8, marginTop: 10, borderRadius: 5, width: 100 }}>
+              <Text style={{ textAlign: 'center', fontWeight: 'bold', color: '#fff' }}>{APP_BUTTON_NAMES.start}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Dialog>
       <FlatList
         style={{ backgroundColor: 'rgb(240, 240, 240)', marginHorizontal: 20, marginBottom: 10, borderRadius: 10 }}
         data={activityData}
@@ -479,13 +478,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingTop: 3
   },
+  modalContent: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderColor: COLORS.avatarBackground,
+    height: screenHeight * 0.5
+  },
 });
 
-// function Myapk() {
-//   return (
-//     <TourGuideProvider  preventOutsideInteraction={true} verticalOffset={-45} animationDuration={800} >
-//       <Dashboard />
-//     </TourGuideProvider>
-//   )
-// }
 export default Dashboard

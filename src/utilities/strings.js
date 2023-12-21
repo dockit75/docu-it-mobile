@@ -57,7 +57,8 @@
     save: 'Save',
     update: 'Update',
     submit: 'SUBMIT',
-    done: 'Done'
+    done: 'Done',
+    start: 'Start'
   }
 
   export const FAMILY_LIST_EMPTY = {
@@ -68,9 +69,20 @@
   }
 
   export const TOUR_GUIDE = {
-    cameraTour: 'click to scan and upload PDF',
-    familyTour: 'Click to add and view My Family',
-    documentTour: 'Click to add, view and share My Documents',
-    notificationTour: 'Click here to view notifications',
-    menuTour:'Click here to move Settings'
+    cameraTour: 'Click here to scan and upload your personal documents',
+    familyTour: 'Click here to add family members with whom you can share/receive documents',
+    documentTour: 'Click here to view all your uploaded documents',
+    notificationTour: 'Click here to see family invite request notifications',
+    menuTour:'Click here to view/edit your profile and read T&C',
+    tourModalTitle: 'Introducing ',
+    tourModal: [
+      'Your secure, shareable vault for managing and safeguarding important documents. Say goodbye to paper clutter, categorize your files, and enjoy peace of mind with encrypted protection.',
+      'Say goodbye to paper clutter, categorize your files, and enjoy peace of mind with encrypted protection.',
+      ' to enhance your family document collaboration.',
+      `That's it! You're ready to dive into the world of `,
+      'Enjoy using ',
+      ' and share documents with your family! ',
+
+    ],
+    
   }

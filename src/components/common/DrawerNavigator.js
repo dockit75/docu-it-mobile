@@ -7,6 +7,7 @@ import { TourGuideProvider ,TourGuideZoneByPosition,useTourGuideController} from
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { COLORS } from '../../utilities/colors';
 import { normalizeVertical } from '../../utilities/measurement';
+import { Platform } from 'react-native';
 
 export default function DrawerNavigator(props) {
   const {
@@ -27,7 +28,7 @@ export default function DrawerNavigator(props) {
 
  
   return (
-    <TourGuideProvider preventOutsideInteraction={true} verticalOffset={normalizeVertical(30)}  animationDuration={800}  wrapperStyle={{zIndex:1,}} labels={{
+    <TourGuideProvider preventOutsideInteraction={true} verticalOffset={Platform.OS ==='android' ? normalizeVertical(10) : 0}  animationDuration={800}  wrapperStyle={{zIndex:1,}} labels={{
    // Set to an empty string to effectively "remove" the label
       previous: ' ',
       next: 'Next',

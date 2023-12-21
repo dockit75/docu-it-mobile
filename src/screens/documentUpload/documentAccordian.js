@@ -209,7 +209,6 @@ const DocumentAccordian = ({ navigation }) => {
         }
        }
     }
-    console.log('setSelectedFamilyIds',selectedFamilyIds)
 
     const FamilyAccordionHeader = ({ item, index,openedIndices }) => {
       

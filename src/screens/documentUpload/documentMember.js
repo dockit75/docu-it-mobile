@@ -81,7 +81,7 @@ const DocumentMember = ({ navigation, props }) => {
         try {
             let userData = await retrieveUserDetail()
             let response = await NetworkManager.listFamilyMembers(family.id)
-            console.log('response==>listFamilyMembers', response.data?.response.MemberList, response.data?.response.MemberList?.length)
+            // console.log('response==>listFamilyMembers', response.data?.response.MemberList, response.data?.response.MemberList?.length)
             if (response.data.code === 200) {
                 let memberList = response.data.response.MemberList.filter(filterItem => filterItem.user.id !== userData.id)
                 setFamilyMember(memberList)
