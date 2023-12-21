@@ -245,6 +245,7 @@ const UploadConfirmation = ({ navigation, route }) => {
   }
 
   return (
+    <View style={{ flex: 1 }}>
       <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={[styles.imageBackground]}>
         <DrawerNavigator>
         <View style={{ flex: 1 }}>
@@ -276,11 +277,13 @@ const UploadConfirmation = ({ navigation, route }) => {
                   contentContainerStyle={{ marginHorizontal: 10 }}
                   renderItem={({ item }) => (
                     <View style={{ backgroundColor: COLORS.darkTransparent, padding:5, margin: 5 ,borderRadius:8,marginLeft:10}}>
-                      <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                      <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',height:30}}>
                       <Text style={{color:'white',marginLeft:10}}>
                         {item.categoryName}
                       </Text>
-                      {/* <CheckBox
+                   { Platform.OS === 'ios' ? ( <View>
+                      <CheckBox
+                        style={{width:20,height:20,marginRight:10}}
                         tintColors={{ true: 'red', false: 'white' }}
                         onCheckColor="white"
                         onTintColor="green"
@@ -289,14 +292,16 @@ const UploadConfirmation = ({ navigation, route }) => {
                         onAnimationType="fill"
                         value={item.categoryId === categoryData?.categoryId}
                         onValueChange={() => setCategoryData(item)}
-                      /> */}
-                      <RadioButton
+                      />
+                      </View>):(
+                       <RadioButton
                         value={item.categoryName}
                         status={ item.categoryId === categoryData?.categoryId ? 'checked' : 'unchecked' }
                         onPress={() => setCategoryData(item)}
-                        uncheckedColor={COLORS.red}
+                        uncheckedColor={COLORS.white}
                         color={COLORS.red}
-                      />
+                      /> )
+                    }
                        </View>
                     </View>
                   )}
@@ -318,6 +323,7 @@ const UploadConfirmation = ({ navigation, route }) => {
         </Dialog>
         </DrawerNavigator>
       </ImageBackground>
+    </View>
   );
 };
 
