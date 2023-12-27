@@ -184,7 +184,10 @@ const Profile = ({ navigation }) => {
               <Text style={[{ fontSize: normalize(14), textTransform: 'uppercase', color: COLORS.black, paddingRight: 20, fontWeight: '500' }, index && { marginTop: normalize(22) }]}>{`${item.id}   `}{(item.isEdit) && <Icon size={20} name='pencil' color={COLORS.warnLight} style={{ paddingLeft: 20 }} />}</Text>
               <View style={{ zIndex: 1, }}>
                 <TouchableOpacity style={[styles.dropdownContainer]}
-                    onPress={() => toggleDropdown()}
+                    onPress={() => {
+                      Keyboard.dismiss()
+                      toggleDropdown()
+                    }}
                 >
                     <Text style={[styles.selectedOption, { color: 'black',  }]}>{profileData?.gender ?? 'Choose Gender'}</Text>
                     {isOpen ? (
@@ -225,6 +228,7 @@ const Profile = ({ navigation }) => {
                 value={profileData?.[item.itemKeyName]}
                 style={[{ borderColor: item.isEdit ? COLORS.warnLight :COLORS.gray, borderWidth: normalize(1), borderRadius: normalize(8), marginTop: normalize(8), color: COLORS.black, height: normalize(48), paddingHorizontal: 10 }]}
                 // onChangeText={(value) => setProfileData(prev => prev = { ...prev, [item.id]: value })}
+                onFocus={() => setIsOpen(false)}
                 onChangeText={(value) => handleInputChange(value, item)}
                 maxLength={51}
               /> 

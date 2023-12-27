@@ -291,7 +291,7 @@ const FamilyMember = ({ navigation, props }) => {
           <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
         </Dialog> ) : (
         <FlatList
-          data={arrayCombined}
+          data={arrayCombined?.sort((a, b) => Number(b.inviteStatus === 'Accepted') - Number(a.inviteStatus === 'Accepted'))}
           style={{ flex: 1 }}
           ListEmptyComponent={<View style={styles.listEmptyComponent}>
             <Icon name='account' size={80} color={'white'}/>

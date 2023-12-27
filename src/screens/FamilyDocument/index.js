@@ -346,7 +346,7 @@ const FamilyDocument = ({ navigation }) => {
               }
 
             } else {
-              editFamilyCall && setCurrentItemId([]);
+              // editFamilyCall && setCurrentItemId([]);
               setNewFamilyName('');
             }
             }}
