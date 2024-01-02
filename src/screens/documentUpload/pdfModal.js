@@ -10,7 +10,7 @@ const PdfModal = ({closeModal, pdfData}) => {
 
   let filePath = pdfData?.documentUrl ?? pdfData?.url
     return (
-        <View style={styles.centeredView} >
+        // <View style={styles.centeredView} >
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -42,7 +42,7 @@ const PdfModal = ({closeModal, pdfData}) => {
                 </View>
                 </View>
             </Modal>
-        </View>
+        // </View>
     )
 }
 

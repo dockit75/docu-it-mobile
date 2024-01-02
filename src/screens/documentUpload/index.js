@@ -455,10 +455,11 @@ const readFileAsBase64 = async (filePath) => {
     setTimeout(() => (navigation.navigate('DocumentAccordian', { document: document, categoryInfo: categoryInfo })), 150)
   }
 
-  const handleViewDocument = async (document) => {
+  const handleViewDocument = async (document,isMenuPressed) => {
     console.log('document',document)
-    handleShowOption(document, false)
-    setIsViewPdf(document)
+    handleShowOption(document, false,isMenuPressed)
+    setTimeout(()=>  setIsViewPdf(document),isMenuPressed? 500 : 0)
+  
  
   }
 
@@ -526,7 +527,7 @@ const readFileAsBase64 = async (filePath) => {
         fromUrl: document?.documentUrl ?? document?.url,
         toFile: downloadPath,
       }).promise;
-      ReactNativeBlobUtil.ios.previewDocument(downloadPath);
+      setTimeout(() =>   ReactNativeBlobUtil.ios.previewDocument(downloadPath), 500)
       if (downloadResult.statusCode === 200) {
         setIsDownloadComplete(true);
       } else {
@@ -544,7 +545,7 @@ const readFileAsBase64 = async (filePath) => {
       case (action.itemKey === 'shareDocument'):
         return await handleShareDocument(document)
       case (action.itemKey === 'viewDocument'):
-        return await handleViewDocument(document)
+        return await handleViewDocument(document,true)
       case (action.itemKey === 'deleteDocument'):
         return await handleDeleteDocument(document)
       case (action.itemKey === 'downloadDocument'):
@@ -556,10 +557,14 @@ const readFileAsBase64 = async (filePath) => {
     }
   }
 
-  const handleShowOption = (item, status) => {
+  const handleShowOption = (item, status,isMenuPressed) => {
     // console.log('handleShowOption', item)
     status ? setListExtraData(prev => prev = [{ ...prev, ...item, showOptions: status }]) : setListExtraData({})
+    if(isMenuPressed){
+      setCombinedDocuments(prev => prev.map(prevItem => prevItem = { ...prevItem, showOptions: false }))
+    }else{
     setCombinedDocuments(prev => prev.map(prevItem => prevItem = { ...prevItem, showOptions: status ? (prevItem.documentId === item.documentId) : false }))
+    }
   }
 
 
