@@ -55,6 +55,9 @@ target 'DockIt' do
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   pod 'react-native-document-scanner-plugin', :path => '../node_modules/react-native-document-scanner-plugin'
   pod 'react-native-contacts', :path => '../node_modules/react-native-contacts'
+  pod 'react-native-blob-util',:path => '../node_modules/react-native-blob-util'
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+
   use_react_native!(
     :path => config[:reactNativePath],
     # Hermes is now enabled by default. Disable by setting this flag to false.
