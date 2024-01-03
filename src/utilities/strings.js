@@ -1,3 +1,5 @@
+  export const APP_NAME = 'Dock.IT'
+
   export const Dashboard_CARD_TEXT ={
     lifeInsurance: 'LIFE INSURANCE',
     assets: 'ASSETS',
