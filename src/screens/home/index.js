@@ -5,8 +5,10 @@ import { normalize, screenWidth,screenHeight } from '../../utilities/measurement
 import { COLORS } from '../../utilities/colors'
 import { Images } from '../../assets/images/images'
 import Dashboard from '../Dashboard'
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import DrawerNavigator from '../../components/common/DrawerNavigator'
+import Tile from './components/Tile'
+import RecentActivity from './components/RecentActivity'
 
 
 const Home = ({navigation,props}) => {
@@ -17,12 +19,15 @@ const Home = ({navigation,props}) => {
     }, [])
 
     return (
-      <ImageBackground
+        <ImageBackground
         source={Images.REGISTRATION}
         resizeMode="cover"
         style={{ width: screenWidth, height: '100%' }}>
           <DrawerNavigator navigation={navigation}>
-            <Dashboard/> 
+            <SafeAreaView style={{flex:1,alignItems:'center',flexDirection:'column',justifyContent:'space-between'}}>
+            <Tile/>
+            <RecentActivity/>
+            </SafeAreaView>
           </DrawerNavigator>    
       </ImageBackground>
             
