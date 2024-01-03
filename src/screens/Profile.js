@@ -34,6 +34,7 @@ const Profile = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true)
     const [inputError, setInputError] = useState(false); 
     const [loader, setLoader] = useState(true);
+    const [isNameValid, setIsNameValid] = useState(true);
 
     const options = LOGIN.genderOptions;
     useEffect(() => {
@@ -167,14 +168,19 @@ const Profile = ({ navigation }) => {
     }
   }
   const handleInputChange = (value, item) => {
-    if (value.length <= 50) {
-      setProfileData((prev) => ({ ...prev, [item.id]: value }));
-      setInputError(false); // Clear error if within limit
+    const alphabetRegex = /^[A-Za-z_ ]+$/;
+    const isValid = alphabetRegex.test(value.trim());
+    
+    setIsNameValid(isValid);
+  
+    if (value.trim().length <= 50 && isValid) {
+      setProfileData((prev) => ({ ...prev, [item.id]: value.trim() }));
+      setInputError(false); // Clear error if within limit and matches the regex pattern
     } else {
-      setInputError(true); // Set error if exceeded limit
-      // Keyboard.dismiss()
+      setInputError(true); // Set error if exceeded limit or doesn't match the regex pattern
     }
   };
+  
 
     const mapInputs = ({item, index}) => {
         return (
@@ -316,10 +322,10 @@ const Profile = ({ navigation }) => {
                         }
                       /> */}
                       {PROFILE_SCREEN.fields.map((item, index)=>mapInputs({item, index}))}
-                      {inputError && <Text style={{ color: 'red' }}>Max length exceeded (50 characters)</Text>}
-                      <TouchableOpacity style={{ backgroundColor: (buttonEnable) ? '#17826b' : COLORS.gray, alignItems: 'center', alignSelf: 'center', width: 120, height: 40, alignContent: 'center', justifyContent: 'center', marginTop: 30, borderRadius: 20, flexDirection: 'row' }} disabled={isLoading || !isValueChange} onPress={() => handleUpdate()}>
+                      {inputError && <Text style={{ color: 'red' }}>Max length exceeded (50 characters) and Name must contain only alphabets.</Text>}
+                      <TouchableOpacity style={{ backgroundColor: (buttonEnable) && isNameValid ? '#17826b' : COLORS.gray, alignItems: 'center', alignSelf: 'center', width: 120, height: 40, alignContent: 'center', justifyContent: 'center', marginTop: 30, borderRadius: 20, flexDirection: 'row' }} disabled={isLoading || !isValueChange} onPress={() => handleUpdate()}>
                             { isLoading && <ActivityIndicator size={'small'} color={COLORS.avatarBackground} />}
-                            <Text style={[styles.done, { color: (buttonEnable) ? COLORS.warnLight : COLORS.backdrop }, !buttonEnable && { opacity: 0.5, marginLeft: isLoading ? 10 : 0 }]}>
+                            <Text style={[styles.done, { color: (buttonEnable) && isNameValid  ? COLORS.warnLight : COLORS.backdrop }, !buttonEnable && { opacity: 0.5, marginLeft: isLoading ? 10 : 0 }]}>
                               {APP_BUTTON_NAMES.done}
                             </Text>
                           </TouchableOpacity>
