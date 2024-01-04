@@ -19,10 +19,9 @@ import UploadedPreview from '../screens/documentUpload/uploadedPreview';
 import UploadedComplete from '../screens/documentUpload/uploadConfirmation';
 import Settings from '../screens/Settings';
 import CategoryScreen from '../screens/category';
-import FamilyDocument from '../screens/FamilyDocument';
-import FamilyMember from '../screens/FamilyDocument/FamilyMember';
-import FamilyInvite from '../screens/FamilyDocument/FamilyInvite';
-import PendingUser from '../screens/FamilyDocument/PendingUser';
+import FamilyDocument from '../screens/FamilyDocument/Family';
+import FamilyMember from '../screens/FamilyDocument/Member/FamilyMember';
+import PendingUser from '../screens/FamilyDocument/PendingInvites/PendingUser';
 import CommonInvite from '../screens/FamilyDocument/CommonInvite';
 // import Onboard from '../screens/onboard';
 import DocumentFamily from '../screens/documentUpload/documentFamily';
@@ -114,11 +113,7 @@ const AppNavigator = ({ initialRouteName }) => {
        component={FamilyMember}
        options={{ headerShown: false }}
      />
-     <Stack.Screen
-       name="FamilyInvite"
-       component={FamilyInvite}
-       options={{ headerShown: false }}
-     />
+  
       <Stack.Screen
        name="PendingUser"
        component={PendingUser}

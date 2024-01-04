@@ -14,25 +14,27 @@ import {
   Platform
 } from 'react-native';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
-import { normalize, screenWidth, screenHeight } from '../../utilities/measurement';
-import { COLORS } from '../../utilities/colors';
-import { Images } from '../../assets/images/images';
+import { normalize, screenWidth, screenHeight } from '../../../utilities/measurement';
+import { COLORS } from '../../../utilities/colors';
+import { Images } from '../../../assets/images/images';
 import { useNavigation } from '@react-navigation/native';
-import Dashboard from '../Dashboard';
+import Dashboard from '../../Dashboard';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import DrawerNavigator from '../../components/common/DrawerNavigator';
-import NetworkManager from '../../services/NetworkManager';
+import DrawerNavigator from '../../../components/common/DrawerNavigator';
+import NetworkManager from '../../../services/NetworkManager';
 import { useFocusEffect } from '@react-navigation/native';
 import { color } from '@rneui/base';
-import { retrieveUserDetail } from '../../storageManager';
+import { retrieveUserDetail } from '../../../storageManager';
 import Contacts from 'react-native-contacts';
 import { Dialog } from '@rneui/themed';
-import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
-import { processAddressBookContacts } from '../../utilities/Utils';
-import CustomSnackBar from '../../components/common/SnackBar';
+import { FAMILY_LIST_EMPTY } from '../../../utilities/strings';
+import { processAddressBookContacts } from '../../../utilities/Utils';
+import CustomSnackBar from '../../../components/common/SnackBar';
 import {check, PERMISSIONS, RESULTS,request} from 'react-native-permissions';
+import MemberFlatlist from './components/MemberFlatlist';
+import Loader from '../../../../src/components/common/Loader'
 
 
 const FamilyMember = ({ navigation, props }) => {
@@ -329,48 +331,8 @@ const FamilyMember = ({ navigation, props }) => {
           </View> : null}
         </View>
 
-        {isLoader === true ?(<Dialog overlayStyle={{ width: 120 }} isVisible={isLoader} >
-          <ActivityIndicator size={'large'} color={'#0e9b81'} />
-          <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-        </Dialog> ) : (
-        <FlatList
-          data={arrayCombined}
-          style={{ flex: 1 }}
-          ListEmptyComponent={<View style={styles.listEmptyComponent}>
-            <Icon name='account' size={80} color={'white'}/>
-            <Text style={{ color: 'white', fontSize: 20 }}>{FAMILY_LIST_EMPTY.memberEmpty}</Text>
-          </View>}
-          renderItem={({ item }) => (
-            <View style={styles.FlatListContainer}>
-              {typeof item === 'object' ? ( // Check if item is an object (family member)
-                <View style={{width:'70%'}}>
-                  <Text style={styles.text}>
-                  {item.user ? item.user.name : ''} {item.displayName ? `(${item.displayName})` : ''}
-                  </Text>
-                </View>
-              ) : ( // Otherwise, it's a phone number
-                <View>
-                  <Text style={styles.text}>{item.phone}</Text>
-                </View>
-              )}
-              <View style={styles.iconView}>
-                {item.inviteStatus === 'Invited' ? (
-                  <View>
-                    <TouchableOpacity onPress={() => handleInviteUser(item)} style={{ marginRight: 20 }}>
-                      {iconEnabled ? <Icon name="account-plus" size={28} color="white" /> : <Icon name="account-multiple-plus" size={28} color="white" />}
-                    </TouchableOpacity>
-                  </View>) : null}
-                {(item.inviteStatus === 'Accepted' && userDetails.id === familyItem.createdBy ) ? (
-                  <View>
-                    <TouchableOpacity style={{ marginRight: 20 }} onPress={() => handleFamilyMemberDelete(item)}>
-                      <Icon name="delete" size={25} color="white" />
-                    </TouchableOpacity>
-                  </View>) : null}
-
-              </View>
-            </View>
-          )}
-        />
+        {isLoader === true ?( <Loader isLoading={isLoader} text={'loading'}/> ) : (
+       <MemberFlatlist arrayCombined={arrayCombined} familyItem={familyItem} />
         )}
                   <CustomSnackBar
                     message={isSnackbarVisible?.message}

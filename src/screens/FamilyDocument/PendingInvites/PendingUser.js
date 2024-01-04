@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { Image, ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, FlatList, ActivityIndicator, } from 'react-native'
-import { normalize, screenHeight, screenWidth } from '../../utilities/measurement'
-import { Images } from '../../assets/images/images';
+import { normalize, screenHeight, screenWidth } from '../../../utilities/measurement'
+import { Images } from '../../../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS } from '../../utilities/colors';
-import DrawerNavigator from '../../components/common/DrawerNavigator';
+import { COLORS } from '../../../utilities/colors';
+import DrawerNavigator from '../../../../src/components/common/DrawerNavigator';
 import { useRoute } from '@react-navigation/native';
-import { retrieveUserDetail } from '../../storageManager';
-import NetworkManager from '../../services/NetworkManager';
-import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
+import { retrieveUserDetail } from '../../../storageManager';
+import NetworkManager from '../../../services/NetworkManager';
+import { FAMILY_LIST_EMPTY } from '../../../utilities/strings';
 import { Dialog } from '@rneui/themed';
-import CustomSnackBar from '../../components/common/SnackBar';
+import CustomSnackBar from '../../../components/common/SnackBar';
+import PendingFlatlist from './Components/PendingFlatlist';
 
 
 
@@ -90,43 +91,9 @@ const PendingUser = ({ navigation }) => {
                     <ActivityIndicator size={'large'} color={'#0e9b81'} />
                     <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
                    </Dialog> ): (
-                <FlatList
-                    data={invitesPending.slice().reverse()}
-                    style={{ flex: 1 }}
-                    ListEmptyComponent={<View style={styles.listEmptyComponent}>
-                        <MaterialCommunityIcons name='account-multiple-remove-outline' size={60} color={'white'}/>
-                        <Text style={{ color: 'white', fontSize: 20,textAlign:'center' }}>{FAMILY_LIST_EMPTY.pendingEmpty}</Text>
-                    </View>}
-                    renderItem={({ item }) => (
-                        <View style={styles.FlatListContainer}>
-                            <View style={{alignItems:'center',flexDirection:'row',justifyContent:'space-between'}}>
-                            <View style={{width:'70%'}}>
-                                <Text style={{ fontSize: 14, color: "white", marginLeft: 10, }}>
-                                    <Text style={{ fontSize: 17, fontWeight: 'bold' }}>{item.invitedBy.name}</Text>
-                                    {" "}inviting you to  {'\n'} join 
-                                    <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'yellow' }}>{" "}{item.family.name}</Text>{" family"}</Text>
-                            </View>
-                            <View style={styles.buttons}>
-                                <TouchableOpacity onPress={() => handleInvite(item, 'Accepted')} style={styles.iconTouchable}>
-                                    <Icon name="check" size={24} color="#50C878" />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => handleInvite(item, 'rejected')} style={styles.iconTouchable}>
-                                    <Icon name="remove" size={24} color="red" />
-                                </TouchableOpacity>
-                            </View>
-                            </View>
-                        </View>
-                    )}
-                />)}
-                 <CustomSnackBar
-                    message={isSnackbarVisible?.message}
-                    status={isSnackbarVisible?.visible}
-                    setStatus={setIsSnackbarVisible}
-                    styles={[styles.snackBar, {backgroundColor: isSnackbarVisible.isFailed ? COLORS.red : '#0e9b81'}]}
-                    textStyle={{ color: COLORS.white, textAlign: 'left', fontSize: 13 }}
-                    roundness={10}
-                    duration={isSnackbarVisible.isFailed ? 3000 : 2000}
-                 />
+                    <PendingFlatlist  invitesPending={invitesPending}/>
+                   )}
+                
               </View>
             </DrawerNavigator>
         </ImageBackground>
