@@ -216,7 +216,6 @@ const UploadedPreview = ({ navigation, route }) => {
   }
 
   const handleSave = async () => {
-    // let documentData = uploadFiles[0]?.fileType === 'application/pdf' ? documentPageList : { ...documentPageList, pageCount: documentPageList?.length}
     navigation.navigate('uploadFinished',{documentPage:  documentPageList, categoryInfo, refreshData, isEditDocument})
   }
 
@@ -250,7 +249,7 @@ const UploadedPreview = ({ navigation, route }) => {
         <View style={{ borderWidth: 0.3, position: 'absolute', alignSelf: 'center', height: screenHeight * 0.93, paddingTop: insets.top }}>
           <View style={styles.fullScreenContainer}>
             {fullScreenImage.documentUrl?.includes('.pdf') ? 
-              <Pdf
+              <Pd
                 singlePage
                 trustAllCerts={false}
                 page={fullScreenImage?.pageIndex + 1}
@@ -269,17 +268,11 @@ const UploadedPreview = ({ navigation, route }) => {
               resizeMode="contain"
               style={[
                 styles.fullScreenImage,
-                // { transform: [{ rotate: `${rotateDegrees[fullScreenImage] || 0}deg` }] },
               ]}
               source={{ uri: fullScreenImage.documentUrl }}
             />}
           </View>
           <View style={styles.buttonContainerFullScreen}>
-            {/* <TouchableOpacity onPress={() => { 
-              // console.log(fullScreenImage)
-            }}>
-              <Icon name="share-alt" size={24} color="#050000" />
-            </TouchableOpacity> */}
             <TouchableOpacity onPress={() => toggleFullScreen(fullScreenImage)}>
               {fullScreenImage === fullScreenImage ? (
                 <Icon name="compress" size={24} color="#79aee7" />
@@ -332,64 +325,7 @@ const UploadedPreview = ({ navigation, route }) => {
                 </TouchableOpacity>
               </View>
             </View>
-        {/* <Popover
-          isVisible={isChangeNameOpen}
-          onRequestClose={() => {
-            setIsChangeNameOpen(false);
-          }}
-          popoverStyle={styles.popover}>
-          <View style={styles.modalContent}>
-              <Text
-                style={{
-                  color: 'black',
-                  fontSize: 18,
-                  fontWeight: '500',
-                  marginVertical: 10,
-                }}>
-                Change Document Name
-              </Text>
-
-            <TextInput
-              ref={documentNameInputRef}
-              value={documentName}
-              style={styles.input}
-              onChangeText={text => setDocumentName(text)}
-            />
-            <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.setParams('uploadFiles', [{...uploadFiles, documentName}])
-                  setIsChangeNameOpen(false)
-                }}
-                style={styles.saveButton}>
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    marginTop: 6,
-                    fontSize: 16,
-                    color: 'white',
-                    fontWeight: '500',
-                  }}>
-                  Rename
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setIsChangeNameOpen(false)}
-                style={styles.cancelButton}>
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    marginTop: 6,
-                    fontSize: 16,
-                    color: 'white',
-                    fontWeight: '500',
-                  }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Popover> */}
+       
                 <CustomSnackBar
                     message={isSnackbarVisible?.message}
                     status={isSnackbarVisible?.visible}
