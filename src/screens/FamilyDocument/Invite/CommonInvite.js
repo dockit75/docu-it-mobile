@@ -1,26 +1,27 @@
 import React, { useRef, useState, useEffect, cloneElement, useMemo } from 'react'
 import { ScrollView, StyleSheet, ImageBackground, Text, View, Image, TouchableOpacity, FlatList, TextInput, Alert, PermissionsAndroid, ActivityIndicator, Platform } from 'react-native'
 import { Card, Title, Paragraph, Button } from 'react-native-paper'
-import { normalize, normalizeVertical, screenHeight, screenWidth } from '../../utilities/measurement';
-import { COLORS } from '../../utilities/colors'
-import { Images } from '../../assets/images/images'
+import { normalize, normalizeVertical, screenHeight, screenWidth } from '../../../utilities/measurement';
+import { COLORS } from '../../../utilities/colors'
+import { Images } from '../../../assets/images/images'
 import { useNavigation, useIsFocused } from '@react-navigation/native'
-import Dashboard from '../Dashboard'
+import Dashboard from '../../Dashboard'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import DrawerNavigator from '../../components/common/DrawerNavigator'
+import DrawerNavigator from '../../../components/common/DrawerNavigator'
 import { Dialog, SearchBar, Tab, TabView } from '@rneui/themed';
-import { FONTALIGNMENT } from '../../utilities/Fonts';
+import { FONTALIGNMENT } from '../../../utilities/Fonts';
 import PhoneInput from "react-native-phone-number-input";
-import { retrieveUserDetail } from '../../storageManager';
-import NetworkManager from '../../services/NetworkManager';
+import { retrieveUserDetail } from '../../../storageManager';
+import NetworkManager from '../../../services/NetworkManager';
 import Contacts from 'react-native-contacts';
 import CheckBox from '@react-native-community/checkbox';
 import { FlashList } from '@shopify/flash-list'
-import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
-import CustomSnackBar from '../../components/common/SnackBar';
+import { FAMILY_LIST_EMPTY } from '../../../utilities/strings';
+import CustomSnackBar from '../../../components/common/SnackBar';
+import Loader from '../../../components/common/Loader';
 
 
 const CommonInvite = ({ navigation, props }) => {
@@ -204,11 +205,12 @@ const CommonInvite = ({ navigation, props }) => {
                 <View>
                     {memoizedRenderChatsHeader}
                 </View>
+                {isLoader === true && <Loader isLoading={isLoader} text={'loading'}/> }
 
-                <Dialog overlayStyle={{ width: 120, zIndex: 111 }} isVisible={isLoader} >
+                {/* <Dialog overlayStyle={{ width: 120, zIndex: 111 }} isVisible={isLoader} >
                     <ActivityIndicator size={'large'} color={'#0e9b81'} />
                     <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-                </Dialog>
+                </Dialog> */}
                 <FlashList
                     data={search?.length ? searchData : filteredContacts.slice().sort((a, b) => a.name.localeCompare(b.name))}
                     extraData={selectedItems}

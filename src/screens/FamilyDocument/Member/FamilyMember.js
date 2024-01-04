@@ -242,58 +242,7 @@ const FamilyMember = ({ navigation, props }) => {
     }
   }
 
-  const handleInviteUser = async (item) => {
-    const params = {
-      phoneNumbers: [item.user?.phone ?? item.phone],
-      familyId: familyItem.id,
-      invitedBy: userDetails.id
-    }
-    // console.log('handleInviteUser ====== Params', params)
-    try {
-      let response = await NetworkManager.inviteUser(params)
-      if (response.data.code === 200) {
-        setIsSnackbarVisible({ message: response.data.message, visible: true})
-
-        setIconEnabled(true)
-      } 
-    } catch (error) {
-      setIsSnackbarVisible({ message: error.response.data.message, visible: true})
-
-    }
-
-  }
-
-  const handleFamilyMemberDelete = async (item) => {
-    const params = {
-      memberIds: [item.id]
-    }
-    Alert.alert(
-      'Are you want to delete the member?',
-      '',
-    [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-        onPress: () => {}
-      },
-      { text: 'Ok', onPress: async () => {
-        try {
-          let response = await NetworkManager.removeFamilyMembers(params)
-          if (response.data.code === 200) {
-            setIsSnackbarVisible({ message: response.data.message, visible: true})
-            const updatedCombinedArray = arrayCombined.filter(
-              arrayItem => arrayItem !== item
-            );     
-            setArrayCombined(updatedCombinedArray)
-          } else {
-          }
-        } catch (error) {
-          setIsSnackbarVisible({ message:error.response.data.message, visible: true})
-        }
-      }, style: 'destructive' }
-    ]
-    )
-  }
+  
 
   return (
     <ImageBackground

@@ -22,7 +22,7 @@ import CategoryScreen from '../screens/category';
 import FamilyDocument from '../screens/FamilyDocument/Family';
 import FamilyMember from '../screens/FamilyDocument/Member/FamilyMember';
 import PendingUser from '../screens/FamilyDocument/PendingInvites/PendingUser';
-import CommonInvite from '../screens/FamilyDocument/CommonInvite';
+import CommonInvite from '../screens/FamilyDocument/Invite/CommonInvite';
 // import Onboard from '../screens/onboard';
 import DocumentFamily from '../screens/documentUpload/documentFamily';
 import DocumentMember from '../screens/documentUpload/documentMember';
