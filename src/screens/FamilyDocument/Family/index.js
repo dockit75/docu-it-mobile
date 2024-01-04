@@ -52,12 +52,14 @@ const FamilyDocument = ({ navigation }) => {
 
 
   const showModalAdd = () => {
-    console.log('show add modal called')
-
     setNewFamilyName('')
     setEditFamilyCall(false);
-    setIsModalVisible(true);
-    console.log('ismodalVisible===>addd',isModalVisible)
+    setTimeout(
+      () =>
+      setIsModalVisible(true),
+      1000,
+    );
+   
   };
 
   useEffect(() => {
@@ -82,7 +84,22 @@ const FamilyDocument = ({ navigation }) => {
     }
   };
  
+  const cancelModal = () => {
+    // setTimeout(
+    //   () =>
+    //   setIsModalVisible(false),
+    //   500,
+    // );
+    setIsModalVisible(false)
+    Keyboard.dismiss();
+    setCurrentItemId([]);
+    setNewFamilyName('');
+    setErrorMessage('');
+    // setIsSnackbarVisible(false);
+  };
 
+
+  
   return (
     <ImageBackground
       source={Images.REGISTRATION}
@@ -99,7 +116,15 @@ const FamilyDocument = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-       {isModalVisible === true && <FamilyModal isModalVisible={isModalVisible} editFamilyCall={editFamilyCall} userDetails={userDetails}  currentItemId={currentItemId} getFamilyList={getFamilyList}/>}
+     {isModalVisible ? 
+      <FamilyModal
+      isVisible={isModalVisible}
+      editCall={editFamilyCall}
+      userId = {userDetails}
+      currentId={currentItemId}
+      cancelModal={cancelModal}
+      getFamilyList = {getFamilyList}
+    /> : null}
 
         <View style={styles.header}>
           <View>
@@ -110,7 +135,13 @@ const FamilyDocument = ({ navigation }) => {
           </View>
         </View>
         {isLoader === true ? <Loader isLoading={isLoader} text={'loading'}/> : (
-          <FamilyFlatlist  familyDetails={familyDetails} userDetails={userDetails}  getFamilyList={getFamilyList}/>
+          <FamilyFlatlist 
+           familyData={familyDetails}
+           userId={userDetails}  
+           getFamilyList={getFamilyList}
+           editCall={editFamilyCall}
+           currentId={currentItemId}
+           />
           )}
           <CustomSnackBar
             message={isSnackbarVisible?.message}

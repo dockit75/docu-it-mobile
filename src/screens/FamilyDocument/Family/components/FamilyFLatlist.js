@@ -24,18 +24,25 @@ import CustomSnackBar from '../../../../components/common/SnackBar';
 import FamilyModal from './FamilyModal';
 import { useNavigation } from '@react-navigation/native';
 
-const FamilyFlatlist = (props) => {
+const FamilyFlatlist = ({ familyData, userId, getFamilyList ,editCall,currentId}) => {
+   console.log('familyFlatList called=====>>>>',familyData)
     const insets = useSafeAreaInsets();
     const navigation = useNavigation();
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [familyDetails, setFamilyDetail] = useState(props.familyDetails);
-    const [userDetails, setUserDetails] = useState(props.userDetails);
-    const [currentItemId, setCurrentItemId] = useState([]);
-    const [editFamilyCall, setEditFamilyCall] = useState(false);
+    const [familyDetails, setFamilyDetail] = useState([]);
+    const [userDetails, setUserDetails] = useState(userId);
+    const [currentItemId, setCurrentItemId] = useState(currentId);
+    const [editFamilyCall, setEditFamilyCall] = useState();
     const [isLoader, setIsLoader] = useState(true);
     const [previousCurrentItemId, SetPreviousCurrentItemId] = useState([])
     const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
-    console.log('navigation====>>', props, familyDetails,)
+    // console.log('navigation====>>', props, familyDetails,)
+
+    useEffect(() => {
+        console.log('useEffect called familyFlatlist');
+        // setIsModalVisible(isVisible.isModalVisible);
+        setFamilyDetail(familyData);
+    }, [familyData]); 
     const showModal = (item) => {
         setCurrentItemId(item);
         SetPreviousCurrentItemId(item)
@@ -43,6 +50,19 @@ const FamilyFlatlist = (props) => {
         setIsModalVisible(true);
         console.log('show modal modal called')
     };
+
+    const cancelModal = () => {
+        // setTimeout(
+        //   () =>
+        //   setIsModalVisible(false),
+        //   500,
+        // );
+        setIsModalVisible(false)
+        Keyboard.dismiss();
+        setCurrentItemId([]);
+        // setIsSnackbarVisible(false);
+      };
+    
 
     const handleFamilyDelete = async (item) => {
         const params = {
@@ -80,8 +100,16 @@ const FamilyFlatlist = (props) => {
 
     return (
         <View style={{ flex: 1 }}>
-            {isModalVisible === true && <FamilyModal isModalVisible={isModalVisible} editFamilyCall={editFamilyCall} userDetails={userDetails}  currentItemId={currentItemId} getFamilyList={props.getFamilyList}/>}
-            <FlatList
+            {isModalVisible ?
+                <FamilyModal
+                    isVisible={isModalVisible}
+                    editCall={editFamilyCall}
+                    userId={userDetails}
+                    currentId={currentItemId}
+                    cancelModal={cancelModal}
+                    getFamilyList={getFamilyList}
+                /> : null}
+                <FlatList
                 data={familyDetails}
                 style={{ flex: 1 }}
                 ListEmptyComponent={<View style={styles.listEmptyComponent}>
@@ -205,7 +233,7 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         backgroundColor: 'white',
         zIndex: 1,
-        width:'90%'
+        width: '90%'
     },
     text: {
         textAlign: 'center',

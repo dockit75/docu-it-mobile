@@ -29,15 +29,14 @@ import NetworkManager from '../../../../services/NetworkManager';
 import CustomSnackBar from '../../../../components/common/SnackBar';
 import Loader from '../../../../components/common/Loader';
 
-const FamilyModal = (isVisible) => {
+const FamilyModal = ({ isVisible, editCall,userId, currentId, cancelModal,getFamilyList}) => {
   const insets = useSafeAreaInsets();
   const [isModalVisible, setIsModalVisible] = useState();
   const [newFamilyName, setNewFamilyName] = useState('');
   const [familyDetails, setFamilyDetail] = useState([]);
-  const [userDetails, setUserDetails] = useState(isVisible.userDetails);
-  const [currentItemId, setCurrentItemId] = useState(isVisible.currentItemId);
-  const [editFamilyCall, setEditFamilyCall] = useState(isVisible.editFamilyCall);
-  const [getFamilyList, setGetFamilyList] = useState();
+  const [userDetails, setUserDetails] = useState(userId);
+  const [currentItemId, setCurrentItemId] = useState(currentId);
+  const [editFamilyCall, setEditFamilyCall] = useState(editCall);
   const [isNameValid, setIsNameValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoader, setIsLoader] = useState(true);
@@ -50,30 +49,18 @@ const FamilyModal = (isVisible) => {
   console.log('visible', isVisible)
 
   useEffect(() => {
-    console.log('useEffect Called==================>',isVisible.isModalVisible)
-    // setIsModalVisible(isVisible.isModalVisible)
-    setTimeout(
-      () =>
-      setIsModalVisible(isVisible.isModalVisible),
-      500,
-    );
-  }, [isVisible.isModalVisible]);
 
-  const cancelModal = () => {
     setTimeout(
       () =>
-      setIsModalVisible(false),
+      setIsModalVisible(isVisible),
       500,
     );
-    Keyboard.dismiss();
-    setCurrentItemId([]);
-    setNewFamilyName('');
-    setErrorMessage('');
-    setIsSnackbarVisible(false);
-  };
+  }, []);
+
+
   const editFamilyName = async () => {
     console.log('editFamilyName==called')
-    setIsModalVisible(false);
+    setIsModalVisible(null)
     setIsLoading(true);
     try {
       let params = {
@@ -81,9 +68,7 @@ const FamilyModal = (isVisible) => {
         familyId: currentItemId.id,
         adminId: userDetails.id,
       };
-      // console.log('params',params)
       let editFamilyRes = await NetworkManager.editFamily(params);
-      // console.log('editFamilyRes',editFamilyRes)
       if (editFamilyRes.data.code === 200) {
         setTimeout(
           () =>
@@ -92,15 +77,11 @@ const FamilyModal = (isVisible) => {
         );
         Keyboard.dismiss();
         setErrorMessage('');
-        isVisible.getFamilyList()
-        setTimeout(
-          () =>
-            setIsSnackbarVisible({
+        getFamilyList()
+        setIsSnackbarVisible({
               message: editFamilyRes.data.message,
               visible: true,
-            }),
-          500,
-        );
+            })
         
       } else {
         Keyboard.dismiss();
@@ -122,33 +103,34 @@ const FamilyModal = (isVisible) => {
       setCurrentItemId([]);
       Keyboard.dismiss();
       setErrorMessage('');
-      setTimeout(
-        () =>
-          setIsSnackbarVisible({
+      setIsSnackbarVisible({
             message: error.response.data.message,
             visible: true,
             isFailed: true,
-          }),
-        500,
-      );
+          })
+        
     }
-    setIsModalVisible(false);
+    setTimeout(
+      () =>
+        cancelModal(),
+      500,
+    );
   };
 
   console.log('isloading False')
   const handleSaveFamily = async () => {
     console.log('saveFamily--called')
-    setIsModalVisible(false);
+   setIsModalVisible(null)
     setIsLoading(true);
     setEditFamilyCall(false);
     let params = {
       name: newFamilyName,
       adminId: userDetails.id,
     };
+    console.log('params',params)
     try {
       let res = await NetworkManager.addFamily(params);
       if (res.data.code === 200) {
-      
         setTimeout(
           () =>
           setIsLoading(false),
@@ -157,12 +139,8 @@ const FamilyModal = (isVisible) => {
         Keyboard.dismiss();
         setNewFamilyName('');
         setErrorMessage('');
-        isVisible.getFamilyList()
-        setTimeout(
-          () =>
-            setIsSnackbarVisible({ message: res.data.message, visible: true }),
-          500,
-        );
+        getFamilyList()
+        setIsSnackbarVisible({ message: res.data.message, visible: true })
       } else {
         Keyboard.dismiss();
         setNewFamilyName('');
@@ -174,7 +152,7 @@ const FamilyModal = (isVisible) => {
               visible: true,
               isFailed: true,
             }),
-          1000,
+          500,
         );
       }
     } catch (error) {
@@ -182,25 +160,28 @@ const FamilyModal = (isVisible) => {
       setIsLoading(false);
       setNewFamilyName('');
       setErrorMessage('');
-      setTimeout(
-        () =>
-          setIsSnackbarVisible({
+      setIsSnackbarVisible({
             message: error.response.data.message,
             visible: true,
             isFailed: true,
-          }),
-        500,
-      );
+          })
     }
-   
-    setIsModalVisible(false);
+    setTimeout(
+      () =>
+        cancelModal(),
+      500,
+    );
+    //
   };
+
+  
+  
   const handleFamily = () => {
     if (isNameValid) {
       if (editFamilyCall && currentItemId.name != previousCurrentItemId.name) {
-        editFamilyName();
+        editFamilyName()
       } else if (!editFamilyCall) {
-        handleSaveFamily();
+        handleSaveFamily()
       } else {
         null;
       }
