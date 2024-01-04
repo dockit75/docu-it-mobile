@@ -24,31 +24,31 @@ import {
   normalizeVertical,
   screenHeight,
   screenWidth,
-} from '../../utilities/measurement';
+} from '../../../utilities/measurement';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { Images } from '../../assets/images/images';
+import { Images } from '../../../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DocumentPicker from 'react-native-document-picker';
 import { FAB, Portal, PaperProvider, Snackbar } from 'react-native-paper';
-import { COLORS } from '../../utilities/colors';
-import { retrieveUserDetail } from '../../storageManager';
-import NetworkManager from '../../services/NetworkManager';
+import { COLORS } from '../../../utilities/colors';
+import { retrieveUserDetail } from '../../../storageManager';
+import NetworkManager from '../../../services/NetworkManager';
 import Pdf from 'react-native-pdf';
-import DrawerNavigator from '../../components/common/DrawerNavigator';
+import DrawerNavigator from '../../../components/common/DrawerNavigator';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { Menu, MenuItem, MenuDivider } from 'react-native-material-menu';
-import { UPLOAD_DOCUMENT } from '../../utilities/strings';
+import { UPLOAD_DOCUMENT } from '../../../utilities/strings';
 import moment from 'moment';
-import PdfModal from './pdfModal';
+import PdfModal from './components/pdfModal';
 import { PDFDocument } from 'pdf-lib';
-import { DocumentListItemLoader } from './documentListItemLoader';
-import { maxFileSizeLimit } from '../../services/config';
+import { DocumentListItemLoader } from '../documentListItemLoader';
+import { maxFileSizeLimit } from '../../../services/config';
 import { FlashList } from '@shopify/flash-list';
 import { Dialog, LinearProgress } from '@rneui/themed';
-import { setProfileCompletion } from '../../slices/UserSlices';
+import { setProfileCompletion } from '../../../slices/UserSlices';
 import { useDispatch } from 'react-redux';
 import Popover from 'react-native-popover-view';
-import CustomSnackBar from '../../components/common/SnackBar';
+import CustomSnackBar from '../../../components/common/SnackBar';
 // import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 import RNFS from 'react-native-fs';
 // import Share from 'react-native-share';
@@ -459,8 +459,6 @@ const readFileAsBase64 = async (filePath) => {
     console.log('document',document)
     handleShowOption(document, false,isMenuPressed)
     setTimeout(()=>  setIsViewPdf(document),isMenuPressed? 500 : 0)
-  
- 
   }
 
   const handleDownloadDocument = async (document) => {

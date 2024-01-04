@@ -13,24 +13,24 @@ import {
 } from 'react-native';
 import moment from 'moment';
 import { useDispatch } from 'react-redux';
-import { COLORS } from '../../utilities/colors';
+import { COLORS } from '../../../utilities/colors';
 import { RadioButton } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
-import { Images } from '../../assets/images/images';
+import { Images } from '../../../assets/images/images';
 import { createPdf } from 'react-native-images-to-pdf';
 import { Dialog, LinearProgress } from '@rneui/themed';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import { retrieveUserDetail } from '../../storageManager';
+import { retrieveUserDetail } from '../../../storageManager';
 import { ScrollView } from 'react-native-gesture-handler';
-import NetworkManager from '../../services/NetworkManager';
-import { setProfileCompletion } from '../../slices/UserSlices';
+import NetworkManager from '../../../services/NetworkManager';
+import { setProfileCompletion } from '../../../slices/UserSlices';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { screenHeight, screenWidth } from '../../utilities/measurement';
-import { APP_BUTTON_NAMES, UPLOAD_DOCUMENT } from '../../utilities/strings';
+import { screenHeight, screenWidth } from '../../../utilities/measurement';
+import { APP_BUTTON_NAMES, UPLOAD_DOCUMENT } from '../../../utilities/strings';
 import { validatePathConfig } from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox';
-import DrawerNavigator from '../../components/common/DrawerNavigator';
+import DrawerNavigator from '../../../components/common/DrawerNavigator';
 
 const UploadConfirmation = ({ navigation, route }) => {
 

@@ -14,22 +14,22 @@ import {
     ActivityIndicator,
     ScrollView
 } from 'react-native';
-import { normalize, screenHeight, screenWidth } from '../../utilities/measurement';
-import { Images } from '../../assets/images/images';
+import { normalize, screenHeight, screenWidth } from '../../../utilities/measurement';
+import { Images } from '../../../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Popover from 'react-native-popover-view';
-import { COLORS } from '../../utilities/colors';
-import NetworkManager from '../../services/NetworkManager';
+import { COLORS } from '../../../utilities/colors';
+import NetworkManager from '../../../services/NetworkManager';
 import { Snackbar } from 'react-native-paper';
-import { retrieveUserDetail } from '../../storageManager';
-import DrawerNavigator from '../../components/common/DrawerNavigator';
+import { retrieveUserDetail } from '../../../storageManager';
+import DrawerNavigator from '../../../components/common/DrawerNavigator';
 import CheckBox from '@react-native-community/checkbox';
 import { Dialog,LinearProgress } from '@rneui/themed';
-import { FAMILY_LIST_EMPTY } from '../../utilities/strings';
+import { FAMILY_LIST_EMPTY } from '../../../utilities/strings';
 import { addContact } from 'react-native-contacts';
-import CustomSnackBar from '../../components/common/SnackBar';
+import CustomSnackBar from '../../../components/common/SnackBar';
 
 const DocumentAccordian = ({ navigation }) => {
     const insets = useSafeAreaInsets();

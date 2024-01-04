@@ -18,24 +18,24 @@ import {
   normalizeVertical,
   screenHeight,
   screenWidth,
-} from '../../utilities/measurement';
+} from '../../../utilities/measurement';
 import { PDFDocument } from 'pdf-lib';
-import { COLORS } from '../../utilities/colors';
-import { Images } from '../../assets/images/images';
+import { COLORS } from '../../../utilities/colors';
+import { Images } from '../../../assets/images/images';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { retrieveUserDetail } from '../../storageManager';
-import NetworkManager from '../../services/NetworkManager';
+import { retrieveUserDetail } from '../../../storageManager';
+import NetworkManager from '../../../services/NetworkManager';
 import React, { useState, useEffect, useRef } from 'react';
 import { DraggableGrid } from 'react-native-draggable-grid';
-import { convertPdfUrlToBase64 } from '../../utilities/Utils';
+import { convertPdfUrlToBase64 } from '../../../utilities/Utils';
 import DocumentScanner from 'react-native-document-scanner-plugin';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { APP_BUTTON_NAMES, UPLOAD_DOCUMENT } from '../../utilities/strings';
+import { APP_BUTTON_NAMES, UPLOAD_DOCUMENT } from '../../../utilities/strings';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { DocumentItemLoader } from './documentItemLoader';
-import DrawerNavigator from '../../components/common/DrawerNavigator';
-import CustomSnackBar from '../../components/common/SnackBar';
+import { DocumentItemLoader } from '../documentItemLoader';
+import DrawerNavigator from '../../../components/common/DrawerNavigator';
+import CustomSnackBar from '../../../components/common/SnackBar';
 
 const UploadedPreview = ({ navigation, route }) => {
 

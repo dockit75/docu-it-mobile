@@ -14,9 +14,9 @@ import HamburgerMenu from '../screens/home/index';
 import User from '../screens/User';
 import Profile from '../screens/Profile';
 import PinGenerationScreen from '../screens/PinGenerationScreen';
-import DocumentScannerScreen from '../screens/documentUpload/index';
-import UploadedPreview from '../screens/documentUpload/uploadedPreview';
-import UploadedComplete from '../screens/documentUpload/uploadConfirmation';
+import DocumentScannerScreen from '../screens/documentUpload/Documents/index';
+import UploadedPreview from '../screens/documentUpload/DocumentPreview/uploadedPreview';
+import UploadedComplete from '../screens/documentUpload/UploadConfirmation/uploadConfirmation';
 import Settings from '../screens/Settings';
 import CategoryScreen from '../screens/category';
 import FamilyDocument from '../screens/FamilyDocument/Family';
@@ -24,9 +24,8 @@ import FamilyMember from '../screens/FamilyDocument/Member/FamilyMember';
 import PendingUser from '../screens/FamilyDocument/PendingInvites/PendingUser';
 import CommonInvite from '../screens/FamilyDocument/Invite/CommonInvite';
 // import Onboard from '../screens/onboard';
-import DocumentFamily from '../screens/documentUpload/documentFamily';
-import DocumentMember from '../screens/documentUpload/documentMember';
-import DocumentAccordian from '../screens/documentUpload/documentAccordian';
+
+import DocumentAccordian from '../screens/documentUpload/Share/documentAccordian';
 import ChangePin from '../screens/ChangePin';
 
 import { PaperProvider } from 'react-native-paper';
@@ -124,16 +123,7 @@ const AppNavigator = ({ initialRouteName }) => {
       component={CommonInvite}
       options={{ headerShown: false }}
     />
-    <Stack.Screen
-      name="DocumentFamily"
-      component={DocumentFamily}
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen
-      name="DocumentMember"
-      component={DocumentMember}
-      options={{ headerShown: false }}
-    />
+  
      <Stack.Screen
       name="ChangePin"
       component={ChangePin}

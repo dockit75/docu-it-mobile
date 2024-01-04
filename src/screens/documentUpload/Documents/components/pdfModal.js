@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Pdf from 'react-native-pdf';
-import { COLORS } from '../../utilities/colors';
-import { MEDIA_API_URL } from '../../services/config';
-import { screenHeight, screenWidth } from '../../utilities/measurement';
+import { COLORS } from '../../../../utilities/colors';
+import { MEDIA_API_URL } from '../../../../services/config';
+import { screenHeight, screenWidth } from '../../../../utilities/measurement';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Modal, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
 
