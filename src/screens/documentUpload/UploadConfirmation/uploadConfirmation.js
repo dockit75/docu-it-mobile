@@ -43,7 +43,6 @@ const UploadConfirmation = ({ navigation, route }) => {
   // hooks
   const dispatch = useDispatch()
   const insets = useSafeAreaInsets();
-  // console.log('categoryInfo *******', categoryInfo)
   // state
   const [isLoading, setIsLoading] = useState(false)
   const [categoryList, setCategoryList] = useState([])
@@ -80,7 +79,6 @@ const UploadConfirmation = ({ navigation, route }) => {
       if (categoryResult.data?.status === 'SUCCESS' && categoryResult.data?.code === 200) {
         setCategoryList(categoryResult.data.response.categoryDetails)
         if (!categoryInfo) {
-          // setCategoryData(categoryResult.data.response.categoryDetails[0])
           let documentName = `${userData.name}_${'Draft'}_Doc_${moment().valueOf()}`
           setDocumentName(documentInfo?.[0]?.documentName?.split('.pdf')[0] ?? documentName)
         }
@@ -104,7 +102,6 @@ const UploadConfirmation = ({ navigation, route }) => {
         "provideAccess": [],
         "familyId": [],
       }
-      // console.log('handleUpdate params-->',  params)
       const udpateResult = await NetworkManager.updateDocument(params)
       console.log('udpateResult',udpateResult)
       if (udpateResult?.data.code === 200 && udpateResult?.data.status === 'SUCCESS') {
@@ -127,41 +124,33 @@ const UploadConfirmation = ({ navigation, route }) => {
 
   const handleSave = async () => {
     setIsLoading(true)
-    // console.log('document=====>',documentInfo, documentInfo?.[0]?.type === 'application/pdf')
     if (documentInfo?.[0]?.type === 'application/pdf') {
       let userData = await retrieveUserDetail()
       let bodyFormData = new FormData()
       let fileObj = { uri: documentInfo[0].documentUrl, name: documentName + '.pdf', type: 'application/pdf' }
       bodyFormData.append('file', fileObj)
       let uploadResult = await NetworkManager.documentUpload(userData.id, bodyFormData)
-      // console.log('handleSave uploadResult-->',  uploadResult)
       if (uploadResult.status === 200) {
         saveDocument(uploadResult.data, fileObj.uri, documentInfo[0].pageCount)
       } else {
-        // console.log(`Failed to upload PDF:`)
       }
     } else {
       const { dirs } = ReactNativeBlobUtil.fs
       let filePath = Platform.OS == 'ios' ? '' : 'file://' + dirs.DownloadDir + '/' + documentName + '.pdf'
-      // console.log('handleSave uploadResult-->',  filePath, documentInfo)
       createPdf({
         pages: documentInfo.map(item => ({ imagePath: item.documentUrl })),
         outputPath: filePath
       })
         .then(async path => {
-          // console.log('handleSave uploadResult-->',  path)
           let uploadFilePath = Platform.OS == 'ios' ? filePath : 'file://' + filePath
           let userData = await retrieveUserDetail()
           let bodyFormData = new FormData()
           let fileObj = { uri: uploadFilePath, name: documentName + '.pdf', type: 'application/pdf' }
           bodyFormData.append('file', fileObj)
-          // console.log('handleSave uploadResult-->',  uploadFilePath)
           let uploadResult = await NetworkManager.documentUpload(userData.id, bodyFormData)
-          // console.log('handleSave uploadResult-->',  uploadResult)
           if (uploadResult.status === 200) {
             saveDocument(uploadResult.data, uploadFilePath, documentInfo.length)
           } else {
-            // console.log(`Failed to upload PDF:`)
           }
         })
         .catch(error => {
@@ -190,9 +179,7 @@ const UploadConfirmation = ({ navigation, route }) => {
         "uploadedBy": userData.id?.toString(),
         "sharedMembers": []
       }
-      console.log('handleSave params-->', params)
       const saveResult = await NetworkManager.saveDocument(params)
-      console.log('handleSave saveResult-->============>>>>>', saveResult?.data)
       if (saveResult?.data.code === 200 && saveResult?.data.status === 'SUCCESS') {
         let profileStatusResult = await NetworkManager.getUserRanking(userData.id)
         if (profileStatusResult?.data.code === 200 && profileStatusResult?.data.status === 'SUCCESS') {
@@ -252,7 +239,6 @@ const UploadConfirmation = ({ navigation, route }) => {
           <View style={{ height: screenHeight * 0.075 }}>
             <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }} style={styles.headerView} onPress={() => navigation.goBack()}>
               <MaterialCommunityIcons name="arrow-u-left-top" size={24} color={COLORS.white} />
-              {/* <Text style={styles.headerViewText}>{UPLOAD_DOCUMENT.back}</Text> */}
             </TouchableOpacity>
           </View>
           <View style={styles.contentView}>
@@ -268,9 +254,6 @@ const UploadConfirmation = ({ navigation, route }) => {
               </View> : null}
               <View>
                 <Text style={{ color: COLORS.white, marginHorizontal: 20, textTransform: 'uppercase', fontWeight: 'bold' }}>{UPLOAD_DOCUMENT.categoryTitle}<Text style={{ color: COLORS.red }}>{' *'}</Text></Text>
-                {/* <ScrollView style={{ marginHorizontal: 20, marginTop: 10, maxHeight: 180 }} contentContainerStyle={{ flexDirection: "row", flexWrap: "wrap" }}>
-                  {categoryList.map((item, index) => (<TouchableOpacity onPress={() => setCategoryData(item)}><Text style={{ opacity: (categoryData?.categoryId === item.categoryId) ? 1 : 0.7, color: (categoryData?.categoryId === item.categoryId) ? COLORS.warnLight : COLORS.transparentWhite, marginHorizontal: 10, padding: 5, borderWidth: 1, borderColor: (categoryData?.categoryId === item.categoryId) ? COLORS.warnLight : COLORS.transparentWhite, borderRadius: 20, paddingHorizontal: 10, marginBottom: 10 }}>{item.categoryName}</Text></TouchableOpacity>))}
-                </ScrollView> */}
                 {(!categoryData && categoryList?.length) ?<Text style={{ marginHorizontal: 20, color: COLORS.red }}>{UPLOAD_DOCUMENT.categorySelectError}</Text> : null}
                 <FlatList
                   data={categoryList}

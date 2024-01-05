@@ -63,7 +63,6 @@ const DocumentAccordian = ({ navigation }) => {
         getUserDetails()
         getFamilyWithMember();
         getDocumentDetails();
-        // console.log('document',document,categoryInfo)
     }, []);
     const getUserDetails = async() => {
         let UserId = await retrieveUserDetail();
@@ -76,9 +75,7 @@ const DocumentAccordian = ({ navigation }) => {
     let UserId = await retrieveUserDetail();
         try {
             let response = await NetworkManager.getFamilyWithMembers(UserId.id);
-            // console.log('getFamilyWithMember================>>>', response)
             let FamilyList = response.data.response.familyListWithMembers;
-            // console.log('FamilyList',FamilyList)
             if (response.data.code === 200) {
                 setFamilyDetail(FamilyList);
                 
@@ -90,10 +87,8 @@ const DocumentAccordian = ({ navigation }) => {
  }
 
  const getDocumentDetails = async () => {
-    // console.log('getDocumentDetails==========>>.><<<<>>><///',document.documentId)
     try {
         let response = await NetworkManager.getDocumentsById(document.documentId ?? Document.id,)
-        // console.log('response==>getDocumentDetails_____))____)_)_)_)))_',(response.data))
         if (response.data.code === 200) {
             let memberIdArray = response.data.response.memberIds
             setAddMembers(memberIdArray)
@@ -123,10 +118,9 @@ const DocumentAccordian = ({ navigation }) => {
         documentName: document.documentName,
         updatedBy: document.uploadedBy ?? Document.updatedBy
     }
-    console.log('params========>>>', params)
+    // console.log('params========>>>', params)
     try {
         let response = await NetworkManager.updateDocument(params)
-        // console.log('handleShareDocument--->>',response)
         if (response.data.code === 200) {
             setIsProcessing(false)
             setIsSnackbarVisible({ message: 'Document shared successfully', visible: true})
@@ -171,7 +165,6 @@ const DocumentAccordian = ({ navigation }) => {
                if (value.includes(`${familyId}`)) {
                 setSelectedFamilyIds(selectedFamilyIds)
                setRevokeMembers((prevRevokeMembers) => [...prevRevokeMembers, ...memberIds])
-            //    setSelectedFamilyIds(familyId)
                }
 
            }else{
@@ -180,11 +173,6 @@ const DocumentAccordian = ({ navigation }) => {
             setSelectedFamilyIds(updatedFamilyIds)
             setAddMembers(updatedMemberIds)
             setRevokeMembers((prevRevokeMembers) => prevRevokeMembers.filter(memberItem => !memberIds.includes(memberItem)))
-            // let updatedFamilyIds = isCheckWholeFamily ? [familyId] : [...selectedFamilyIds, familyId];
-            // let updatedMemberIds = isCheckWholeFamily ? memberIds : [...addMembers, ...memberIds];
-            // setSelectedFamilyIds(updatedFamilyIds);
-            // setAddMembers(updatedMemberIds);
-            // setRevokeMembers((prevRevokeMembers) => prevRevokeMembers.filter(memberItem => !memberIds.includes(memberItem)));
            }
        }else{
         if (addMembers.includes(`${memberId}`)) {
@@ -195,8 +183,6 @@ const DocumentAccordian = ({ navigation }) => {
             }
             if (value.length === 0 && selectedFamilyIds.includes(familyId)) {
                 setSelectedFamilyIds(prev => prev.filter(selectedFamilyId => selectedFamilyId !== familyId));
-                // setRevokeMembers(prev => prev.filter(filterItem => filterItem != memberId))
-
             }
         } else {
             addMembers = [...addMembers, `${memberId}`]
@@ -214,7 +200,6 @@ const DocumentAccordian = ({ navigation }) => {
       
         let membersList = item.membersList.filter(filterItem => filterItem.user.id !== userDetails.id )
         let membersCount = membersList?.length 
-        // console.log('membersList',membersList,addMembers,item.name)
         let isCheckWholeFamily =membersList.length && membersList.every(memberItem => addMembers.includes(memberItem.id))
         const isOpen = openedIndices.includes(index);
         let uncheckBoxColor = membersCount ? COLORS.white : COLORS.lightNeutral
@@ -350,7 +335,6 @@ const styles = StyleSheet.create({
         marginRight: normalize(15),
     },
     header: {
-        // height: normalize(50),
         width: screenWidth - 25,
         marginLeft: 14,
         backgroundColor: 'rgb(212, 215, 219)',
@@ -367,7 +351,6 @@ const styles = StyleSheet.create({
         marginTop: 5,
         borderRadius: 8,
         marginRight: 10,
-        // width: 60,
         padding: 8,
         flexDirection: 'row',
         alignItems: 'center'
@@ -375,7 +358,6 @@ const styles = StyleSheet.create({
     addText: {
         textAlign: 'center',
         color: COLORS.white,
-        // fontSize: 16,
         fontWeight: 'bold',
     },
     input: {
@@ -418,30 +400,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         marginLeft: 15,
-        // textDecorationLine:'underline',
         borderBottomColor: 'white',
         borderBottomWidth: 2
     },
     FlatListContainer: {
-        // height: normalize(50),
         backgroundColor: COLORS.darkTransparent,
         marginTop: 5,
         borderRadius: 8,
         padding: 15,
-        // flexDirection: 'row',
-        // width:'75%',
         marginLeft: 14,
-        // justifyContent: 'space-between',
         width: screenWidth - 25,
     },
     scrollViewContainer : {
-        // height: normalize(50),
         backgroundColor: COLORS.darkTransparent,
         marginTop: 5,
         borderRadius: 8,
         padding: 10,
         flexDirection: 'row',
-        // width:'75%',
         marginRight: 14,
         justifyContent: 'space-between',
         width: screenWidth * 0.865,

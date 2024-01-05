@@ -79,12 +79,7 @@ const UploadedPreview = ({ navigation, route }) => {
   const getPDFDocumentInfo = async () => {
     if (uploadFiles[0]?.fileType === 'application/pdf'){
       setIsDocumentProcessing(true)
-      // let base64 = uploadFiles?.[0]?.base64 ? uploadFiles?.[0]?.base64 :  await convertPdfUrlToBase64(uploadFiles[0].documentUrl)
-      // let pdfDoc = await PDFDocument.load(base64, { ignoreEncryption: true })
-      // pdfDocumentInfo.current  = pdfDoc
       let pageList = Array(uploadFiles[0]?.pageCount).fill(1).map((n, pageIndex) => n = { pageIndex, ...uploadFiles[0], key: `page_${pageIndex}`, fileName: `page_${pageIndex+1}` })
-      // console.log('getPDFDocumentInfo --->', uploadFiles[0].documentUrl)
-      // let pageList = pdfDoc.getPages().map((page, pageIndex) => { return { pageIndex, ...uploadFiles[0], key: `page_${pageIndex}`, fileName: `page_${pageIndex+1}` } })
       setDocumentPageList(pageList)
       setIsDocumentProcessing(false)
     } else {
@@ -140,7 +135,6 @@ const UploadedPreview = ({ navigation, route }) => {
   };
 
   const toggleFullScreen = (imageUri) => {
-    // console.log('toggleFullScreen -->', imageUri)
     if (fullScreenImage === imageUri) { 
       // If the same image is already in full-screen mode, close it
       setFullScreenImage(null);
@@ -168,14 +162,11 @@ const UploadedPreview = ({ navigation, route }) => {
       { text: 'Ok', onPress: async () => {
         try {
           const updatedDocuments = combinedDocuments.filter((doc) => doc.documentUrl !== item.documentUrl);
-          // console.log('deleteItem ----->', updatedDocuments?.length)
-          // setCombinedDocuments(updatedDocuments);
           setDocumentPageList(prev => prev.filter((doc) => doc.documentUrl !== item.documentUrl))
           if (fullScreenImage && fullScreenImage.documentUrl === item.documentUrl) {
             setFullScreenImage(null);
           }
         } catch (error) {
-          // console.error('Error fetching unique id:', error.response);
           setIsSnackbarVisible({ message:error, visible: true})
 
         }
@@ -290,7 +281,6 @@ const UploadedPreview = ({ navigation, route }) => {
             <View style={styles.wrapper}>
               <TouchableOpacity hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }} style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start', paddingHorizontal: 15, paddingBottom: 10 }} onPress={() => navigation.goBack()}>
                 <MaterialCommunityIcons name="arrow-u-left-top" size={24} color={COLORS.white}  />
-                {/* <Text style={{ fontSize: 14, fontWeight: '700', alignItems: 'center', paddingLeft: 10, color: COLORS.white }}>{UPLOAD_DOCUMENT.back}</Text> */}
               </TouchableOpacity>
               {
                 (uploadFiles[0]?.fileType !== 'application/pdf') ? 
@@ -315,7 +305,6 @@ const UploadedPreview = ({ navigation, route }) => {
                     contentContainerStyle={{ paddingBottom: 20 }}
                     numColumns={2}
                     renderItem={renderItems}
-                    // ItemSeparatorComponent={() => <View style={{ width: 10, backgroundColor: 'red', height: 220 }} />}
                   />
               }
               
@@ -482,7 +471,6 @@ const styles = StyleSheet.create({
   groupFab:{
     backgroundColor: COLORS.gray,
     borderRadius: 30
-   // color: COLORS.red
  },
 
  popover: {

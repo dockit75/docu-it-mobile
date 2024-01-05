@@ -29,9 +29,7 @@ const CategoryScreen = ({navigation, route}) => {
     const getCategoryList = async () => {
         try {
             let userData = await retrieveUserDetail()
-            // console.log('CategoryScreen --->', userData.id)
             let categoryResult = await NetworkManager.listCategoriesByUser(userData.id)
-            // console.log('categoryResult --->', categoryResult?.data)
             if(categoryResult.data?.status === 'SUCCESS' && categoryResult.data?.code === 200){
                 setCategoryList(categoryResult.data.response.categoryDetails)
                 setIsLoading(false)
@@ -42,7 +40,6 @@ const CategoryScreen = ({navigation, route}) => {
             setIsLoading(false)
             console.error(error); // You might send an exception to your error tracker
           }
-        // console.log('getCategoryList -->', categoryResult.data)
     }
 
     const handleUploadDocument = async (categoryInfo) => {
@@ -50,7 +47,6 @@ const CategoryScreen = ({navigation, route}) => {
     };
 
     const renderItems = ({item, index}) => {
-        // if (item?.isLoading) return <CategoryItemLoader item={item} />
         return <TouchableOpacity key={item.categoryId} onPress={() => handleUploadDocument(item)}>
             <Card style={styles.cardContainer}>
                 <Image source={Images.ICON_ASSETS} style={styles.viewDocumentImage} resizeMode='center' />
@@ -61,7 +57,6 @@ const CategoryScreen = ({navigation, route}) => {
 
     return (
         <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, flex: 1 }}>
-					{/* <SafeAreaView style={{ flex: 1 }}> */}
 						<DrawerNavigator navigation={navigation}>
 							<FlatList
 								nestedScrollEnabled
@@ -72,7 +67,6 @@ const CategoryScreen = ({navigation, route}) => {
                                     <Fragment>
                                     <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }} onPress={() => navigation.goBack()}>
                                       <MaterialCommunityIcons name='arrow-u-left-top' color={'white'} size={32} />
-                                      {/* <Text style={{ color: 'white', fontSize: 15, marginLeft: 5, fontWeight: 'bold' }}>Back</Text> */}
                                     </TouchableOpacity>
                                         <FlatList
                                             nestedScrollEnabled
@@ -92,7 +86,6 @@ const CategoryScreen = ({navigation, route}) => {
                     <ActivityIndicator size={'large'} color={'#0e9b81'} />
                     <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
                 </Dialog>
-            {/* </SafeAreaView> */}
         </ImageBackground>
     );
   }
