@@ -16,7 +16,6 @@ import {
 import { normalize, screenHeight, screenWidth } from '../../../utilities/measurement';
 import { Images } from '../../../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-// import Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Popover from 'react-native-popover-view';
@@ -85,17 +84,11 @@ const FamilyDocument = ({ navigation }) => {
   };
  
   const cancelModal = () => {
-    // setTimeout(
-    //   () =>
-    //   setIsModalVisible(false),
-    //   500,
-    // );
     setIsModalVisible(false)
     Keyboard.dismiss();
     setCurrentItemId([]);
     setNewFamilyName('');
     setErrorMessage('');
-    // setIsSnackbarVisible(false);
   };
 
 
@@ -236,7 +229,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 30,
-    // textDecorationLine:'underline',
     borderBottomColor: 'white',
     borderBottomWidth: 2
   },
@@ -247,7 +239,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     flexDirection: 'row',
-    // width:'75%',
     marginLeft: 14,
     justifyContent: 'space-between',
     width: screenWidth - 25,

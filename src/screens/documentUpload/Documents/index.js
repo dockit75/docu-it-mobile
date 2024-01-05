@@ -49,10 +49,8 @@ import { setProfileCompletion } from '../../../slices/UserSlices';
 import { useDispatch } from 'react-redux';
 import Popover from 'react-native-popover-view';
 import CustomSnackBar from '../../../components/common/SnackBar';
-// import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 import RNFS from 'react-native-fs';
-// import Share from 'react-native-share';
-// import RNFetchBlob from 'rn-fetch-blob';
+
 
 
 const DocumentScannerScreen = ({ navigation, route }) => {
@@ -96,13 +94,10 @@ const DocumentScannerScreen = ({ navigation, route }) => {
   }, [])
 
   const getUploadedDocumentsList = async (isOpenLatest) => {
-    console.log('getUploadedDocuments=====Called', categoryInfo)
     try {
       let userData = await retrieveUserDetail()
       setUserData(userData)
-      // console.log('setCombinedDocuments', userData.id, categoryInfo.categoryId)
       let categoryResult = await NetworkManager.getUploadedDocumentsByCategoryId(userData.id, categoryInfo.categoryId)
-      // console.log('setCombinedDocuments', categoryResult.data)
       if (categoryResult.data?.status === 'SUCCESS' && categoryResult.data?.code === 200) {
         isOpenLatest && setCombinedDocuments([])
         setCombinedDocuments(categoryResult.data.response.documentDetailsList.map(item => item = { ...item, showOptions: false }))
@@ -231,7 +226,6 @@ const DocumentScannerScreen = ({ navigation, route }) => {
     handleShowOption(item, false)
     let userData = await retrieveUserDetail()
     const docmentFilterList = combinedDocuments.filter((doc) => ((doc.documentUrl ?? doc?.url) !== (item?.documentUrl ?? item.url))).filter(item => item.uploadedBy === userData.id);
-    // Alert.alert(deleteResult.data?.message)
     Alert.alert(
       'Are you want to delete the document?',
       '',
@@ -246,7 +240,6 @@ const DocumentScannerScreen = ({ navigation, route }) => {
             try {
               let deleteResult = await NetworkManager.documentDelete(item.documentId ?? item?.documentId)
               if (deleteResult.data?.status === 'SUCCESS' && deleteResult.data?.code === 200) {
-                // Alert.alert(deleteResult.data?.message)
                 setIsSnackbarVisible({ message: deleteResult.data?.message, visible: true })
                 getUploadedDocumentsList();
                 if (docmentFilterList?.length === 0) {
@@ -266,7 +259,6 @@ const DocumentScannerScreen = ({ navigation, route }) => {
             } catch (error) {
               setIsSnackbarVisible({ message: error?.response?.data.message, visible: true, isFailed: true })
             }
-            // console.log('deleteResult ****** -->', deleteResult)
           }, style: 'destructive'
         }
       ]
@@ -312,14 +304,11 @@ const handlePickDocument = async () => {
     });
 
     const bodyFormData = new FormData();
-    console.log('upload doc --->', docs);
 
     if (docs?.length <= 5) {
       setIsUploading(true);
       let exceedFileSizeList = docs.filter((filterItem) => filterItem.size > maxFileSizeLimit);
-      console.log('exceedFileSizeList---->>>', exceedFileSizeList);
       let docList = docs.filter((filterItem) => filterItem.size < maxFileSizeLimit);
-      console.log('docList---->>>', docList);
 
       let fileList = await Promise.all(
         docList.map(async (item) => {
@@ -349,7 +338,6 @@ const handlePickDocument = async () => {
       fileList = fileList.filter((item) => item !== null);
 
       if (fileList.length === 1) {
-        console.log('fileList========>>>>>>>>', fileList);
         uploadFileList(fileList);
       } else if (fileList.length > 0) {
         fileList.forEach((item, index) => multipleUpload(item, fileList.length - 1 === index, exceedFileSizeList));
@@ -450,13 +438,11 @@ const readFileAsBase64 = async (filePath) => {
   }
 
   const handleShareDocument = async (document) => {
-    // Alert.alert('','working under progress')
     handleShowOption(document, false)
     setTimeout(() => (navigation.navigate('DocumentAccordian', { document: document, categoryInfo: categoryInfo })), 150)
   }
 
   const handleViewDocument = async (document,isMenuPressed) => {
-    console.log('document',document)
     handleShowOption(document, false,isMenuPressed)
     setTimeout(()=>  setIsViewPdf(document),isMenuPressed? 500 : 0)
   }
@@ -465,11 +451,10 @@ const readFileAsBase64 = async (filePath) => {
     handleShowOption(document, false)
     let fileName = document?.documentName?.split('.pdf')[0] ?? document.documentname.split('.pdf')[0]
     let downloadPath =
-      Platform.OS === 'ios'
-        ? ReactNativeBlobUtil.fs.dirs.DocumentDir + '/' + fileName
-        : ReactNativeBlobUtil.fs.dirs.LegacyDownloadDir + '/' + fileName
-    const android = ReactNativeBlobUtil.android;
-    console.log('downloadPath',downloadPath)
+    Platform.OS === 'ios'
+      ? ReactNativeBlobUtil.fs.dirs.DocumentDir + '/' + fileName
+      : ReactNativeBlobUtil.fs.dirs.LegacyDownloadDir + '/' + fileName
+  const android = ReactNativeBlobUtil.android;
     await ReactNativeBlobUtil.config({
       appendExt: 'pdf',
       addAndroidDownloads: {
@@ -485,20 +470,14 @@ const readFileAsBase64 = async (filePath) => {
       .fetch("GET", document?.documentUrl ?? document?.url)
       .then(async (res) => {
         const base64Image = await res.base64();
-        console.log('base64Image',base64Image)
         if (Platform.OS === 'ios') {
-          await RNFS.writeFile(downloadPath, base64Image, 'base64');
-          await RNFS.downloadFile({
-            fromUrl: document.documentUrl, // Replace with the actual URL
-            toFile: downloadPath,
-          }).promise;
+          ReactNativeBlobUtil.ios.previewDocument(path);
         } else {
-          // console.log('base64Image', base64Image, res.base64(), ReactNativeBlobUtil.fs.dirs)
           try {
-            ReactNativeBlobUtil.fs.writeFile(downloadPath, base64Image, 'base64')
-              .then(res => {
-
-              })
+          ReactNativeBlobUtil.fs.writeFile(downloadPath, base64Image, 'base64')
+          .then(res => {
+            
+          })
           } catch (error) {
             console.log('Error:', error);
           } finally {
@@ -518,7 +497,6 @@ const readFileAsBase64 = async (filePath) => {
         ? RNFS.DocumentDirectoryPath + '/' + fileName + '.pdf'
         : RNFS.DownloadDirectoryPath + '/' + fileName + '.pdf';
 
-        console.log('downloadPath',downloadPath)
   
     try {
       const downloadResult = await RNFS.downloadFile({
@@ -556,7 +534,6 @@ const readFileAsBase64 = async (filePath) => {
   }
 
   const handleShowOption = (item, status,isMenuPressed) => {
-    // console.log('handleShowOption', item)
     status ? setListExtraData(prev => prev = [{ ...prev, ...item, showOptions: status }]) : setListExtraData({})
     if(isMenuPressed){
       setCombinedDocuments(prev => prev.map(prevItem => prevItem = { ...prevItem, showOptions: false }))
@@ -568,7 +545,6 @@ const readFileAsBase64 = async (filePath) => {
 
   const handleSelectedName = (document) => {
 
-    console.log('document', document)
     setSelectedName(document.documentName)
     setSelectedDocument(document.documentId)
     setIsModalVisible(true)
@@ -582,7 +558,6 @@ const readFileAsBase64 = async (filePath) => {
   }
 
   const handleSaveName = async () => {
-    console.log('document===>>', selectedDocument, selectedName, categoryInfo)
     setIsModalVisible(false)
     let userData = await retrieveUserDetail()
     try {
@@ -595,11 +570,8 @@ const readFileAsBase64 = async (filePath) => {
         "provideAccess": [],
         "familyId": [],
       }
-      // console.log('handleUpdate params-->',  params)
       const udpateResult = await NetworkManager.updateDocument(params)
-      // console.log('udpateResult------>>>>++++++++++++++++++++',udpateResult)
       if (udpateResult.data.code === 200) {
-        // Alert.alert(udpateResult.data.message)
         setTimeout(() => setIsSnackbarVisible({ message: udpateResult.data?.message, visible: true }), 1000)
         setSelectedDocument(null)
         setSelectedName(null)
@@ -614,14 +586,12 @@ const readFileAsBase64 = async (filePath) => {
 
   }
 
-  console.log('setSelectedName==========>>>', selectedName, prevSelectedName)
 
   const renderItems = useCallback(({ item, index }) => {
 
     // const renderItems = ({ item, index }) => {
 
     let document = item
-    // console.log('document',document)
     if (document?.isLoading) return <DocumentListItemLoader />
     let documentNameInfo = document?.documentName ?? document?.documentname
     let name = documentNameInfo
@@ -641,12 +611,10 @@ const readFileAsBase64 = async (filePath) => {
             trustAllCerts={false}
             source={{ uri: decodeURIComponent(document?.documentUrl ?? document?.url) }}
             onError={(error) => {
-              // console.log(error, document?.documentUrl) 
             }}
             renderActivityIndicator={() => <ActivityIndicator size="large" />}
             style={{ width: '100%', height: '99.5%', borderTopLeftRadius: 5, borderTopRightRadius: 5, padding: 5 }}
             onLoadComplete={(numberOfPages, filePath) => {
-              // console.log(`Number of pages: ${numberOfPages}`, document?.documentUrl)
             }}
           />
         </TouchableOpacity>
@@ -662,7 +630,6 @@ const readFileAsBase64 = async (filePath) => {
           anchor={
             <TouchableOpacity style={{ marginRight: normalize(0), marginTop: normalize(0) }} onPress={() => handleShowOption(document, true)}>
               <MaterialCommunityIcons name="dots-vertical" size={24} color={COLORS.black} />
-              {/* <Text style={{ color: COLORS.black, fontSize: 10 }} >{'More'}</Text> */}
             </TouchableOpacity>
           }
           onRequestClose={() => handleShowOption(document, false)}>
@@ -688,19 +655,14 @@ const readFileAsBase64 = async (filePath) => {
   }, [listExtraData, userData, documentList])
 
   const keyExtractor = useCallback((item, index) => index?.toString() + item?.documentId?.toString(), [])
-  // let documentList = isLoader ? Array(10).fill(1).map((n, i) => n = { "categoryId": 'category_loader'+i,  isLoading: true, "documentUrl": 'category_url_loader'+i }) : combinedDocuments
   let documentList = combinedDocuments
-  // console.log('categpry ---->', fullScreenImage)
   return (
     <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight, flex: 1 }}>
       <DrawerNavigator navigation={navigation}>
         <SafeAreaView style={{ flex: 1 }}>
-          {/* <View style={{ margin: 10 }}> */}
           <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }} onPress={() => navigation.navigate('CategoryScreen')}>
             <MaterialCommunityIcons name='arrow-u-left-top' color={'white'} size={32} />
-            {/* <Text style={{ color: 'white', fontSize: 15, marginLeft: 5, fontWeight: 'bold' }}>Back</Text> */}
           </TouchableOpacity>
-          {/* </View> */}
           {fullScreenImage ? (
             <View style={{ borderWidth: 0.3, position: 'absolute', alignSelf: 'center', height: '100%' }}>
               <View style={styles.fullScreenContainer}>
@@ -708,7 +670,6 @@ const readFileAsBase64 = async (filePath) => {
                   resizeMode="contain"
                   style={[
                     styles.fullScreenImage,
-                    // { transform: [{ rotate: `${rotateDegrees[fullScreenImage] || 0}deg` }] },
                   ]}
                   source={{ uri: fullScreenImage?.documentUrl }}
                 />
@@ -735,23 +696,11 @@ const readFileAsBase64 = async (filePath) => {
                 }
               </View>
               <View style={styles.buttonContainerFullScreen}>
-
-                {/* { (fullScreenImage.documentName?.includes('.jpg')) ? <Fragment>
-                    <TouchableOpacity onPress={() => rotateLeft(fullScreenImage)}>
-                      <Icon name="rotate-left" size={24} color="#050000" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => rotateRight(fullScreenImage)}>
-                      <Icon name="rotate-right" size={24} color="#050000" />
-                    </TouchableOpacity>
-                  </Fragment>
-                  : */}
                 <TouchableOpacity onPress={() => {
-                  // console.log(fullScreenImage)
                 }
                 }>
                   <Icon name="share-alt" size={24} color="#050000" />
                 </TouchableOpacity>
-                {/* } */}
                 <TouchableOpacity onPress={() => toggleFullScreen(fullScreenImage)}>
                   {fullScreenImage === fullScreenImage ? (
                     <Icon name="compress" size={24} color="#79aee7" />
@@ -768,15 +717,6 @@ const readFileAsBase64 = async (filePath) => {
             <ActivityIndicator size={'large'} color={'#0e9b81'} />
             <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Loading...</Text>
           </Dialog>) : (<>
-            {/* <FlatList
-                data={documentList}
-                keyExtractor={keyExtractor}
-                numColumns={2}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ marginTop: 10, paddingBottom: 20 }}
-                renderItem={renderItems}
-                extraData={listExtraData}
-              /> */}
             <FlashList
               numColumns={2}
               data={documentList}
@@ -786,7 +726,6 @@ const readFileAsBase64 = async (filePath) => {
               </View>}
               keyExtractor={keyExtractor}
               renderItem={renderItems}
-              // ItemSeparatorComponent={props => <View style={{ backgroundColor: COLORS.coolLight, height: 2, width: screenWidth }} />}
               estimatedItemSize={200}
             />
             {isViewPdf ? <PdfModal pdfData={isViewPdf} closeModal={setIsViewPdf} /> : null}
@@ -820,39 +759,7 @@ const readFileAsBase64 = async (filePath) => {
             />
           </>)
           }
-          {/* <Popover
-          isVisible={isModalVisible}
-          onRequestClose={() => {
-            // Keyboard.dismiss()
-            setTimeout(() => setIsModalVisible(false), 1000)
-            // setNewFamilyName('');
-            // setCurrentItemId([])
-          }}
-          popoverStyle={styles.popover}>
-             <View style={styles.modalContent}>
-             <Text style={styles.textInputHeader}> Change Document Name </Text>
-             <TextInput
-             numberOfLines={2}
-              // value={selectedName.toString().replace('.pdf', '')}
-              value={selectedName ? selectedName.replace('.pdf', '') : ''}
-              onChangeText={(text) => setSelectedName(text)}
-              style={styles.input}
-            />
-             <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity
-                onPress={cancelModal}
-                style={styles.cancelButton}>
-                <Text style={styles.buttonText}> Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-               onPress={handleSaveName}
-                style={styles.saveButton}>
-                <Text style={styles.buttonText}> Save </Text>
-              </TouchableOpacity>
-            </View>
-            </View>
-          </Popover> */}
-
+          
           <Modal
             animationType={'fade'}
             transparent={true}
@@ -868,7 +775,6 @@ const readFileAsBase64 = async (filePath) => {
                 <TextInput
                   autoFocus
                   numberOfLines={2}
-                  // value={selectedName.toString().replace('.pdf', '')}
                   value={selectedName ? selectedName.replace('.pdf', '') : ''}
                   onChangeText={(text) => text.trim().length ? setSelectedName(text) : setSelectedName('')}
                   style={styles.input}
