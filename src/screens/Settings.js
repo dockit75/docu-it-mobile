@@ -22,7 +22,6 @@ const Settings = ({ navigation }) => {
                                 <Image source={Images.ARROW} style={{ width: 28, height: 28 }} />
                             </TouchableOpacity>
                             <Text style={styles.TextSettings}>Settings</Text>
-                            {/* <View /> */}
                         </View>
                     </View>
                     <Text style={styles.HeaderLine}>General</Text> 

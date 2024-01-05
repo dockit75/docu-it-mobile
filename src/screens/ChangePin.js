@@ -43,10 +43,7 @@ const ChangePin = ({ navigation }) => {
         value,
         setValue
     });
-    // const ref = useBlurOnFulfill({
-    //     value: clearedConfirmedPin,
-    //     cellCount: CELL_COUNT,
-    // });
+  
     const toggleMaskPin = () => setEnableMaskPin(f => !f);
     const toggleMask = () => setEnableMask(f => !f);
     const handlePinChange = (value) => {
@@ -150,7 +147,7 @@ const ChangePin = ({ navigation }) => {
             phone: UserId.phone,
             pinNumber: pin
         }
-        console.log('params', params)
+        // console.log('params', params)
         try {
             let response = await NetworkManager.changePin(params);
             console.log('response==', response)

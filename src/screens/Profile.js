@@ -108,20 +108,14 @@ const Profile = ({ navigation }) => {
               let bodyFormData = new FormData()
               let fileObj = { uri: docs[0].uri , name: docs[0].name , type: docs[0].type }
                 bodyFormData.append('file',fileObj)
-                // console.log('handleSave uploadResult-->',  fileObj)
               let uploadResult =  await NetworkManager.documentUpload(userData.id, bodyFormData)
-              // console.log('handleSave uploadResult-->',  uploadResult.data)
               if(uploadResult.status === 200){
-                // setProfileData(prev => prev = { ...prev, imageUrl: uploadResult.data.documentUrl })
                 handleUpdate(uploadResult.data.documentUrl)
               } else {
                 setIsImageUpload(false)
-                // console.log(`Failed to upload PDF:`)
               }
-            // console.log('docs --->', docs)
         } catch (err) {
           if (DocumentPicker.isCancel(err)) {
-            // console.log('User canceled the upload', err);
           } else {
             setIsImageUpload(false)
             console.error('An error occurred during document picking:', err);
@@ -131,7 +125,6 @@ const Profile = ({ navigation }) => {
   }
 
   const handleUpdate = async (imageUrl) => {
-    // console.log('handleUpdate uploadResult-->',  imageUrl)
     Keyboard.dismiss()
     setIsLoading(true)
     let params = { 
@@ -230,7 +223,6 @@ const Profile = ({ navigation }) => {
                 placeholderTextColor={COLORS.warnLight}
                 value={profileData?.[item.itemKeyName]}
                 style={[{ borderColor: item.isEdit ? COLORS.warnLight :COLORS.gray, borderWidth: normalize(1), borderRadius: normalize(8), marginTop: normalize(8), color: COLORS.black, height: normalize(48), paddingHorizontal: 10 }]}
-                // onChangeText={(value) => setProfileData(prev => prev = { ...prev, [item.id]: value })}
                 onChangeText={(value) => handleInputChange(value, item)}
                 maxLength={51}
               /> 
@@ -241,7 +233,6 @@ const Profile = ({ navigation }) => {
                 placeholderTextColor={COLORS.warnLight}
                 value={profileData?.[item.itemKeyName]}
                 style={[{ borderColor: item.isEdit ? COLORS.warnLight :COLORS.gray, borderWidth: normalize(1), borderRadius: normalize(8), marginTop: normalize(8), color: COLORS.black, height: normalize(48), paddingHorizontal: 10 }]}
-                // onChangeText={(value) => setProfileData(prev => prev = { ...prev, [item.id]: value })}
                 onChangeText={(value) => handleInputChange(value, item)}
               />
             }
@@ -307,20 +298,6 @@ const Profile = ({ navigation }) => {
                           </View>
                         </TouchableOpacity>
                       </View>
-                      {/* <ScrollView
-                        renderItem={mapInputs}
-                        data={PROFILE_SCREEN.fields}
-                        removeClippedSubviews={false}
-                        keyExtractor={(item) => item.id}
-                        CellRendererComponent={({children}) => children}
-                        ListFooterComponent={() => 
-                          <TouchableOpacity style={{ backgroundColor: (buttonEnable) ? '#17826b' : COLORS.gray, alignItems: 'center', alignSelf: 'center', width: 120, height: 40, alignContent: 'center', justifyContent: 'center', marginTop: 30, borderRadius: 20 }} disabled={isLoading || !isValueChange} onPress={() => handleUpdate()}>
-                            <Text style={[styles.done, { color: (buttonEnable) ? COLORS.warnLight : COLORS.backdrop }, !buttonEnable && { opacity: 0.5 }]}>
-                              {'Done'}
-                            </Text>
-                          </TouchableOpacity>
-                        }
-                      /> */}
                       {PROFILE_SCREEN.fields.map((item, index)=>mapInputs({item, index}))}
                       {inputError && <Text style={{ color: 'red' }}>Max length exceeded (50 characters) and Name must contain only alphabets.</Text>}
                       <TouchableOpacity style={{ backgroundColor: (buttonEnable) && isNameValid ? '#17826b' : COLORS.gray, alignItems: 'center', alignSelf: 'center', width: 120, height: 40, alignContent: 'center', justifyContent: 'center', marginTop: 30, borderRadius: 20, flexDirection: 'row' }} disabled={isLoading || !isValueChange} onPress={() => handleUpdate()}>
