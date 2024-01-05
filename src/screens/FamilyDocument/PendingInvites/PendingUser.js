@@ -41,42 +41,16 @@ const PendingUser = ({ navigation }) => {
         let UserId = await retrieveUserDetail();
         try {
             let response = await NetworkManager.listPendingInvites(UserId.id);
-            // console.log('pendingUser ----->>>response', response.data.response);
             if (response.data.code === 200) {
                 setInvitesPending(response.data.response)
                 setIsLoading(false)
             }
         } catch (error) {
-            // console.log('error called===============>>>>')
-            // console.error('Error fetching unique id:', error.response);
+            
         }
 
     }
    
-    const handleInvite = async (item, type) => {
-        let UserId = await retrieveUserDetail();
-        const params = {
-            userId: UserId.id,
-            familyId: item.family.id,
-            inviteStatus: type
-        }
-        // console.log('params',params)
-        try {
-            let response = await NetworkManager.acceptInvite(params)
-            // console.log("response",response)
-            if (response.data.code === 200) {
-                setIsSnackbarVisible({ message: response.data.message, visible: true})
-                setInvitesPending(prevInvites => prevInvites.filter(invite => invite !== item));
-               
-            } else {
-                setIsSnackbarVisible({ message: response.data.message, visible: true})
-            }
-        } catch (error) {
-            // console.error('Error fetching unique id:', error.response);
-            setIsSnackbarVisible({ message: 'Something went Wrong ', visible: true})
-        }
-    }
-
     return (
         <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: '100%' }}>
             <DrawerNavigator>

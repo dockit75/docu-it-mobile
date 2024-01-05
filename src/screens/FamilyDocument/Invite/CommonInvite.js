@@ -51,9 +51,6 @@ const CommonInvite = ({ navigation, props }) => {
 
     useEffect(() => {
         setIsLoader(true)
-        // console.log('familyMember', familyMember)
-        // console.log('contacts====>>>', myContacts)
-        // console.log('newArray', arrayCombined)
         getUser();
         filterContacts();
         setTimeout(() => setIsLoader(false), 2000)
@@ -79,8 +76,6 @@ const CommonInvite = ({ navigation, props }) => {
     const getUser = async () => {
         let UserId = await retrieveUserDetail();
         setUserDetails(UserId);
-        // console.log('userDetails', userDetails)
-        // console.log('familyItem', familyItem)
     }
 
     const uniquePhoneNumbers = new Set();
@@ -115,10 +110,10 @@ const CommonInvite = ({ navigation, props }) => {
             familyId: familyItem.id,
             invitedBy: userDetails.id
         }
-        console.log('handleInviteUser ====== Params', params)
+        // console.log('handleInviteUser ====== Params', params)
         try {
             let response = await NetworkManager.inviteUser(params)
-            console.log('handleInviteUser==>response', response)
+            // console.log('handleInviteUser==>response', response)
             if (response.data.code === 200) {
                 setIsSnackbarVisible({ message: response.data.message, visible: true})
                 setTimeout(() =>  navigation.navigate('FamilyMember',{familyItem:familyItem}),1000)
@@ -131,7 +126,6 @@ const CommonInvite = ({ navigation, props }) => {
         setSelectedItems([]);
 
     }
-    console.log('setIsSnackbarVisible',isSnackbarVisible)
 
     const filterContacts = () => {
         // Extract all phone numbers from arrayCombined
@@ -148,7 +142,6 @@ const CommonInvite = ({ navigation, props }) => {
                 }
                 return contact !== undefined; // Include contacts without phone numbers
             });
-        // console.log('filterd-Contacts---', filtered?.length)
         setFilteredContacts(filtered);
     };
 
@@ -178,7 +171,6 @@ const CommonInvite = ({ navigation, props }) => {
     }
 
     const memoizedRenderChatsHeader = useMemo(renderChatsHeader, [search])
-    // console.log('filteredContacts', isLoader)
     
     return (
         <ImageBackground
@@ -206,11 +198,6 @@ const CommonInvite = ({ navigation, props }) => {
                     {memoizedRenderChatsHeader}
                 </View>
                 {isLoader === true && <Loader isLoading={isLoader} text={'loading'}/> }
-
-                {/* <Dialog overlayStyle={{ width: 120, zIndex: 111 }} isVisible={isLoader} >
-                    <ActivityIndicator size={'large'} color={'#0e9b81'} />
-                    <Text style={{ textAlign: 'center',color:'#0e9b81' }}>Loading...</Text>
-                </Dialog> */}
                 <FlashList
                     data={search?.length ? searchData : filteredContacts.slice().sort((a, b) => a.name.localeCompare(b.name))}
                     extraData={selectedItems}
@@ -218,7 +205,6 @@ const CommonInvite = ({ navigation, props }) => {
                         <Icon name='phone-slash' size={60} color={'white'}/>
                     <Text style={{ color: 'white', fontSize: 20 ,marginTop:10}}>{FAMILY_LIST_EMPTY.contactEmpty}</Text>
                   </View>}
-                    // ListHeaderComponent={memoizedRenderChatsHeader}
                     renderItem={({ item, index }) => (
                         <View style={styles.FlatListContainer}>
                             <View style={{ flexDirection: 'row',  flex: 0.9 }}>
@@ -298,9 +284,7 @@ const styles = StyleSheet.create({
     },
     addTouchable: {
         backgroundColor: COLORS.darkTransparent,
-        // marginTop: 5,
         borderRadius: 8,
-        // marginRight: 20,
         width: 80,
         padding: 5,
     },
@@ -329,13 +313,11 @@ const styles = StyleSheet.create({
         borderRadius: 25 
     },
     messageSearchBarContainer: {
-        // paddingLeft: normalize(16),
         height: normalizeVertical(30),
         alignItems: 'center',
         flexDirection: 'row',
         marginVertical: normalize(12),
         marginLeft: 6,
-        // width: screenWidth - 20
     },
     messageSearchBar: {
       fontSize: 16,

@@ -20,7 +20,6 @@ import {
 } from '../../../../utilities/measurement';
 import { Images } from '../../assets/images/images';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-// import Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Popover from 'react-native-popover-view';
@@ -59,7 +58,6 @@ const FamilyModal = ({ isVisible, editCall,userId, currentId, cancelModal,getFam
 
 
   const editFamilyName = async () => {
-    console.log('editFamilyName==called')
     setIsModalVisible(null)
     setIsLoading(true);
     try {
@@ -117,9 +115,7 @@ const FamilyModal = ({ isVisible, editCall,userId, currentId, cancelModal,getFam
     );
   };
 
-  console.log('isloading False')
   const handleSaveFamily = async () => {
-    console.log('saveFamily--called')
    setIsModalVisible(null)
     setIsLoading(true);
     setEditFamilyCall(false);
@@ -244,7 +240,6 @@ const FamilyModal = ({ isVisible, editCall,userId, currentId, cancelModal,getFam
                 <Text style={styles.buttonText}> Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                // onPress={isNameValid ? (editFamilyCall && currentItemId.name !==  currentItemId.name ? editFamilyName : handleSaveFamily) : null}
                 onPress={
                   isNameValid &&
                     ((!editFamilyCall && newFamilyName?.length) ||
@@ -281,14 +276,7 @@ const FamilyModal = ({ isVisible, editCall,userId, currentId, cancelModal,getFam
             roundness={10}
             duration={isSnackbarVisible.isFailed ? 3000 : 2000}
           />
-
-      {/* <Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
-        <ActivityIndicator size={'large'} color={'#0e9b81'} />
-        <Text style={{ textAlign: 'center', color: '#0e9b81' }}>Processing...</Text>
-      </Dialog> */}
-     
      {isLoading && <Loader isLoading={isLoading} text={'Processing'}/>}
-   
     </View>
   );
 };
@@ -317,7 +305,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     borderRadius: 25,
     marginRight: 20,
-    // width: 60,
     padding: 5,
   },
   addText: {

@@ -25,7 +25,6 @@ import FamilyModal from './FamilyModal';
 import { useNavigation } from '@react-navigation/native';
 
 const FamilyFlatlist = ({ familyData, userId, getFamilyList ,editCall,currentId}) => {
-   console.log('familyFlatList called=====>>>>',familyData)
     const insets = useSafeAreaInsets();
     const navigation = useNavigation();
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -36,11 +35,9 @@ const FamilyFlatlist = ({ familyData, userId, getFamilyList ,editCall,currentId}
     const [isLoader, setIsLoader] = useState(true);
     const [previousCurrentItemId, SetPreviousCurrentItemId] = useState([])
     const [isSnackbarVisible, setIsSnackbarVisible] = useState(false)
-    // console.log('navigation====>>', props, familyDetails,)
 
     useEffect(() => {
         console.log('useEffect called familyFlatlist');
-        // setIsModalVisible(isVisible.isModalVisible);
         setFamilyDetail(familyData);
     }, [familyData]); 
     const showModal = (item) => {
@@ -52,15 +49,10 @@ const FamilyFlatlist = ({ familyData, userId, getFamilyList ,editCall,currentId}
     };
 
     const cancelModal = () => {
-        // setTimeout(
-        //   () =>
-        //   setIsModalVisible(false),
-        //   500,
-        // );
+       
         setIsModalVisible(false)
         Keyboard.dismiss();
         setCurrentItemId([]);
-        // setIsSnackbarVisible(false);
       };
     
 
@@ -84,7 +76,6 @@ const FamilyFlatlist = ({ familyData, userId, getFamilyList ,editCall,currentId}
                         try {
                             let response = await NetworkManager.deleteFamily(params);
                             if (response.data.code === 200) {
-                                // Alert.alert(response.data.message)
                                 setTimeout(() => setIsSnackbarVisible({ message: response.data.message, visible: true }), 1000)
                                 const updatedFamilyDetails = familyDetails.filter((family) => family.id !== item.id);
                                 setFamilyDetail(updatedFamilyDetails);
@@ -241,7 +232,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginLeft: 30,
-        // textDecorationLine:'underline',
         borderBottomColor: 'white',
         borderBottomWidth: 2
 

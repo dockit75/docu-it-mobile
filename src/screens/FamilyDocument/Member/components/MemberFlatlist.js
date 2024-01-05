@@ -33,7 +33,6 @@ import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
 
 
 const MemberFlatlist =(props) => {
-    console.log('props,',props)
     const route = useRoute();
     const [familyItem, setFamilyItem] = useState(props.familyItem);
     const [myContacts, setMyContacts] = useState([]);
@@ -52,31 +51,10 @@ const MemberFlatlist =(props) => {
 
 
     useEffect(() => {
-        // const unsubscribe = navigation.addListener('focus', async () => {
             getUser();
             setArrayCombined(props.arrayCombined)
-            //  console.log('familyItem',familyItem)
-        // });
-        // return unsubscribe;
     }, [props.arrayCombined]);
-
-    // useEffect(() => {
-    //     // Add a check to ensure myContacts is not empty and myContactsUpdated is set to true
-    //     getUpdateMemberList();
-    // }, [myContacts, familyMember, myContactsUpdated]);
-
-    // const getUpdateMemberList = async () => {
-    //     let userData = await retrieveUserDetail()
-
-    //     if (myContacts.length > 0 && myContactsUpdated) {
-    //         const updatedExternalInvite = mapPhoneNumbersToDisplayNames(myContacts);
-    //         let updatedCombinedArray = userData.id === familyItem.createdBy ? [...familyMember, ...updatedExternalInvite] : familyMember.filter(filterItem => filterItem.inviteStatus === "Accepted");
-    //         setArrayCombined(updatedCombinedArray);
-    //     }
-    // }
-console.log('arrayCombined',arrayCombined)
-
-   
+ 
     const getUser = async () => {
         let UserId = await retrieveUserDetail();
         setUserDetails(UserId);
@@ -90,7 +68,6 @@ console.log('arrayCombined',arrayCombined)
             familyId: familyItem.id,
             invitedBy: userDetails.id
         }
-        // console.log('handleInviteUser ====== Params', params)
         try {
             let response = await NetworkManager.inviteUser(params)
             if (response.data.code === 200) {
@@ -243,7 +220,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'white',
         fontWeight: 'bold',
-        // textTransform: 'uppercase',
         marginLeft: 30
     },
     memberText: {
@@ -256,7 +232,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '500',
         color: 'black',
-        // marginRight: 30,
     },
     listEmptyComponent: {
         alignItems: 'center',

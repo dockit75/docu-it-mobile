@@ -34,10 +34,8 @@ const PendingFlatlist = (props) => {
             familyId: item.family.id,
             inviteStatus: type
         }
-        // console.log('params',params)
         try {
             let response = await NetworkManager.acceptInvite(params)
-            // console.log("response",response)
             if (response.data.code === 200) {
                 setIsSnackbarVisible({ message: response.data.message, visible: true})
                 setInvitesPending(prevInvites => prevInvites.filter(invite => invite !== item));
@@ -46,7 +44,6 @@ const PendingFlatlist = (props) => {
                 setIsSnackbarVisible({ message: response.data.message, visible: true})
             }
         } catch (error) {
-            // console.error('Error fetching unique id:', error.response);
             setIsSnackbarVisible({ message: 'Something went Wrong ', visible: true})
         }
     }
@@ -108,9 +105,7 @@ const styles = StyleSheet.create({
         marginTop: 5,
         borderRadius: 8,
         padding: 15,
-        // flexDirection: 'row',
         marginLeft: 14,
-        // justifyContent: 'space-between',
         width: screenWidth - 25,
     },
     iconTouchable: {

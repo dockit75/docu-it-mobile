@@ -57,7 +57,6 @@ const FamilyMember = ({ navigation, props }) => {
   const checkContactPermission = async () => {
     if(Platform.OS === 'ios'){
       let status = await check(PERMISSIONS.IOS.CONTACTS);
-      console.log('status,',status)
       if(status === RESULTS.GRANTED){
        loadContacts();
       }else if(status === RESULTS.DENIED){
@@ -83,10 +82,8 @@ const FamilyMember = ({ navigation, props }) => {
         }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        // console.log('Contacts permission granted');
         loadContacts();
       }else {
-        // console.log('Contacts permission denied');
         setIsSnackbarVisible({ message:'Permission to access contacts was denied. You can update it in your device settings.', visible: true})
       }
     } catch (err) {
@@ -96,15 +93,12 @@ const FamilyMember = ({ navigation, props }) => {
   };
 
   useEffect(() => {
-    // console.log('useEffect called...')
     const unsubscribe = navigation.addListener('focus', async () => {
       setFamilyItem(NewItem);
       getUser();
       checkContactPermission();
       listFamilyMembers(NewItem);
-    //  console.log('familyItem',familyItem)
     });
-    // console.log('myContacts===>', myContacts);
 
     return unsubscribe;
   }, [myContacts]);
@@ -154,7 +148,6 @@ const FamilyMember = ({ navigation, props }) => {
         }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        // console.log('arrayCombined ******', arrayCombined)
         isPressedAdd ?  navigation.navigate('CommonInvite', { familyItem: familyItem, familyMember: familyMember,arrayCombined : arrayCombined,myContacts:myContacts }) : loadContacts();
       }else {
         setIsSnackbarVisible({ message:'Permission to access contacts was denied. You can update it in your device settings.', visible: true})
@@ -169,19 +162,6 @@ const FamilyMember = ({ navigation, props }) => {
   const loadContacts = () => {
     Contacts.getAll()
       .then((contacts) => {
-        // contacts.filter(filterItem => filterItem)
-        // .sort(
-        //   (a, b) =>
-        //     a.givenName?.toLowerCase() > b.givenName?.toLowerCase(),)
-        //     let contactList = contacts.map(contact =>{
-        //               if (contact.phoneNumbers.length > 0) {
-        //                     return {
-        //                       name : contact.givenName,
-        //                       phoneNumber : contact.phoneNumbers[0].number.replace(/\D/g, '')
-        //                     }
-        //               }
-        //             })
-        
         const processedContacts = processAddressBookContacts(contacts)
         setMyContacts((prevContacts) => [...prevContacts, ...processedContacts]);
         setMyContactsUpdated(true);
@@ -204,12 +184,10 @@ const FamilyMember = ({ navigation, props }) => {
     const phoneToDisplayNameMap = {};
     myContacts.forEach((contact) => {
       if (contact?.name?.length > 0) {
-        // Normalize the phone number to match the format in externalInvite
         const normalizedPhoneNumber = contact.phoneNumber?.length > 10 ? contact.phoneNumber.substr(contact.phoneNumber.length - 10, contact.phoneNumber.length) : contact?.phoneNumber ?? '';
         phoneToDisplayNameMap[normalizedPhoneNumber] = contact.name; 
       }
     });
-    // Map display names from myContacts to externalInvites based on common phone numbers
     const updatedExternalInvites = newExterNalInvites.map((phone) => ({
       displayName: phoneToDisplayNameMap[phone] || phone ,
       phone: phone,
@@ -221,7 +199,6 @@ const FamilyMember = ({ navigation, props }) => {
   const listFamilyMembers = async (family) => {
     try {
 
-      // setIsLoader(true)
       let userData = await retrieveUserDetail()
       let response = await NetworkManager.listFamilyMembers(family.id)
         if (response.data.code === 200) {
@@ -230,7 +207,6 @@ const FamilyMember = ({ navigation, props }) => {
           setNewExternalInvites(externalInvite)
           const updatedExternalInvite = mapPhoneNumbersToDisplayNames(externalInvite);
           let updatedCombinedArray = userData.id === familyItem.createdBy ? [...memberList, ...updatedExternalInvite] :  memberList.filter(filterItem => filterItem.inviteStatus ===  "Accepted") ;
-          // console.log('memberList',updatedCombinedArray,memberList,familyItem.id,userData.id)
           setArrayCombined( updatedCombinedArray)
           setFamilyMember(memberList)
           setIsLoader(false)
@@ -320,13 +296,11 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   FlatListContainer: {
-    // height: normalize(50),
     backgroundColor: COLORS.darkTransparent,
     marginTop: 5,
     borderRadius: 8,
     padding: 10,
     flexDirection: 'row',
-    // width:'75%',
     marginLeft: 12,
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -348,7 +322,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'white',
     fontWeight: 'bold',
-    // textTransform: 'uppercase',
     marginLeft:30
   },
   memberText:{
@@ -361,7 +334,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '500',
     color: 'black',
-    // marginRight: 30,
   },
   listEmptyComponent:{ 
     alignItems: 'center', 
