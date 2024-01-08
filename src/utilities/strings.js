@@ -51,7 +51,9 @@ export const PROFILE_SCREEN = {
     {id: 'gender', type: 'text', placeHolder: 'enter the gender', itemKeyName: 'gender', isEdit: true},
     {id: 'email', type: 'text', placeHolder: 'enter the email', itemKeyName: 'email', isEdit: false},
     {id: 'phone', type: 'text', placeHolder: 'enter the phone', itemKeyName: 'phone', isEdit: false},
-  ]
+  ],
+  sureDeleteAccount: 'Are you sure want to delete your account?',
+  deleteMyAccount: 'Yes, Delete My Account',
 }
 
 export const APP_BUTTON_NAMES = {
@@ -60,7 +62,9 @@ export const APP_BUTTON_NAMES = {
   update: 'Update',
   submit: 'SUBMIT',
   done: 'Done',
-  start: 'Start'
+  start: 'Start',
+  deleteAccount: 'Delete Account',
+  cancel: 'Cancel'
 }
 
 export const FAMILY_LIST_EMPTY = {

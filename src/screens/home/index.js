@@ -1,11 +1,11 @@
 import React ,{useEffect, useRef}from 'react'
-import { ScrollView, StyleSheet,ImageBackground, Text, View, Image, TouchableOpacity } from 'react-native'
+import { ScrollView, StyleSheet,ImageBackground, Text, View, Image, TouchableOpacity ,SafeAreaView} from 'react-native'
 import { Card, Title, Paragraph, Button } from 'react-native-paper'
 import { normalize, screenWidth,screenHeight } from '../../utilities/measurement'
 import { COLORS } from '../../utilities/colors'
 import { Images } from '../../assets/images/images'
 import Dashboard from '../Dashboard'
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {  useSafeAreaInsets } from 'react-native-safe-area-context';
 import DrawerNavigator from '../../components/common/DrawerNavigator'
 import Tile from './components/Tile'
 import RecentActivity from './components/RecentActivity'

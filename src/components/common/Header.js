@@ -1,6 +1,6 @@
 import { HEADER, TOUR_GUIDE } from '../../utilities/strings';
 import React, { useState, useRef, Fragment, useEffect, useMemo } from 'react';
-import { Text, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { Text, View, TouchableOpacity, Image, StyleSheet, Platform } from 'react-native';
 import { normalize, screenWidth } from '../../utilities/measurement';
 import { Images } from '../../assets/images/images';
 import Drawer from 'react-native-drawer';
@@ -168,7 +168,7 @@ const Header = props => {
           justifyContent: 'space-between',
           borderColor: 'black',
           borderBottomWidth: 1,
-          marginTop: normalize(insets.top),
+          marginTop: 40,
           paddingHorizontal: 10,
           paddingBottom: 10
           //   backgroundColor: 'green',

@@ -58,6 +58,7 @@ const CategoryScreen = ({navigation, route}) => {
     return (
         <ImageBackground source={Images.REGISTRATION} resizeMode='cover' style={{ width: screenWidth, height: screenHeight + insets.top, flex: 1 }}>
 						<DrawerNavigator navigation={navigation}>
+                            <View style={{flex:1}}>
 							<FlatList
 								nestedScrollEnabled
                                 scrollEnabled={!isLoading}
@@ -80,6 +81,7 @@ const CategoryScreen = ({navigation, route}) => {
                                     </Fragment>
 								}
 							/>
+                            </View>
             </DrawerNavigator>
 
                 <Dialog overlayStyle={{ width: 120 }} isVisible={isLoading} >
