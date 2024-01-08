@@ -24,10 +24,10 @@ const Home = ({navigation,props}) => {
         resizeMode="cover"
         style={{ width: screenWidth, height: '100%' }}>
           <DrawerNavigator navigation={navigation}>
-            <SafeAreaView style={{flex:1,alignItems:'center',flexDirection:'column',justifyContent:'space-between'}}>
+            <View style={{flex:1,alignItems:'center',flexDirection:'column',justifyContent:'space-between'}}>
             <Tile/>
             <RecentActivity/>
-            </SafeAreaView>
+            </View>
           </DrawerNavigator>    
       </ImageBackground>
             

@@ -16,11 +16,15 @@ import {
 } from '../../utilities/measurement';
 import {COLORS} from '../../utilities/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import UserAvatar from 'react-native-user-avatar';
 import {useDispatch} from 'react-redux';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {clearStorage, retrieveUserSession, storeUserDetail, storeUserSession} from '../../storageManager';
 import {useNavigation} from '@react-navigation/native';
+import { clearUser } from '../../slices/UserSlices';
+import { APP_BUTTON_NAMES, PROFILE_SCREEN } from '../../utilities/strings';
+import BottomViewModal from './../BottomViewModal';
 
 const drawerOptions = [
   {name: 'Edit Profile', path: 'Profile', icon: 'person'},
@@ -34,6 +38,7 @@ const DrawerContent = ({route, drawerRef}) => {
   const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [userData, setUserData] = useState(null);
+  const [deleteAccountModal, setDeleteAccountModal] = useState(false)
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -71,6 +76,7 @@ const DrawerContent = ({route, drawerRef}) => {
       await storeUserSession({ ...userData, isAuthenticated: false})
       await storeUserDetail({ ...userData, isAuthenticated: false })
       navigation.navigate('LockScreen', {signInParam: false});
+      dispatch(clearUser())
       // clearStorage();
     } catch (error) {
       console.error('Error in handleNavigation:', error);
@@ -100,6 +106,9 @@ const DrawerContent = ({route, drawerRef}) => {
     </>
   }
  
+  const handleDelete = () => {
+    setDeleteAccountModal(!deleteAccountModal)
+  }
   return (
     <View style={{
       backgroundColor: '#0e9b81', padding: 20, height: '100%',  paddingTop: insets.top// Adjust the z-index to be above other components
@@ -150,6 +159,20 @@ const DrawerContent = ({route, drawerRef}) => {
           <Text style={styles.menuTextLogout}>Log out</Text>
         </TouchableOpacity>
       </View>
+      <View style={[styles.viewContainer, { marginTop: 20 }]}>
+        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'flex-start', padding: 13, borderRadius: 20, flexDirection: 'row', paddingLeft: 20}}  onPress={() => setDeleteAccountModal(!deleteAccountModal)}>
+          <Icon name='trash-outline' color={'red'} size={22} />
+          <Text style={[styles.menuTextLogout]}>{APP_BUTTON_NAMES.deleteAccount}</Text>
+        </TouchableOpacity>
+      </View>
+      <BottomViewModal
+        visible={deleteAccountModal}
+        modalHeader={PROFILE_SCREEN.sureDeleteAccount}
+        title={PROFILE_SCREEN.deleteMyAccount}
+        onPress={() => handleDelete()}
+        cancelTitle={APP_BUTTON_NAMES.cancel}
+        cancelPress={() => setDeleteAccountModal(!deleteAccountModal)}
+      />
     </View>
   );
 };
