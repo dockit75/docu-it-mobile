@@ -783,7 +783,7 @@ const readFileAsBase64 = async (filePath) => {
                   <TouchableOpacity
                     onPress={cancelModal}
                     style={styles.cancelButton}>
-                    <Text style={styles.buttonText}> Cancel</Text>{console.log('name text -->', selectedName)}
+                    <Text style={styles.buttonText}> Cancel</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={selectedName?.length && (selectedName && selectedName.replace('.pdf', '')) != (prevSelectedName && prevSelectedName.replace('.pdf', '')) ? handleSaveName : null}

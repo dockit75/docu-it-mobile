@@ -20,7 +20,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import UserAvatar from 'react-native-user-avatar';
 import {useDispatch} from 'react-redux';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {clearStorage, retrieveUserSession, storeUserDetail, storeUserSession} from '../../storageManager';
+import {clearStorage, retrieveUserSession, storeUserDetail, storeUserSession,retrieveUserDetail} from '../../storageManager';
 import {useNavigation} from '@react-navigation/native';
 import { clearUser } from '../../slices/UserSlices';
 import { APP_BUTTON_NAMES, PROFILE_SCREEN } from '../../utilities/strings';
@@ -106,7 +106,9 @@ const DrawerContent = ({route, drawerRef}) => {
     </>
   }
  
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    let userDetails = await retrieveUserDetail();
+    console.log('userDetails',userDetails.id)
     setDeleteAccountModal(!deleteAccountModal)
   }
   return (

@@ -58,7 +58,6 @@ const Header = props => {
   };
 
   useEffect(() => {
-    console.log('useEffect one called')
    
     setInterval(() => { checkTourStatus() }, 1000);
   }, []);

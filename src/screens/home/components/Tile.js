@@ -416,6 +416,12 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: COLORS.white
     },
+    modalContent: {
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderColor: COLORS.avatarBackground,
+        height: screenHeight * 0.5
+      },
 });
 
 
